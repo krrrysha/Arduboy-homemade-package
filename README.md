@@ -7,37 +7,37 @@ To change the screen type, please edit Arduboy2Core.h (default value is "#define
 ## Pin wiring table
 
 | Arduboy function | Some NANO <BR> Arduboy Clone  | Arduboy <BR>Leonardo/Micro |   DevelopmentKit    | ProMicro 5V <br>(standard wiring) | ProMicro 5V <br>(alternate wiring) |
-| ---------------- | -------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
-| OLED CS          |12 PORTD6^      | 12 PORTD6              |  6 PORTD7   |    GND/(inverted CART_CS)****      |  1/TXO PORTD3*                    |
-| OLED DC          | 4 PORTD4^      |  4 PORTD4              |  4 PORTD4   |  4 PORTD4                          |  4 PORTD4                         |
-| OLED RST         | 6 PORTD7^      |  6 PORTD7              | 12 PORTD6   |  6 PORTD7                          |  2 PORTD1*                        |
-| SPI SCK          |15 PORTC1^      | 15 PORTB1              | 15 PORTB1   | 15 PORTB                   1       | 15 PORTB1                         |
-| SPI MOSI         |17 PORTC3^      | 16 PORTB2              | 16 PORTB2   | 16 PORTB2                          | 16 PORTB2                         |
-| RGB LED RED      |16 PORTC2^      | 10 PORTB6              |    _        | 10 PORTB6                          | 10 PORTB6                         |
-| RGB LED GREEN    |   _            | 11 PORTB7              |    _        |    -                               |  3 PORTD0*                        | 
-| RGB LED BLUE     |   _            |  9 PORTB5              | 17 PORTB0   |  9 PORTB5                          |  9 PORTB5                         |
-| RxLED            |   _            | 17 PORTB0              |    _        | 17 PORTB0                          | 17 PORTB0                         | 
-| TxLED            |   _            | 30 PORTD5              |    _        | 30 PORTD5                          | 30 PORTD5                         | 
-| BUTTON UP        | 3 PORTD3       | A0 PORTF7              |  8 PORTB4   | A0 PORTF7                          | A0 PORTF7                         |
-| BUTTON RIGHT     | 6 PORTD6       | A1 PORTF6              |  5 PORTC6   | A1 PORTF6                          | A1 PORTF6                         |
-| BUTTON LEFT      | 2 PORTD2       | A2 PORTF5              |  9 PORTB5   | A2 PORTF5                          | A2 PORTF5                         |
-| BUTTON DOWN      | 5 PORTD5       | A3 PORTF4              | 10 PORTB6   | A3 PORTF4                          | A3 PORTF4                         |
-| BUTTON A (left)  | 4 PORTD4       |  7 PORTE6              | A0 PORTF7   |  7 PORTE6                          |  7 PORTE6                         |
-| BUTTON B (right) | 7 PORTD7       |  8 PORTB4              | A1 PORTF6   |  8 PORTB4                          |  8 PORTB4                         |
-| SPEAKER PIN 1    | 9 PORTB1       |  5 PORTC6              | A2 PORTF5   |  5 PORTC6                          |  5 PORTC6                         |
-| SPEAKER PIN 2    |11 PORTB3^      | 13 PORTC7              | A3 PORTF4** |    GND                             |  6 PORTD7*                        |
-|----------------- | -------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
-| CART_CS (org)    |    -           |  0 PORTD2***           |    -        |    0 PORTD2***                     |  0 PORTD2***                      | 
-| CART_CS (new)    |    -           |  2 PORTD1***           |    -        |    2 PORTD1***                     |  -                                | 
-| SPI MISO         |    -           | 14 PORTB3***           |    -        |    -                               | 14 PORTB3***                      | 
-|----------------- | -------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
-| OLED SDA         |18 PORTC4       |  4 PORTD4*****         |    -        |  4 PORTD4*****                     |  4 PORTD4*****                    |
-| OLED SCL         |19 PORTC5       |  6 PORTD7*****         |    -        |  6 PORTD7*****                     |  1/TXO PORTD3*****                |
-|----------------- | -------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
-|non-standard keys:|		        |                        |             |                                    |                                   |
-|----------------- | -------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
-| BUTTON C(up-left)|11^^            |    -                   |    -        |    -                               |    -                              |
-| BUTTON D(up-left)|12^^            |    -                   |    -        |    -                               |    -                              |
+| ---------------- | --------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
+| OLED CS          |12 PORTD6^       | 12 PORTD6              |  6 PORTD7   |    GND/(inverted CART_CS)****      |  1/TXO PORTD3*                    |
+| OLED DC          | 4 PORTD4^       |  4 PORTD4              |  4 PORTD4   |  4 PORTD4                          |  4 PORTD4                         |
+| OLED RST         | 6 PORTD7^       |  6 PORTD7              | 12 PORTD6   |  6 PORTD7                          |  2 PORTD1*                        |
+| SPI SCK          |15 PORTC1^       | 15 PORTB1              | 15 PORTB1   | 15 PORTB                   1       | 15 PORTB1                         |
+| SPI MOSI         |17 PORTC3^       | 16 PORTB2              | 16 PORTB2   | 16 PORTB2                          | 16 PORTB2                         |
+| RGB LED RED      |16 PORTC2^       | 10 PORTB6              |    _        | 10 PORTB6                          | 10 PORTB6                         |
+| RGB LED GREEN    |   _             | 11 PORTB7              |    _        |    -                               |  3 PORTD0*                        | 
+| RGB LED BLUE     |   _             |  9 PORTB5              | 17 PORTB0   |  9 PORTB5                          |  9 PORTB5                         |
+| RxLED            |   _             | 17 PORTB0              |    _        | 17 PORTB0                          | 17 PORTB0                         | 
+| TxLED            |   _             | 30 PORTD5              |    _        | 30 PORTD5                          | 30 PORTD5                         | 
+| BUTTON UP        | 3 PORTD3        | A0 PORTF7              |  8 PORTB4   | A0 PORTF7                          | A0 PORTF7                         |
+| BUTTON RIGHT     | 6 PORTD6        | A1 PORTF6              |  5 PORTC6   | A1 PORTF6                          | A1 PORTF6                         |
+| BUTTON LEFT      | 2 PORTD2        | A2 PORTF5              |  9 PORTB5   | A2 PORTF5                          | A2 PORTF5                         |
+| BUTTON DOWN      | 5 PORTD5        | A3 PORTF4              | 10 PORTB6   | A3 PORTF4                          | A3 PORTF4                         |
+| BUTTON A (left)  | 4 PORTD4        |  7 PORTE6              | A0 PORTF7   |  7 PORTE6                          |  7 PORTE6                         |
+| BUTTON B (right) | 7 PORTD7        |  8 PORTB4              | A1 PORTF6   |  8 PORTB4                          |  8 PORTB4                         |
+| SPEAKER PIN 1    | 9 PORTB1        |  5 PORTC6              | A2 PORTF5   |  5 PORTC6                          |  5 PORTC6                         |
+| SPEAKER PIN 2    |11 PORTB3^       | 13 PORTC7              | A3 PORTF4** |    GND                             |  6 PORTD7*                        |
+|----------------- | --------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
+| CART_CS (org)    |    -            |  0 PORTD2***           |    -        |    0 PORTD2***                     |  0 PORTD2***                      | 
+| CART_CS (new)    |    -            |  2 PORTD1***           |    -        |    2 PORTD1***                     |  -                                | 
+| SPI MISO         |    -            | 14 PORTB3***           |    -        |    -                               | 14 PORTB3***                      | 
+|----------------- | --------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
+| OLED SDA         |18 PORTC4        |  4 PORTD4*****         |    -        |  4 PORTD4*****                     |  4 PORTD4*****                    |
+| OLED SCL         |19 PORTC5        |  6 PORTD7*****         |    -        |  6 PORTD7*****                     |  1/TXO PORTD3*****                |
+|----------------- | --------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
+|non-standard keys:|		         |                        |             |                                    |                                   |
+|----------------- | --------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
+| BUTTON C(up-left)|11^^             |    -                   |    -        |    -                               |    -                              |
+| BUTTON D(up-left)|12^^             |    -                   |    -        |    -                               |    -                              |
 
 Numbers before the portnames are Arduino assigned pin numbers.
 
