@@ -61,6 +61,7 @@ void Arduboy2Base::beginDoFirst()
 
 void Arduboy2Base::flashlight()
 {
+#ifndef ECONSOLE 
   if (!pressed(UP_BUTTON)) {
     return;
   }
@@ -81,6 +82,7 @@ void Arduboy2Base::flashlight()
   while (true) {
     idle();
   }
+#endif
 }
 
 void Arduboy2Base::systemButtons()
@@ -306,6 +308,7 @@ bool Arduboy2Base::nextFrame()
   return true;
 }
 
+#ifndef ECONSOLE
 bool Arduboy2Base::nextFrameDEV()
 {
   bool ret = nextFrame();
@@ -318,6 +321,7 @@ bool Arduboy2Base::nextFrameDEV()
   }
   return ret;
 }
+#endif
 
 int Arduboy2Base::cpuLoad()
 {

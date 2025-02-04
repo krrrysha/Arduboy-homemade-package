@@ -41,6 +41,10 @@ THE SOFTWARE.
 
 #include <Arduino.h>
 
+#ifdef __AVR_ATmega328P__
+#warning ECONSOLE!
+#define ECONSOLE
+#endif
 // ************************************************************
 // ***** Values to use as function parameters in sketches *****
 // ************************************************************
@@ -119,6 +123,20 @@ THE SOFTWARE.
 // the tone() function.
 #define MAX_TONES 3
 
+#ifdef ECONSOLE
+// ECONSOLE speaker pin 1 = Arduino pin 9 = ATmega328 PB1
+#define TONE_PIN_PIN PINB
+#define TONE_PIN_PORT PORTB
+#define TONE_PIN_DDR DDRB
+#define TONE_PIN PORTB1
+#define TONE_PIN_MASK _BV(TONE_PIN)
+// ECONSOLE speaker pin 2 = Arduino pin 11 = ATmega328 PB3
+#define TONE_PIN2_PIN PINB
+#define TONE_PIN2_PORT PORTB
+#define TONE_PIN2_DDR DDRB
+#define TONE_PIN2 PORTB3
+#define TONE_PIN2_MASK _BV(TONE_PIN2)
+#else
 #ifndef AB_DEVKIT
   // Arduboy speaker pin 1 = Arduino pin 5 = ATmega32u4 PC6
   #define TONE_PIN_PIN PINC
@@ -147,6 +165,7 @@ THE SOFTWARE.
   #define TONE_PIN PORTF5
   #define TONE_PIN_MASK _BV(TONE_PIN)
 #endif
+#endif  
 
 // The minimum frequency that can be produced without a clock prescaler.
 #define MIN_NO_PRESCALE_FREQ ((uint16_t)(((F_CPU / 2L) + (1L << 16) - 1L) / (1L << 16)))

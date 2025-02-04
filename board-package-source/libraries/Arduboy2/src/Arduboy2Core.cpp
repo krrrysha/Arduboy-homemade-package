@@ -95,8 +95,11 @@ const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
 
   // Set Display Clock Divisor v = 0xF0
   // default is 0x80
+#if defined (ECONSOLE)
   0xD5, 0xF0,
-
+#else
+0xD5, 0x80,
+#endif
   // Set Multiplex Ratio v = 0x3F
   // 0xA8, 0x3F,
 
@@ -192,7 +195,22 @@ void Arduboy2Core::setCPUSpeed8MHz()
 void Arduboy2Core::bootPins()
 {
 #ifdef ARDUBOY_10
+#ifdef ECONSOLE
+    // Port C INPUT_PULLUP
+  PORTD |= _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) |
+           _BV(B_BUTTON_BIT);
+  DDRD &= ~(_BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) |
+	    _BV(B_BUTTON_BIT));
+  // Port D INPUT_PULLUP
+  PORTD |= _BV(RIGHT_BUTTON_BIT) |
+           _BV(DOWN_BUTTON_BIT) | _BV(A_BUTTON_BIT);
+  DDRD &= ~(_BV(RIGHT_BUTTON_BIT) |
+	    _BV(DOWN_BUTTON_BIT) | _BV(A_BUTTON_BIT));   
+  DDRC  |= _BV(GREEN_LED_BIT)   | _BV(BLUE_LED_BIT) | _BV(RED_LED_BIT);
 
+  // switch off LEDs by default
+  PORTC &= ~(_BV(GREEN_LED_BIT)   | _BV(BLUE_LED_BIT) | _BV(RED_LED_BIT));
+#else
   // Port B INPUT_PULLUP or HIGH
   PORTB = (0
          #ifndef MICROCADE
@@ -316,7 +334,7 @@ void Arduboy2Core::bootPins()
           _BV(Y_BUTTON_BIT) | 
          #endif
          _BV(RAND_SEED_IN_BIT));
-
+#endif
 #elif defined(AB_DEVKIT)
 
   // Port B INPUT_PULLUP or HIGH
@@ -354,7 +372,6 @@ void Arduboy2Core::bootPins()
   DDRF &= ~(_BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT) | _BV(RAND_SEED_IN_BIT));
   // Port F outputs (none)
   // Speaker: Not set here. Controlled by audio class
-
 #endif
 }
 
@@ -520,11 +537,16 @@ void Arduboy2Core::idle()
 
 void Arduboy2Core::bootPowerSaving()
 {
+  #if defined(PRR) && !defined(PRR0)
+  PRR = _BV(PRTWI) | _BV(PRADC);
+  PRR = _BV(PRUSART0);
+  #else
   // disable Two Wire Interface (I2C) and the ADC
   // All other bits will be written with 0 so will be enabled
   PRR0 = _BV(PRTWI) | _BV(PRADC);
   // disable USART1
   PRR1 = _BV(PRUSART1);
+  #endif
 }
 
 #if defined(GU12864_800B)
@@ -1230,6 +1252,11 @@ void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
   (void)red;    // parameter unused
   (void)green;  // parameter unused
   bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue ? RGB_ON : RGB_OFF);
+#elif defined(ECONSOLE)
+  // only blue on DevKit, which is not PWM capable
+  (void)red;    // parameter unused
+  (void)green;  // parameter unused
+   (void)blue;  // parameter unused
 #endif
 }
 
@@ -1304,6 +1331,11 @@ void Arduboy2Core::digitalWriteRGB(uint8_t red, uint8_t green, uint8_t blue)
   (void)red;    // parameter unused
   (void)green;  // parameter unused
   bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue);
+  #elif defined(ECONSOLE)
+  // only blue on DevKit, which is not PWM capable
+  (void)red;    // parameter unused
+  (void)green;  // parameter unused
+   (void)blue;  // parameter unused
  #endif
 #endif
 }
@@ -1339,6 +1371,16 @@ uint8_t Arduboy2Core::buttonsState()
   uint8_t buttons;
 
 #ifdef ARDUBOY_10
+  #if defined (ECONSOLE)
+  buttons = 0;
+  if (bitRead(UP_BUTTON_PORTIN, UP_BUTTON_BIT) == 0) { buttons |= UP_BUTTON; }
+  if (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT) == 0) { buttons |= DOWN_BUTTON; }
+  if (bitRead(LEFT_BUTTON_PORTIN, LEFT_BUTTON_BIT) == 0) { buttons |= LEFT_BUTTON; }
+  if (bitRead(RIGHT_BUTTON_PORTIN, RIGHT_BUTTON_BIT) == 0) { buttons |= RIGHT_BUTTON; }
+
+  if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
+  if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
+  #else
   // up, right, left, down
   buttons = ((~PINF) &
               (_BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) |
@@ -1355,6 +1397,7 @@ uint8_t Arduboy2Core::buttonsState()
   // Y 
   if (bitRead(X_BUTTON_PORTIN, X_BUTTON_BIT) == 0) { buttons |= X_BUTTON; }
  #endif
+#endif
 #elif defined(AB_DEVKIT)
   // down, left, up
   buttons = ((~PINB) &
@@ -1411,12 +1454,14 @@ void Arduboy2Core::exitToBootloader()
     "jmp exit_to_bootloader \n" // resuse ISR exit to bootloader code
   );
  #else
-  // set bootloader magic key
+#if !defined (ECONSOLE)  
+// set bootloader magic key
   // storing two uint8_t instead of one uint16_t saves an instruction
   //  when high and low bytes of the magic key are the same
   *(uint8_t *)MAGIC_KEY_POS = lowByte(MAGIC_KEY);
   *(uint8_t *)(MAGIC_KEY_POS + 1) = highByte(MAGIC_KEY);
   // enable watchdog timer reset, with 16ms timeout
+#endif
   wdt_reset();
   WDTCSR = (_BV(WDCE) | _BV(WDE));
   WDTCSR = _BV(WDE);
@@ -1434,6 +1479,7 @@ void Arduboy2Core::exitToBootloader()
 
 void Arduboy2NoUSB::mainNoUSB()
 {
+#if !defined (ECONSOLE)
   // disable USB
   UDCON = _BV(DETACH);
   UDIEN = 0;
@@ -1474,7 +1520,7 @@ void Arduboy2NoUSB::mainNoUSB()
 //#if defined(USBCON)
 //  USBDevice.attach();
 //#endif
-
+#endif
   setup();
 
   for (;;) {

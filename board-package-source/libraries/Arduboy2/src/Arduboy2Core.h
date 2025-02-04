@@ -11,6 +11,11 @@
 #include <avr/power.h>
 #include <avr/sleep.h>
 
+#ifdef __AVR_ATmega328P__
+#define OLED_SSD1306_I2C
+#define ECONSOLE
+#warning ECONSOLE!
+#endif
 
 // main hardware compile flags
 
@@ -37,6 +42,19 @@
 // ----- Arduboy pins -----
 #ifdef ARDUBOY_10
 
+#if defined(ECONSOLE) 
+	#define PIN_CS 12       // Display CS Arduino pin number
+	#define CS_PORT PORTD   // Display CS port
+	#define CS_BIT PORTD6   // Display CS physical bit number
+
+	#define PIN_DC 4        // Display D/C Arduino pin number
+	#define DC_PORT PORTD   // Display D/C port
+	#define DC_BIT PORTD4   // Display D/C physical bit number
+
+	#define PIN_RST 6       // Display reset Arduino pin number
+	#define RST_PORT PORTD  // Display reset port
+	#define RST_BIT PORTD7  // Display reset physical bit number
+#else
 #ifdef AB_ALTERNATE_WIRING
   #define PIN_CS 1        // Pro Micro alternative display CS pin (pin 12 not not available)
   #define CS_PORT PORTD
@@ -53,6 +71,7 @@
   #define PIN_RST 6       // Display reset Arduino pin number
   #define RST_PORT PORTD  // Display reset port
   #define RST_BIT PORTD7  // Display reset physical bit number
+#endif
 #endif
 
  #define PIN_DC 4        // Display D/C Arduino pin number
@@ -77,7 +96,33 @@
 #define SPI_SCK_PORT PORTB
 #define SPI_SCK_BIT PORTB1
 
+
+
+
 #if defined (OLED_SSD1306_I2C) || (OLED_SSD1306_I2CX) || (OLED_SH1106_I2C)
+#if defined (ECONSOLE)
+	#define I2C_PORT  PORTC
+	#define I2C_DDR   DDRC
+	#define I2C_PIN   PINC
+	#define I2C_SCL PORTC5
+	#define I2C_SDA PORTC4
+	//port states
+	#define I2C_SDA_HIGH() I2C_PORT |=  (1 << I2C_SDA)
+	#define I2C_SCL_HIGH() I2C_PORT |=  (1 << I2C_SCL)
+	#define I2C_SDA_LOW()  I2C_PORT &= ~(1 << I2C_SDA)
+	#define I2C_SCL_LOW()  I2C_PORT &= ~(1 << I2C_SCL)
+
+	//port directions
+	#define I2C_SDA_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SDA)
+	#define I2C_SCL_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SCL)
+	#define I2C_SDA_AS_OUTPUT() I2C_DDR |= (1 << I2C_SDA)
+	#define I2C_SCL_AS_OUTPUT() I2C_DDR |= (1 << I2C_SCL)
+
+	// display address, commands
+	#define SSD1306_I2C_ADDR 0x3c //0x3c:default, 0x3d: alternative)
+	#define SSD1306_I2C_CMD  0x00
+	#define SSD1306_I2C_DATA 0x40
+#else
  #define I2C_PORT  PORTD
  #define I2C_DDR   DDRD
  #define I2C_PIN   PIND
@@ -104,7 +149,22 @@
  #define SSD1306_I2C_CMD  0x00
  #define SSD1306_I2C_DATA 0x40
 #endif
+#endif
 
+#if defined (ECONSOLE)
+	#define RED_LED 15   /**< The pin number for the red color in the RGB LED. */
+	#define GREEN_LED 17 /**< The pin number for the greem color in the RGB LED. */
+	#define BLUE_LED 16   /**< The pin number for the blue color in the RGB LED. */
+
+	#define RED_LED_PORT PORTC
+	#define RED_LED_BIT PORTC1
+
+	#define GREEN_LED_PORT PORTC
+	#define GREEN_LED_BIT PORTC3
+
+	#define BLUE_LED_PORT PORTC
+	#define BLUE_LED_BIT PORTC2
+#else
 #define RED_LED 10   /**< The pin number for the red color in the RGB LED. */
 #ifdef AB_ALTERNATE_WIRING
   #define GREEN_LED 3 // Pro Micro alternative green LED pin
@@ -126,6 +186,7 @@
 
 #define BLUE_LED_PORT PORTB
 #define BLUE_LED_BIT PORTB5
+#endif
 
 #define TX_LED_PORT PORTD
 #define TX_LED_BIT PORTD5
@@ -158,6 +219,43 @@
  #define Y_BUTTON _BV(1)
 #endif
 
+#if defined (ECONSOLE)
+	#define PIN_LEFT_BUTTON 2
+	#define LEFT_BUTTON_PORT PORTD
+	#define LEFT_BUTTON_PORTIN PIND
+	#define LEFT_BUTTON_DDR DDRD
+	#define LEFT_BUTTON_BIT PORTD2
+
+	#define PIN_RIGHT_BUTTON 6
+	#define RIGHT_BUTTON_PORT PORTD
+	#define RIGHT_BUTTON_PORTIN PIND
+	#define RIGHT_BUTTON_DDR DDRD
+	#define RIGHT_BUTTON_BIT PORTD6
+
+	#define PIN_UP_BUTTON 3
+	#define UP_BUTTON_PORT PORTD
+	#define UP_BUTTON_PORTIN PIND
+	#define UP_BUTTON_DDR DDRD
+	#define UP_BUTTON_BIT PORTD3
+
+	#define PIN_DOWN_BUTTON 5
+	#define DOWN_BUTTON_PORT PORTD
+	#define DOWN_BUTTON_PORTIN PIND
+	#define DOWN_BUTTON_DDR DDRD
+	#define DOWN_BUTTON_BIT PORTD5
+
+	#define PIN_A_BUTTON 4
+	#define A_BUTTON_PORT PORTD
+	#define A_BUTTON_PORTIN PIND
+	#define A_BUTTON_DDR DDRD
+	#define A_BUTTON_BIT PORTD4
+
+	#define PIN_B_BUTTON 7
+	#define B_BUTTON_PORT PORTD
+	#define B_BUTTON_PORTIN PIND
+	#define B_BUTTON_DDR DDRD
+	#define B_BUTTON_BIT PORTD7
+#else
 #if defined (MICROCADE)
 #define PIN_LEFT_BUTTON A1
 #define LEFT_BUTTON_PORT PORTF
@@ -244,7 +342,22 @@
  #define Y_BUTTON_DDR DDRF
  #define Y_BUTTON_BIT PORTF1
 #endif
+#endif
 
+
+#if defined (ECONSOLE)
+	#define PIN_SPEAKER_1 9  /**< The pin number of the first lead of the speaker */
+	#define PIN_SPEAKER_2 11 /**< The pin number of the second lead of the speaker. Don't used in ECONSOLE? */ 
+
+	#define SPEAKER_1_PORT PORTB
+	#define SPEAKER_1_DDR DDRB
+	#define SPEAKER_1_BIT PORTB1
+
+	#define SPEAKER_2_PORT PORTB
+	#define SPEAKER_2_DDR DDRB
+	#define SPEAKER_2_BIT PORTB3
+
+#else
 #define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
 
 #define SPEAKER_1_PORT PORTC
@@ -261,6 +374,7 @@
   #define SPEAKER_2_PORT PORTC
   #define SPEAKER_2_DDR DDRC
   #define SPEAKER_2_BIT PORTC7
+#endif
 #endif
 // -----------------------
 
@@ -348,7 +462,6 @@
 // be dangerous and fry your hardware (because of the devkit wiring).
 //
 // Reference: https://github.com/Arduboy/Arduboy/issues/108
-
 #endif
 // --------------------
 
