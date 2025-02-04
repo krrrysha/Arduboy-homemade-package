@@ -38,7 +38,6 @@ To change the screen type, please edit Arduboy2Core.h (default value is "#define
 |----------------- | --------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
 | BUTTON C<br>(up-left)|11^^             |    -                   |    -        |    -                               |    -                              |
 | BUTTON D<br>(up-right)|12^^             |    -                   |    -        |    -                               |    -                              |
-
 Numbers before the portnames are Arduino assigned pin numbers.
 
 (^)
@@ -83,46 +82,5 @@ Note that updating a I2C display is slower than a SPI display. To get the most o
 
 At 2 Mbps the display update will be 4.3 times slower than when a SPI display is used and 3.1 times slower at 2.66 Mbps. Games will still run smootly at 60 FPS when the main program requires less than %70 (2Mbps) or 78% (2.66Mbps) of MCU power.
 
-## expansion connector
 
-An expansion connector can be added to a modified or Homemade Arduboy in the form of a 12 pin male header with 0.1"pitch. which can be used for: 
-* ICSP header for easy in circuit programming (updating bootloader)
-* flash cart slot
-* SD card adapter
-* infrared communications
-* multiplayer link
-* sensors
-
-### Expansion connector pinout (original design)
-
-( (Homemade) Arduboy facing top - looking at the male pinheader)
-
-|  12 |  11 |  10 |  9  |  8  |  7  |  6  |  5  |  4  |  3  |  2  |  1  |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-|  TX |  RX | SCL | SDA |  A5 | KEY | MISO| MOSI| CLK | RST | GND | Vcc |
-
-### Expansion connector pinout (new design)
-
-|  12 |  11 |  10 |  9  |  8  |  7  |  6  |  5  |  4  |  3  |  2  |  1  |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-|  TX | SDA | SCL | RX  |  A5 | KEY | MISO| MOSI| CLK | RST | GND | Vcc |
-
-(RX and SDA pins are swapped)
-
-```text
-TX*  - Serial Transmitter output
-RX   - Serial Receiver input / original Flash cart chip select
-SCL* - I2C/TWI serial clock I/O
-SDA* - I2C/TWI serial data I/O / new Flash cart chip select (Arduboy FX)
-A5   - Analog input pin (Note not broken out on Pro Micro boards)
-KEY  - Key pin. should be filled to block pin insertion (reverse insert protection)
-MISO - SPI/ICSP Master Input, Slave Output
-MOSI - SPI/ICSP Master Output, Slave Input
-CLK  - SPI/ICSP clock
-RST  - MCU/ICSP reset
-GND  - Ground (0V)
-Vcc  - 5V (~3.0V to ~4.1V on Arduboy)
-(*) Not available when using Pro Micro with Alternate Wiring
-```
-Note on the original flash cart design RX is used as flash chip select. In the new design (as used by Arduboy FX) SDA is used as flash chip select and Rx and Tx are available for serial comms.
 
