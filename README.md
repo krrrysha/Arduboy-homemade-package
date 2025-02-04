@@ -36,8 +36,8 @@ To change the screen type, please edit Arduboy2Core.h (default value is "#define
 |----------------- | --------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
 |non-standard keys:|		         |                        |             |                                    |                                   |
 |----------------- | --------------- | ---------------------- | ----------- | ---------------------------------- | --------------------------------- |
-| BUTTON C(up-left)|11^^             |    -                   |    -        |    -                               |    -                              |
-| BUTTON D(up-left)|12^^             |    -                   |    -        |    -                               |    -                              |
+| BUTTON C<br>(up-left)|11^^             |    -                   |    -        |    -                               |    -                              |
+| BUTTON D<br>(up-right)|12^^             |    -                   |    -        |    -                               |    -                              |
 
 Numbers before the portnames are Arduino assigned pin numbers.
 
