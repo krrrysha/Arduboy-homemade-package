@@ -12,7 +12,7 @@
 #include <avr/sleep.h>
 
 #ifdef __AVR_ATmega328P__
-#define OLED_SSD1306_I2C
+#define OLED_SSD1306_I2C // or define OLED_SH1106_I2C
 #define ECONSOLE
 #warning ECONSOLE!
 #endif
