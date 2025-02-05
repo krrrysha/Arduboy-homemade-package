@@ -13,9 +13,9 @@ To change the screen type, please edit Arduboy2Core.h (default value is "#define
 | OLED RST         | 6 PORTD7^       |  6 PORTD7              | 12 PORTD6   |  6 PORTD7                          |  2 PORTD1*                        |
 | SPI SCK          |15 PORTC1^       | 15 PORTB1              | 15 PORTB1   | 15 PORTB                   1       | 15 PORTB1                         |
 | SPI MOSI         |17 PORTC3^       | 16 PORTB2              | 16 PORTB2   | 16 PORTB2                          | 16 PORTB2                         |
-| RGB LED RED      |16 PORTC2^       | 10 PORTB6              |    _        | 10 PORTB6                          | 10 PORTB6                         |
-| RGB LED GREEN    |   _             | 11 PORTB7              |    _        |    -                               |  3 PORTD0*                        | 
-| RGB LED BLUE     |   _             |  9 PORTB5              | 17 PORTB0   |  9 PORTB5                          |  9 PORTB5                         |
+| RGB LED RED      |15 PORTC1^       | 10 PORTB6              |    _        | 10 PORTB6                          | 10 PORTB6                         |
+| RGB LED GREEN    |17 PORTC3^       | 11 PORTB7              |    _        |    -                               |  3 PORTD0*                        | 
+| RGB LED BLUE     |16 PORTC2^       |  9 PORTB5              | 17 PORTB0   |  9 PORTB5                          |  9 PORTB5                         |
 | RxLED            |   _             | 17 PORTB0              |    _        | 17 PORTB0                          | 17 PORTB0                         | 
 | TxLED            |   _             | 30 PORTD5              |    _        | 30 PORTD5                          | 30 PORTD5                         | 
 | BUTTON UP        | 3 PORTD3        | A0 PORTF7              |  8 PORTB4   | A0 PORTF7                          | A0 PORTF7                         |
