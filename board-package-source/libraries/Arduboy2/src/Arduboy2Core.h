@@ -99,7 +99,7 @@
 
 
 
-#if defined (OLED_SSD1306_I2C) || (OLED_SSD1306_I2CX) || (OLED_SH1106_I2C)
+#if defined (OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
 #if defined (ECONSOLE)
 	#define I2C_PORT  PORTC
 	#define I2C_DDR   DDRC
@@ -730,7 +730,7 @@ class Arduboy2Core : public Arduboy2NoUSB
      */
     static uint8_t SPItransferAndRead(uint8_t data);
 
-#if defined (OLED_SSD1306_I2C) || (OLED_SSD1306_I2CX) || (OLED_SH1106_I2C)
+#if defined (OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
     static void i2c_start(uint8_t mode);
 
     static void inline i2c_stop() __attribute__((always_inline))
