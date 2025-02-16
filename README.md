@@ -2,7 +2,8 @@ Project forked from MrBlinky/Arduboy-homemade-package
 This fork is for an Arduino clone based on an Arduino Nano with different button mappings.
 It also uses approaches adopted in the Slimboy project, but unlike it, it uses more modern screen handling procedures (including i2c_sendByte)
 
-To change the screen type, please edit Arduboy2Core.h (default value is "#define OLED_SSD1306_I2C", you can choose OLED_SH1106_I2C )
+To change the screen type, please edit Arduboy2Core.h (default value is "#define OLED_SSD1306_I2C" in the "__AVR_ATmega328P__" section, you can choose OLED_SH1106_I2C )
+To use with Joystick shield,  please edit Arduboy2Core.h ( add #define JOYSTICKANALOG in the "__AVR_ATmega328P__" section )
 
 ## Pin wiring table
 
