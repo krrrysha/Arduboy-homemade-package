@@ -6,10 +6,16 @@
 
 #include "Arduboy2Core.h"
 
+#ifdef JOYSTICKANALOG
+uint8_t Arduboy2Core::ADCJoystickState = 0;
+unsigned int Arduboy2Core::JoystickXZero = 2000; // first run indicator. number greater than 1^10
+unsigned int Arduboy2Core::JoystickYZero = 2000; // first run indicator. number greater than 1^10
+#endif
+
 #include <avr/wdt.h>
 
 #ifndef OLED_CONTRAST
-# define OLED_CONTRAST 0x80 // 0xCF
+# define OLED_CONTRAST 0x80 // 0xCF for high contrast or 0x80 low contrast
 #endif
 
 //========================================
@@ -96,7 +102,7 @@ const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
   // Set Display Clock Divisor v = 0xF0
   // default is 0x80
 #if defined (ECONSOLE)
-  0xD5, 0x80, //0xF0,
+  0xD5, 0x80, //0xF0 for low frequency or 0x80 for high frequency (Reduces coil noise for some OLED displays)
 #else
 0xD5, 0x80,
 #endif
@@ -196,18 +202,28 @@ void Arduboy2Core::bootPins()
 {
 #ifdef ARDUBOY_10
 #ifdef ECONSOLE
-    // Port C INPUT_PULLUP
+  #ifndef  JOYSTICKANALOG
+	// Port  INPUT_PULLUP
   PORTD |= _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) |
-           _BV(B_BUTTON_BIT);
+           _BV(B_BUTTON_BIT) |
+		   _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
   DDRD &= ~(_BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) |
-	    _BV(B_BUTTON_BIT));
-  // Port D INPUT_PULLUP
-  PORTD |= _BV(RIGHT_BUTTON_BIT) |
-           _BV(DOWN_BUTTON_BIT) | _BV(A_BUTTON_BIT);
-  DDRD &= ~(_BV(RIGHT_BUTTON_BIT) |
-	    _BV(DOWN_BUTTON_BIT) | _BV(A_BUTTON_BIT));   
+	    _BV(B_BUTTON_BIT)|
+		_BV(RIGHT_BUTTON_BIT) |
+	    _BV(DOWN_BUTTON_BIT));
+  PORTD |= _BV(A_BUTTON_BIT);
+  DDRD &= ~(_BV(A_BUTTON_BIT)); 
   DDRC  |= _BV(GREEN_LED_BIT)   | _BV(BLUE_LED_BIT) | _BV(RED_LED_BIT);
-
+    #else
+	  //JOYSTICKANALOG
+	power_adc_enable(); //disable power saving for ADC
+	DDRC &= ~(_BV(X_AXIS_BIT) | _BV(Y_AXIS_BIT));
+	PORTC |= _BV(X_AXIS_BIT) | _BV(Y_AXIS_BIT);
+	PORTD |= _BV(B_BUTTON_BIT) | _BV(A_BUTTON_BIT);
+    DDRD &= ~(_BV(B_BUTTON_BIT) | _BV(A_BUTTON_BIT));
+    ADMUX = 0x42;
+	ADCSRA=0b10010011; // ADEN=1, ADSC=0 (stop conversion), ADATE=0, ADIF=1 (conversion complete), ADIE=0 (no interputs), ADPS=011 CK/8
+	#endif
   // switch off LEDs by default
   PORTC &= ~(_BV(GREEN_LED_BIT)   | _BV(BLUE_LED_BIT) | _BV(RED_LED_BIT));
 #else
@@ -538,12 +554,16 @@ void Arduboy2Core::idle()
 void Arduboy2Core::bootPowerSaving()
 {
   #if defined(PRR) && !defined(PRR0)
-  PRR = _BV(PRTWI) | _BV(PRADC);
+	#if defined (JOYSTICKANALOG)  // disable power saving for ADC
+	PRR = _BV(PRTWI);
+	#else
+	PRR = _BV(PRTWI) | _BV(PRADC);
+	#endif
   PRR = _BV(PRUSART0);
   #else
   // disable Two Wire Interface (I2C) and the ADC
   // All other bits will be written with 0 so will be enabled
-  PRR0 = _BV(PRTWI) | _BV(PRADC);
+ PRR0 = _BV(PRTWI) | _BV(PRADC);
   // disable USART1
   PRR1 = _BV(PRUSART1);
   #endif
@@ -1372,12 +1392,39 @@ uint8_t Arduboy2Core::buttonsState()
 
 #ifdef ARDUBOY_10
   #if defined (ECONSOLE)
+   #ifndef JOYSTICKANALOG
   buttons = 0;
   if (bitRead(UP_BUTTON_PORTIN, UP_BUTTON_BIT) == 0) { buttons |= UP_BUTTON; }
   if (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT) == 0) { buttons |= DOWN_BUTTON; }
   if (bitRead(LEFT_BUTTON_PORTIN, LEFT_BUTTON_BIT) == 0) { buttons |= LEFT_BUTTON; }
   if (bitRead(RIGHT_BUTTON_PORTIN, RIGHT_BUTTON_BIT) == 0) { buttons |= RIGHT_BUTTON; }
-
+	#else
+    // JOYSTICKANALOG
+	buttons = 0;  
+  //buttons &= ~(A_BUTTON| B_BUTTON);
+  if (ADCSRA & (1 << ADIF)) {
+    unsigned int ADCdata=(ADCL|ADCH << 8);
+    if ((ADMUX & 0b00001111) ==0 ) { // if the conversion at the AC0 input is complete
+	 ADCJoystickState &= ~(RIGHT_BUTTON | LEFT_BUTTON);
+	 if (JoystickXZero>1024) {JoystickXZero=ADCdata;} // if first run
+	 if (ADCdata > JoystickXZero+JOYSENSX) {ADCJoystickState |= RIGHT_BUTTON;} else if (ADCdata < JoystickXZero-JOYSENSX) {ADCJoystickState |= LEFT_BUTTON;} // we determine the direction along the X axis
+     ADMUX = 0x41; // we will measure the signal at the AC1 input; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=1; AMUX= 0x41
+     ADCSRA |= (1 << ADSC);  // start conversionе
+	  } else if ((ADMUX & 0b00001111) ==1)   // if the conversion at the AC1 input is complete 
+	  { 
+		ADCJoystickState &= ~(UP_BUTTON | DOWN_BUTTON);
+		if (JoystickYZero>1024) {JoystickYZero=ADCdata;} // if first run
+		if (ADCdata > JoystickYZero+JOYSENSY) {ADCJoystickState |= UP_BUTTON;} else if (ADCdata < JoystickYZero-JOYSENSY) {ADCJoystickState |= DOWN_BUTTON;} // we determine the direction along the Y axis
+		ADMUX = 0x40; // we will measure the signal at the AC0 input; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=0; AMUX= 0x40
+		ADCSRA |= (1 << ADSC);  // start conversionе
+    } else 
+	{
+		ADMUX = 0x40; // снимать сигнал будем с входа AC0; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=0; AMUX= 0x40
+		ADCSRA |= (1 << ADSC); 
+	}
+  } 
+buttons |= ADCJoystickState;
+	#endif
   if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
   if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
   #else
@@ -1425,7 +1472,9 @@ unsigned long Arduboy2Core::generateRandomSeed()
 
   seed = ((unsigned long)ADC << 16) + micros();
 
-  power_adc_disable(); // ADC off
+  #ifndef JOYSTICKANALOG
+  power_adc_disable(); // disable power saving for ADC
+  #endif
 
   return seed;
 }
@@ -1488,6 +1537,7 @@ void Arduboy2NoUSB::mainNoUSB()
   UHWCON = 0;
   power_usb_disable();
 
+  
   init();
 
   // This would normally be done in the USB code that uses the TX and RX LEDs

@@ -12,9 +12,17 @@
 #include <avr/sleep.h>
 
 #ifdef __AVR_ATmega328P__
-#define OLED_SSD1306_I2C // or define OLED_SH1106_I2C
+
+#define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
+#define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 #define ECONSOLE
 #warning ECONSOLE!
+
+#endif
+
+#ifdef JOYSTICKANALOG
+	#define JOYSENSX 150 //Joystick sensitivity. X axis
+	#define JOYSENSY 150 //Joystick sensitivity. Y axis
 #endif
 
 // main hardware compile flags
@@ -99,7 +107,7 @@
 
 
 
-#if defined (OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
+#if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
 #if defined (ECONSOLE)
 	#define I2C_PORT  PORTC
 	#define I2C_DDR   DDRC
@@ -220,6 +228,34 @@
 #endif
 
 #if defined (ECONSOLE)
+		
+	#if defined (JOYSTICKANALOG)
+	#define PIN_Y_AXIS A1 //3v3 341..342=0, 0..200=down, 400..674=up; 5V: 518..519=0, 0..200=down, 600..1023=up
+	#define X_AXIS_PORT PORTC
+	#define X_AXIS_PORTIN PINC
+	#define X_AXIS_DDR DDRC
+	#define X_AXIS_BIT PORTC0
+	
+	#define PIN_X_AXIS A0  //3v3 340..341=0, 0..124=left, 540..674=right; 5V 530=0, 0..200=left, 900..1023=rigth
+	#define Y_AXIS_PORT PORTC
+	#define Y_AXIS_PORTIN PINC
+	#define Y_AXIS_DDR DDRC
+	#define Y_AXIS_BIT PORTC0
+
+	#define PIN_A_BUTTON 4
+	#define A_BUTTON_PORT PORTD
+	#define A_BUTTON_PORTIN PIND
+	#define A_BUTTON_DDR DDRD
+	#define A_BUTTON_BIT PORTD4
+
+	#define PIN_B_BUTTON 3
+	#define B_BUTTON_PORT PORTD
+	#define B_BUTTON_PORTIN PIND
+	#define B_BUTTON_DDR DDRD
+	#define B_BUTTON_BIT PORTD3
+	
+
+	#else
 	#define PIN_LEFT_BUTTON 2
 	#define LEFT_BUTTON_PORT PORTD
 	#define LEFT_BUTTON_PORTIN PIND
@@ -255,6 +291,7 @@
 	#define B_BUTTON_PORTIN PIND
 	#define B_BUTTON_DDR DDRD
 	#define B_BUTTON_BIT PORTD7
+	#endif
 #else
 #if defined (MICROCADE)
 #define PIN_LEFT_BUTTON A1
@@ -730,7 +767,7 @@ class Arduboy2Core : public Arduboy2NoUSB
      */
     static uint8_t SPItransferAndRead(uint8_t data);
 
-#if defined (OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
+#if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
     static void i2c_start(uint8_t mode);
 
     static void inline i2c_stop() __attribute__((always_inline))
@@ -1261,7 +1298,12 @@ class Arduboy2Core : public Arduboy2NoUSB
      * \see ARDUBOY_NO_USB
      */
     static void exitToBootloader();
-
+	 #if defined (JOYSTICKANALOG)
+	 static uint8_t ADCJoystickState;
+	 static unsigned int JoystickXZero;
+	 static unsigned int JoystickYZero;
+	#endif
+	
   protected:
     // internals
     static void setCPUSpeed8MHz();
