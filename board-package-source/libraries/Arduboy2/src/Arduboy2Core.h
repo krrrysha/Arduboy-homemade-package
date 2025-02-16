@@ -240,7 +240,7 @@
 	#define Y_AXIS_PORT PORTC
 	#define Y_AXIS_PORTIN PINC
 	#define Y_AXIS_DDR DDRC
-	#define Y_AXIS_BIT PORTC0
+	#define Y_AXIS_BIT PORTC1
 
 	#define PIN_A_BUTTON 4
 	#define A_BUTTON_PORT PORTD
