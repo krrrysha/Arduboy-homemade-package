@@ -11,14 +11,22 @@
 #include <avr/power.h>
 #include <avr/sleep.h>
 
-#ifdef __AVR_ATmega328P__
+//ifdef __AVR_ATmega328P__
 
+#ifdef MCU_MIK32_Amur
 #define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
-//define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
+#define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 #define ECONSOLE
-#warning ECONSOLE!
+#warning ELBEARBOY!
 
 #endif
+/*
+#ifdef MCU_MIK32_Amur
+#define ELBEARBOY
+#warning ELBEARBOY!
+#define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
+#endif
+*/
 
 #ifdef JOYSTICKANALOG
 	#define JOYSENSX 150 //Joystick sensitivity. X axis
@@ -253,9 +261,10 @@
 	#define B_BUTTON_PORTIN PIND
 	#define B_BUTTON_DDR DDRD
 	#define B_BUTTON_BIT PORTD3
-	
 
 	#else
+
+	#ifndef JOYSTICDISCRETE // ECOSOLE KEYS
 	#define PIN_LEFT_BUTTON 2
 	#define LEFT_BUTTON_PORT PORTD
 	#define LEFT_BUTTON_PORTIN PIND
@@ -291,6 +300,82 @@
 	#define B_BUTTON_PORTIN PIND
 	#define B_BUTTON_DDR DDRD
 	#define B_BUTTON_BIT PORTD7
+	#else // JOYSTICDISCRETE KEYS 
+	
+	#define PIN_LEFT_BUTTON 5
+	#define LEFT_BUTTON_PORT PORTD
+	#define LEFT_BUTTON_PORTIN PIND
+	#define LEFT_BUTTON_DDR DDRD
+	#define LEFT_BUTTON_BIT PORTD5
+
+	#define PIN_RIGHT_BUTTON 3
+	#define RIGHT_BUTTON_PORT PORTD
+	#define RIGHT_BUTTON_PORTIN PIND
+	#define RIGHT_BUTTON_DDR DDRD
+	#define RIGHT_BUTTON_BIT PORTD3
+
+	#define PIN_UP_BUTTON 2
+	#define UP_BUTTON_PORT PORTD
+	#define UP_BUTTON_PORTIN PIND
+	#define UP_BUTTON_DDR DDRD
+	#define UP_BUTTON_BIT PORTD2
+
+	#define PIN_DOWN_BUTTON 4
+	#define DOWN_BUTTON_PORT PORTD
+	#define DOWN_BUTTON_PORTIN PIND
+	#define DOWN_BUTTON_DDR DDRD
+	#define DOWN_BUTTON_BIT PORTD4
+
+	#define PIN_A_BUTTON 8
+	#define A_BUTTON_PORT PORTB
+	#define A_BUTTON_PORTIN PINB
+	#define A_BUTTON_DDR DDRB
+	#define A_BUTTON_BIT PORTB0
+
+	#define PIN_B_BUTTON 7
+	#define B_BUTTON_PORT PORTD
+	#define B_BUTTON_PORTIN PIND
+	#define B_BUTTON_DDR DDRD
+	#define B_BUTTON_BIT PORTD7
+		
+	#endif // END KEYS
+#elif defined (ELBEARBOY)
+	#if defined (JOYSTICKANALOG)
+		#define ADC_CONFIG_SAH_TIME_MY          (0x3F << ADC_CONFIG_SAH_TIME_S)
+		#define myADC_SEL_CHANNEL(channel_selection) (ANALOG_REG->ADC_CONFIG = ((ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) & (~ADC_CONFIG_SEL_M)) | ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) | ((channel_selection) << ADC_CONFIG_SEL_S))
+		#define PIN_BUTTON_B 0 // Кнопка 3/0 port_0_0
+		#define GPIO_BUTTON_B 0		
+		
+		#define PIN_BUTTON_A 8 // Кнопка 4/8 port_0_8
+		#define GPIO_BUTTON_A 0 		
+		
+		#define PIN_AXISX 7 // Ось X port_1_5
+		#define PIN_AXISY 5 // Ось Y port_1_7
+		#define PIN_RANDOM 4 // Ось Y port_0_9
+		#define CHAN_AXISX 1 // Ось X port_1_5
+		#define CHAN_AXISY 0 // Ось Y port_1_7
+		#define CHAN_RANDOM 0 // Ось Y port_0_4
+			#ifndef JOYSTICDISCRETE // ECOSOLE KEYS
+			#else // JOYSTICDISCRETE KEYS 
+				#define PIN_BUTTON_B 8 // Кнопка 7/8 port_1_8
+				#define GPIO_BUTTON_B 1 
+				
+				#define PIN_BUTTON_A 9 	 // Кнопка 8/9 port_1_9
+				#define GPIO_BUTTON_A 1 
+				
+				#define PIN_LEFT_BUTTON 1 // Кнопка 5/1 port_0_1
+				#define GPIO_LEFT_BUTTON 0 
+				
+				#define PIN_RIGHT_BUTTON 0 // Кнопка 3/0 port_0_0
+				#define GPIO_RIGHT_BUTTON 0
+				
+				#define PIN_UP_BUTTON 10 // Кнопка 2/10 port_0_10
+				#define GPIO_UP_BUTTON 0
+				
+				#define PIN_DOWN_BUTTON 8 // Кнопка 4/8 port_0_8
+				#define GPIO_DOWN_BUTTON 0				
+				
+				#endif // END KEYS
 	#endif
 #else
 #if defined (MICROCADE)
