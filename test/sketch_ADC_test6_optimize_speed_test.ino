@@ -32,11 +32,15 @@ uint32_t time;
 #define A_BUTTON _BV(3)     /*< The A button value for functions requiring a bitmask */
 #define B_BUTTON _BV(2)     /*< The B button value for functions requiring a bitmask */
 
-#define PIN_BUTTON_B 0 // Кнопка 3/0 port_0_0
-#define PIN_BUTTON_A 8 // Кнопка 4/8 port_0_8
-#define PIN_AXISX 7 // Ось X port_1_5
-#define PIN_AXISY 5 // Ось Y port_1_7
-#define PIN_RANDOM 4 // Ось Y port_0_9
+#define B_BUTTON_BIT 0 // Кнопка 3/0 port_0_0
+#define B_BUTTON_PORTIN GPIO_0->STATE
+
+#define A_BUTTON_BIT 8 // Кнопка 4/8 port_0_8
+#define A_BUTTON_PORTIN GPIO_0->STATE
+
+#define PIN_AXISX 7 // A1 port_1_7
+#define PIN_AXISY 5 // A0 port_1_5
+#define PIN_RANDOM 4 // A2 port_0_4
 
 #define CHAN_AXISX 1 // Ось X port_1_5
 #define CHAN_AXISY 0 // Ось Y port_1_7
@@ -50,19 +54,19 @@ void setup() {
 
 Serial.begin(9600);
 
-GPIO_0->DIRECTION_IN = 1 << PIN_BUTTON_A; // Установка направления вывода A  на вход
-GPIO_0->DIRECTION_IN = 1 << PIN_BUTTON_B; // Установка направления вывода B  на вход
-GPIO_0->DIRECTION_IN = 1 << CHAN_RANDOM; // 
-GPIO_1->DIRECTION_IN = 1 << CHAN_AXISX; // 
-GPIO_1->DIRECTION_IN = 1 << CHAN_AXISY; // 
+GPIO_0->DIRECTION_IN = 1 << A_BUTTON_BIT; // Установка направления вывода A  на вход
+GPIO_0->DIRECTION_IN = 1 << B_BUTTON_BIT; // Установка направления вывода B  на вход
+//GPIO_0->DIRECTION_IN = 1 << PIN_RANDOM; // 
+//GPIO_1->DIRECTION_IN = 1 << PIN_AXISX; // 
+//GPIO_1->DIRECTION_IN = 1 << PIN_AXISY; // 
 
 // ADC init!
 chan_selected=0;
 PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A0=1.5
 PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
 PAD_CONFIG->PORT_0_CFG |= (0b11 << (2 * PIN_RANDOM)); // аналоговый сигнал. порт A2=0.4
-//PAD_CONFIG->PORT_0_CFG &= (0b00 << (2 * PIN_BUTTON_B)); // дискрет . порт D3=0.0
-//PAD_CONFIG->PORT_0_CFG &= (0b00 << (2 * PIN_BUTTON_A)); // дискрет . порт D4=0.8
+//PAD_CONFIG->PORT_0_CFG &= (0b00 << (2 * BUTTON_B_BIT)); // дискрет . порт D3=0.0
+//PAD_CONFIG->PORT_0_CFG &= (0b00 << (2 * BUTTON_A_BIT)); // дискрет . порт D4=0.8
 
   PM->CLK_APB_P_SET = PM_CLOCK_APB_P_ANALOG_REGS_M;
 
@@ -197,9 +201,11 @@ uint8_t buttonsState()
   //Serial.print(" buttons:");
   //Serial.print(buttons,BIN);
 
-if (not(GPIO_0->STATE & (1 << PIN_BUTTON_A))) { buttons |= A_BUTTON; };
+//if (not(GPIO_0->STATE & (1 << A_BUTTON_BIT))) { buttons |= A_BUTTON; };
+//if (not(GPIO_0->STATE & (1 << B_BUTTON_BIT))) { buttons |= B_BUTTON; };
+if (not(bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT))) { buttons |= A_BUTTON; };
+if (not(bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT))) { buttons |= B_BUTTON; };
 
-if (not(GPIO_0->STATE & (1 << PIN_BUTTON_B))) { buttons |= B_BUTTON; };
 
   return buttons;
 } 

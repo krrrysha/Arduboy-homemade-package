@@ -58,6 +58,7 @@
 // ----- Arduboy pins -----
 #ifdef ARDUBOY_10
 
+#ifndef (ELBEARBOY) 
 #if defined(ECONSOLE) 
 	#define PIN_CS 12       // Display CS Arduino pin number
 	#define CS_PORT PORTD   // Display CS port
@@ -112,6 +113,7 @@
 #define SPI_SCK_PORT PORTB
 #define SPI_SCK_BIT PORTB1
 
+#endif // end !ELBEARBOY
 
 
 
@@ -138,6 +140,29 @@
 	#define SSD1306_I2C_ADDR 0x3c //0x3c:default, 0x3d: alternative)
 	#define SSD1306_I2C_CMD  0x00
 	#define SSD1306_I2C_DATA 0x40
+#elif defined (ELBEARBOY)
+		
+		#define I2C_PORT  GPIO_1->STATE
+		#define I2C_SCL 13 // D19  PORT 1.13
+		#define I2C_SDA 12 // D18  PORT 1.12 
+				
+		//port states
+		//#define I2C_SDA_HIGH() I2C_PORT |=  (1 << I2C_SDA)
+		//#define I2C_SCL_HIGH() I2C_PORT |=  (1 << I2C_SCL)
+		//#define I2C_SDA_LOW()  I2C_PORT &= ~(1 << I2C_SDA)
+		//#define I2C_SCL_LOW()  I2C_PORT &= ~(1 << I2C_SCL)
+
+		//port directions
+		//#define I2C_SDA_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SDA)
+		//#define I2C_SCL_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SCL)
+		//#define I2C_SDA_AS_OUTPUT() I2C_DDR |= (1 << I2C_SDA)
+		//#define I2C_SCL_AS_OUTPUT() I2C_DDR |= (1 << I2C_SCL)
+	
+		#define SSD1306_I2C_ADDR 0x3c //0x3c:default, 0x3d: alternative)
+		#define SSD1306_I2C_CMD  0x00
+		#define SSD1306_I2C_DATA 0x40
+
+	
 #else
  #define I2C_PORT  PORTD
  #define I2C_DDR   DDRD
@@ -166,20 +191,21 @@
  #define SSD1306_I2C_DATA 0x40
 #endif
 #endif
-
+#ifndef (ELBEARBOY)
 #if defined (ECONSOLE)
-	#define RED_LED 15   /**< The pin number for the red color in the RGB LED. */
+	#define RED_LED 13   /**< The pin number for the red color in the RGB LED. */
 	#define GREEN_LED 17 /**< The pin number for the greem color in the RGB LED. */
 	#define BLUE_LED 16   /**< The pin number for the blue color in the RGB LED. */
 
-	#define RED_LED_PORT PORTC
-	#define RED_LED_BIT PORTC1
+	#define RED_LED_PORT PORTB  
+	#define RED_LED_BIT PORTB5
 
 	#define GREEN_LED_PORT PORTC
 	#define GREEN_LED_BIT PORTC3
 
 	#define BLUE_LED_PORT PORTC
 	#define BLUE_LED_BIT PORTC2
+
 #else
 #define RED_LED 10   /**< The pin number for the red color in the RGB LED. */
 #ifdef AB_ALTERNATE_WIRING
@@ -204,17 +230,38 @@
 #define BLUE_LED_BIT PORTB5
 #endif
 
-#define TX_LED_PORT PORTD
-#define TX_LED_BIT PORTD5
+#define TX_LED_PORT PORTD 
+#define TX_LED_BIT PORTD5 // D5
 
 #define RX_LED_PORT PORTB
-#define RX_LED_BIT PORTB0
+#define RX_LED_BIT PORTB0 // D8
 
 #ifdef LCD_ST7565
   #define POWER_LED_PORT PORTD
   #define POWER_LED_BIT PORTD0
 #endif
+#else // ELBEARBOY
 
+	#define RED_LED 2  // D13 port 1.2
+	#define GREEN_LED 2 // D17 port 0.2
+	#define BLUE_LED 4  // D16 port 0.4
+
+	#define RED_LED_PORT GPIO_1->STATE
+	#define RED_LED_BIT  2 //
+
+	#define GREEN_LED_PORT GPIO_0->STATE
+	#define GREEN_LED_BIT 2
+
+	#define BLUE_LED_PORT GPIO_0->STATE
+	#define BLUE_LED_BIT 4
+
+
+#define TX_LED_PORT PORTD
+#define TX_LED_BIT PORTD5 // D5
+
+#define RX_LED_PORT PORTB
+#define RX_LED_BIT PORTB0 //d8
+#endif
 // bit values for button states
 // these are determined by the buttonsState() function
 #if defined (MICROCADE)
@@ -343,10 +390,10 @@
 	#if defined (JOYSTICKANALOG)
 		#define ADC_CONFIG_SAH_TIME_MY          (0x3F << ADC_CONFIG_SAH_TIME_S)
 		#define myADC_SEL_CHANNEL(channel_selection) (ANALOG_REG->ADC_CONFIG = ((ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) & (~ADC_CONFIG_SEL_M)) | ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) | ((channel_selection) << ADC_CONFIG_SEL_S))
-		#define PIN_BUTTON_B 0 // Кнопка 3/0 port_0_0
+		#define PIN_BUTTON_B 0 // D3/0 port_0_0
 		#define GPIO_BUTTON_B 0		
 		
-		#define PIN_BUTTON_A 8 // Кнопка 4/8 port_0_8
+		#define PIN_BUTTON_A 8 // D4/8 port_0_8
 		#define GPIO_BUTTON_A 0 		
 		
 		#define PIN_AXISX 7 // Ось X port_1_5
@@ -357,23 +404,30 @@
 		#define CHAN_RANDOM 0 // Ось Y port_0_4
 			#ifndef JOYSTICDISCRETE // ECOSOLE KEYS
 			#else // JOYSTICDISCRETE KEYS 
-				#define PIN_BUTTON_B 8 // Кнопка 7/8 port_1_8
-				#define GPIO_BUTTON_B 1 
+				#define PIN_BUTTON_B 8 // D7/8 port_1_8
+				#define B_BUTTON_PORT GPIO_1->STATE
+				#define B_BUTTON_BIT 8
+
 				
-				#define PIN_BUTTON_A 9 	 // Кнопка 8/9 port_1_9
-				#define GPIO_BUTTON_A 1 
+				#define PIN_BUTTON_A 9 	 // D8/9 port_1_9
+				#define A_BUTTON_PORT GPIO_1->STATE
+				#define A_BUTTON_BIT 9
 				
-				#define PIN_LEFT_BUTTON 1 // Кнопка 5/1 port_0_1
-				#define GPIO_LEFT_BUTTON 0 
+				#define PIN_LEFT_BUTTON 1 // D5/1 port_0_1
+				#define LEFT_BUTTON_PORT GPIO_0->STATE 
+				#define LEFT_BUTTON_BIT 1
 				
-				#define PIN_RIGHT_BUTTON 0 // Кнопка 3/0 port_0_0
-				#define GPIO_RIGHT_BUTTON 0
+				#define PIN_RIGHT_BUTTON 0 // D3/0 port_0_0
+				#define RIGHT_BUTTON_PORT GPIO_0->STATE 
+				#define RIGHT_BUTTON_BIT 0
 				
-				#define PIN_UP_BUTTON 10 // Кнопка 2/10 port_0_10
-				#define GPIO_UP_BUTTON 0
+				#define PIN_UP_BUTTON 10 // D2/10 port_0_10
+				#define UP_BUTTON_PORT GPIO_0->STATE 
+				#define UP_BUTTON_BIT 10
 				
-				#define PIN_DOWN_BUTTON 8 // Кнопка 4/8 port_0_8
-				#define GPIO_DOWN_BUTTON 0				
+				#define PIN_DOWN_BUTTON 8 // D4/8 port_0_8
+				#define DOWN_BUTTON_PORT GPIO_0->STATE 
+				#define DOWN_BUTTON_BIT 8
 				
 				#endif // END KEYS
 	#endif
@@ -478,7 +532,14 @@
 	#define SPEAKER_2_PORT PORTB
 	#define SPEAKER_2_DDR DDRB
 	#define SPEAKER_2_BIT PORTB3
+#elif defined (ELBEARBOY)
+	#define PIN_SPEAKER_1 3  // D9/3 port_0_3
+	#define SPEAKER_1_PORT GPIO_0->STATE
+	#define SPEAKER_1_BIT 3
 
+	#define PIN_SPEAKER_2 1 //D11/1 port_1_1
+	#define SPEAKER_2_PORT GPIO_1->STATE
+	#define SPEAKER_2_BIT 1
 #else
 #define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
 
@@ -591,11 +652,17 @@
 
 // Unconnected analog input used for noise by initRandomSeed()
 #ifndef SUPPORT_XY_BUTTONS
-#define RAND_SEED_IN A4
-#define RAND_SEED_IN_PORT PORTF
-#define RAND_SEED_IN_BIT PORTF1
-// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
-#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(REFS1) | _BV(MUX0))
+	#ifndef (ELBEARBOY)
+	#define RAND_SEED_IN A4
+	#define RAND_SEED_IN_PORT PORTF
+	#define RAND_SEED_IN_BIT PORTF1
+	// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
+	#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(REFS1) | _BV(MUX0))
+	#else
+	#define RAND_SEED_PIN 4 // A2 port_0_4
+	#define GPIO_RAND_SEED 0
+	#define ADCCHAN_RAND_SEED 0
+	#endif
 #else
 #define RAND_SEED_IN A5
 #define RAND_SEED_IN_PORT PORTF
