@@ -226,6 +226,25 @@ void Arduboy2Core::bootPins()
 	#endif
   // switch off LEDs by default
   PORTC &= ~(_BV(GREEN_LED_BIT)   | _BV(BLUE_LED_BIT) | _BV(RED_LED_BIT));
+#elif defined (ELBEARBOY)
+  //INPUT_PULLUP or HIGH
+  #ifndef  JOYSTICKANALOG //JOYSTICDISCRETE
+	// Port  INPUT_PULLUP
+	// SDA and SCL as inputs without pullups
+  // для подтяжки используем значения по-умолчанию. Аналогично  - для типа "обычный дискретный пин"
+  //PAD_CONFIG->PAD1_PUPD &= ~ (0b00 << (2 * BUTTON_B_BIT) | 0b00 << (2 * BUTTON_A_BIT));
+  //PAD_CONFIG->PAD0_PUPD &= ~ (0b00 << (2 * LEFT_BUTTON_BIT) | 0b00 << (2 * RIGHT_BUTTON_BIT) | 0b00 << (2 * UP_BUTTON_BIT) | 0b00 << (2 * DOWN_BUTTON_BIT));
+  // todo - перенести настройку на Serial из *.h
+  // Задаем напрарвление без "|=", т.к. для установки DIRECTION - только запись "1"
+  GPIO_0->DIRECTION_IN = _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
+  GPIO_1->DIRECTION_IN = _BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT);
+ 
+  GPIO_0->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(BLUE_LED_BIT);
+  GPIO_1->DIRECTION_OUT = _BV(RED_LED_BIT);
+
+  #else
+	  //JOYSTICKANALOG
+  #endif	
 #else
   // Port B INPUT_PULLUP or HIGH
   PORTB = (0
@@ -350,24 +369,9 @@ void Arduboy2Core::bootPins()
           _BV(Y_BUTTON_BIT) | 
          #endif
          _BV(RAND_SEED_IN_BIT));
-#elif defined (ELBEARBOY)
-  #ifndef  JOYSTICKANALOG //JOYSTICDISCRETE
-	// Port  INPUT_PULLUP
-  // для подтяжки используем значения по-умолчанию. Аналогично  - для типа "обычный дискретный пин"
-  //PAD_CONFIG->PAD1_PUPD &= ~ (0b00 << (2 * BUTTON_B_BIT) | 0b00 << (2 * BUTTON_A_BIT));
-  //PAD_CONFIG->PAD0_PUPD &= ~ (0b00 << (2 * LEFT_BUTTON_BIT) | 0b00 << (2 * RIGHT_BUTTON_BIT) | 0b00 << (2 * UP_BUTTON_BIT) | 0b00 << (2 * DOWN_BUTTON_BIT));
-  // Задаем напрарвлениеи без "|=", т.к. для установки DIRECTION - только запись "1"
-  GPIO_0->DIRECTION_IN = _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
-  GPIO_1->DIRECTION_IN = _BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT);
- 
-  GPIO_0->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(BLUE_LED_BIT);
-  GPIO_1->DIRECTION_OUT = _BV(RED_LED_BIT);
 
-  #else
-	  //JOYSTICKANALOG
-#endif
-
-#elif defined(AB_DEVKIT)
+// ВОЗМОЖНО ЗДЕСЬ ОШИБКА в ветвлении!
+#elif defined(AB_DEVKIT) 
 
   // Port B INPUT_PULLUP or HIGH
   PORTB |= _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT) |
@@ -404,6 +408,7 @@ void Arduboy2Core::bootPins()
   DDRF &= ~(_BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT) | _BV(RAND_SEED_IN_BIT));
   // Port F outputs (none)
   // Speaker: Not set here. Controlled by audio class
+#endif
 #endif
 }
 

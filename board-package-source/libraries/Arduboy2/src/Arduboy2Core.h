@@ -147,16 +147,18 @@
 		#define I2C_SDA 12 // D18  PORT 1.12 
 				
 		//port states
-		//#define I2C_SDA_HIGH() I2C_PORT |=  (1 << I2C_SDA)
-		//#define I2C_SCL_HIGH() I2C_PORT |=  (1 << I2C_SCL)
-		//#define I2C_SDA_LOW()  I2C_PORT &= ~(1 << I2C_SDA)
-		//#define I2C_SCL_LOW()  I2C_PORT &= ~(1 << I2C_SCL)
+		// INIT I2C as serial: PAD_CONFIG->PORT_1_CFG |= (0b01 << (2 * I2C_SCL));
+		//						PAD_CONFIG->PORT_1_CFG |= (0b01 << (2 * I2C_SDA));
+		#define I2C_SDA_HIGH() I2C_PORT |=  (1 << I2C_SDA)
+		#define I2C_SCL_HIGH() I2C_PORT |=  (1 << I2C_SCL)
+		#define I2C_SDA_LOW()  I2C_PORT &= ~(1 << I2C_SDA)
+		#define I2C_SCL_LOW()  I2C_PORT &= ~(1 << I2C_SCL)
 
 		//port directions
-		//#define I2C_SDA_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SDA)
-		//#define I2C_SCL_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SCL)
-		//#define I2C_SDA_AS_OUTPUT() I2C_DDR |= (1 << I2C_SDA)
-		//#define I2C_SCL_AS_OUTPUT() I2C_DDR |= (1 << I2C_SCL)
+		#define I2C_SDA_AS_INPUT()  GPIO_1->DIRECTION_IN =  1 << I2C_SDA	
+		#define I2C_SCL_AS_INPUT()  GPIO_1->DIRECTION_IN =  1 << I2C_SCL
+		#define I2C_SDA_AS_OUTPUT() GPIO_1->DIRECTION_OUT =  1 << I2C_SDA
+		#define I2C_SCL_AS_OUTPUT() GPIO_1->DIRECTION_OUT =  1 << I2C_SCL
 	
 		#define SSD1306_I2C_ADDR 0x3c //0x3c:default, 0x3d: alternative)
 		#define SSD1306_I2C_CMD  0x00
@@ -407,27 +409,32 @@
 				#define PIN_BUTTON_B 8 // D7/8 port_1_8
 				#define B_BUTTON_PORT GPIO_1->STATE
 				#define B_BUTTON_BIT 8
-
+				#define B_BUTTON_PORTIN GPIO_1->STATE
 				
 				#define PIN_BUTTON_A 9 	 // D8/9 port_1_9
 				#define A_BUTTON_PORT GPIO_1->STATE
 				#define A_BUTTON_BIT 9
+				#define A_BUTTON_PORTIN GPIO_1->STATE
 				
 				#define PIN_LEFT_BUTTON 1 // D5/1 port_0_1
 				#define LEFT_BUTTON_PORT GPIO_0->STATE 
 				#define LEFT_BUTTON_BIT 1
+				#define LEFT_BUTTON_PORTIN GPIO_1->STATE
 				
 				#define PIN_RIGHT_BUTTON 0 // D3/0 port_0_0
 				#define RIGHT_BUTTON_PORT GPIO_0->STATE 
 				#define RIGHT_BUTTON_BIT 0
+				#define RIGHT_BUTTON_PORTIN GPIO_0->STATE
 				
 				#define PIN_UP_BUTTON 10 // D2/10 port_0_10
 				#define UP_BUTTON_PORT GPIO_0->STATE 
 				#define UP_BUTTON_BIT 10
+				#define UP_BUTTON_PORTIN GPIO_0->STATE
 				
 				#define PIN_DOWN_BUTTON 8 // D4/8 port_0_8
 				#define DOWN_BUTTON_PORT GPIO_0->STATE 
 				#define DOWN_BUTTON_BIT 8
+				#define DOWN_BUTTON_PORTIN GPIO_0->STATE
 				
 				#endif // END KEYS
 	#endif
