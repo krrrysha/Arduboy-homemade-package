@@ -207,7 +207,7 @@ void Arduboy2Core::bootPins()
   PORTD |= _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) |
            _BV(B_BUTTON_BIT) |
 		   _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
-  DDRD &= ~(_BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) |
+ DDRD &= ~(_BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) |
 	    _BV(B_BUTTON_BIT)|
 		_BV(RIGHT_BUTTON_BIT) |
 	    _BV(DOWN_BUTTON_BIT));
@@ -370,8 +370,8 @@ void Arduboy2Core::bootPins()
          #endif
          _BV(RAND_SEED_IN_BIT));
 
-// ВОЗМОЖНО ЗДЕСЬ ОШИБКА в ветвлении!
-#elif defined(AB_DEVKIT) 
+#endif
+#if defined(AB_DEVKIT) 
 
   // Port B INPUT_PULLUP or HIGH
   PORTB |= _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT) |
