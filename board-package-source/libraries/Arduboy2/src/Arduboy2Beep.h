@@ -8,10 +8,14 @@
 #define ARDUBOY2_BEEP_H
 
 #ifdef __AVR_ATmega328P__
-#define OLED_SSD1306_I2C
 #define ECONSOLE
 #warning ECONSOLE!
 #endif						 
+
+#ifdef MCU_MIK32_Amur
+#define ELBEARBOY
+#warning ELBEARBOY!
+
 /** \brief
  * Play simple square wave tones using speaker pin 1.
  *
@@ -254,7 +258,11 @@ class BeepPin1
    */
   static constexpr uint16_t freq(const float hz)
   {
+#ifndef (ELBEARBOY) 
     return (uint16_t) (((F_CPU / 8 / 2) + (hz / 2)) / hz) - 1;
+#else
+	return (uint16_t) ((F_CPU/32/hz)-(1/2)) ; 
+#endif
   }
 };
 
@@ -359,7 +367,11 @@ class BeepPin2
    */
   static constexpr uint16_t freq(const float hz)
   {
+#ifndef (ELBEARBOY) 
     return (uint16_t) (((F_CPU / 128 / 2) + (hz / 2)) / hz) - 1;
+#else
+	return (uint16_t) ((F_CPU/32/hz)-(1/2)) ; 
+#endif
   }
 };
 

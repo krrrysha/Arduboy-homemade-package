@@ -16,7 +16,7 @@
 #ifdef MCU_MIK32_Amur
 #define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
 #define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
-#define ECONSOLE
+#define ELBEARBOY
 #warning ELBEARBOY!
 
 #endif
