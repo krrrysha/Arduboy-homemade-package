@@ -11,6 +11,10 @@ uint8_t Arduboy2Core::ADCJoystickState = 0;
 unsigned int Arduboy2Core::JoystickXZero = 2000; // first run indicator. number greater than 1^10
 unsigned int Arduboy2Core::JoystickYZero = 2000; // first run indicator. number greater than 1^10
 #endif
+#ifdef ELBEARBOY
+	uint8_t chan_converted = 0;
+	uint8_t chan_selected = 0;  
+#endif
 
 #include <avr/wdt.h>
 
@@ -227,7 +231,34 @@ void Arduboy2Core::bootPins()
   // switch off LEDs by default
   PORTC &= ~(_BV(GREEN_LED_BIT)   | _BV(BLUE_LED_BIT) | _BV(RED_LED_BIT));
 #elif defined (ELBEARBOY)
-  //INPUT_PULLUP or HIGH
+	
+	//включаем тактирование GPIO_0, GPIO_1, ADC
+	PM->CLK_APB_P_SET |=  PM_CLOCK_APB_P_GPIO_0_M | PM_CLOCK_APB_P_GPIO_1_M | PM_CLOCK_APB_P_ANALOG_REGS_M; 
+	// инициализация ADC
+	chan_selected=0;
+
+	PAD_CONFIG->PORT_0_CFG |= (0b11 << (2 * PIN_RANDOM)); // аналоговый сигнал. порт A2=0.4
+
+	ANALOG_REG->ADC_CONFIG = 0x3c00; // последовательность для инициализации ADC MIK32 из HAL
+	//HAL_ADC_Enable(&hadc);
+	ANALOG_REG->ADC_CONFIG = (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) |
+                                 ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) |
+                                 (1 << ADC_CONFIG_EN_S);
+	//HAL_ADC_ResetEnable:
+	ANALOG_REG->ADC_CONFIG = (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) |
+                                 ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) |
+                                 (1 << ADC_CONFIG_RESETN_S);
+	// HAL_ADC_ChannelSet
+	myADC_SEL_CHANNEL (chan_selected);
+	ANALOG_REG->ADC_CONFIG |= (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) |
+                                 ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) |
+                                 (ADC_EXTREF_OFF << ADC_CONFIG_EXTREF_S) |   // Настройка источника опорного напряжения 
+                                 (ADC_EXTCLB_ADCREF << ADC_CONFIG_EXTPAD_EN_S); // Выбор внешнего источника опорного напряжения 
+	chan_converted=chan_selected;
+	ANALOG_REG->ADC_SINGLE=1; //считаем хз что
+
+
+
   #ifndef  JOYSTICKANALOG //JOYSTICDISCRETE
 	// Port  INPUT_PULLUP
 	// SDA and SCL as inputs without pullups
@@ -235,15 +266,18 @@ void Arduboy2Core::bootPins()
   //PAD_CONFIG->PAD1_PUPD &= ~ (0b00 << (2 * BUTTON_B_BIT) | 0b00 << (2 * BUTTON_A_BIT));
   //PAD_CONFIG->PAD0_PUPD &= ~ (0b00 << (2 * LEFT_BUTTON_BIT) | 0b00 << (2 * RIGHT_BUTTON_BIT) | 0b00 << (2 * UP_BUTTON_BIT) | 0b00 << (2 * DOWN_BUTTON_BIT));
   // todo - перенести настройку на Serial из *.h
-  // Задаем напрарвление без "|=", т.к. для установки DIRECTION - только запись "1"
+  // Задаем направление без "|=", т.к. для установки DIRECTION - только запись "1"
+
+  
   GPIO_0->DIRECTION_IN = _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
   GPIO_1->DIRECTION_IN = _BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT);
  
   GPIO_0->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(BLUE_LED_BIT);
   GPIO_1->DIRECTION_OUT = _BV(RED_LED_BIT);
 
-  #else
-	  //JOYSTICKANALOG
+  #else // JOYSTICKANALOG
+	PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A0=1.5
+	PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
   #endif	
 #else
   // Port B INPUT_PULLUP or HIGH
@@ -1258,7 +1292,14 @@ void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
     blue  = 255;
   }
 #endif
-#ifdef ARDUBOY_10 // RGB, all the pretty colors
+
+
+#ifdef defined(ECONSOLE) || (ELBEARBOY)
+  // only blue on DevKit, which is not PWM capable
+  (void)red;    // parameter unused
+  (void)green;  // parameter unused
+   (void)blue;  // parameter unused
+#elif ARDUBOY_10 // RGB, all the pretty colors
   // timer 0: Fast PWM, OC0A clear on compare / set at top
   // We must stay in Fast PWM mode because timer 0 is used for system timing.
   // We can't use "inverted" mode because it won't allow full shut off.
@@ -1293,17 +1334,14 @@ void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
   (void)red;    // parameter unused
   (void)green;  // parameter unused
   bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue ? RGB_ON : RGB_OFF);
-#elif defined(ECONSOLE)
-  // only blue on DevKit, which is not PWM capable
-  (void)red;    // parameter unused
-  (void)green;  // parameter unused
-   (void)blue;  // parameter unused
 #endif
 }
 
 void Arduboy2Core::setRGBled(uint8_t color, uint8_t val)
 {
-#ifdef ARDUBOY_10
+#ifdef defined(ECONSOLE) || (ELBEARBOY)
+   (void)blue;  // parameter unused
+#elif ARDUBOY_10
   if (color == RED_LED)
   {
    #ifdef LCD_ST7565
@@ -1476,6 +1514,45 @@ buttons |= ADCJoystickState;
   if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
   // B
   if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
+#elif defined(ELBEARBOY)
+	  buttons = 0;
+	#ifndef JOYSTICKANALOG
+		if (bitRead(UP_BUTTON_PORTIN, UP_BUTTON_BIT) == 0) { buttons |= UP_BUTTON; }
+		if (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT) == 0) { buttons |= DOWN_BUTTON; }
+		if (bitRead(LEFT_BUTTON_PORTIN, LEFT_BUTTON_BIT) == 0) { buttons |= LEFT_BUTTON; }
+		if (bitRead(RIGHT_BUTTON_PORTIN, RIGHT_BUTTON_BIT) == 0) { buttons |= RIGHT_BUTTON; }
+	#else
+		if (ANALOG_REG->ADC_VALID) {
+		  if ((chan_converted == CHAN_AXISX | chan_converted==CHAN_AXISY ) & (chan_selected==CHAN_AXISY|chan_selected==CHAN_AXISX))  
+		  {  // последний заданный канал и рассчитанный канал- один из наших
+			unsigned int ADCdata=ANALOG_REG->ADC_VALUE; // данные от прошлого расчета, возможно на канале за пределами используемых
+			if (chan_converted ==CHAN_AXISX ) { // if the conversion at the AC0 input is complete
+				ADCJoystickState &= ~(RIGHT_BUTTON | LEFT_BUTTON);
+				if (JoystickXZero>4096) {JoystickXZero=ADCdata;} // if first run
+				if (ADCdata > JoystickXZero+JOYSENSX) {ADCJoystickState |= RIGHT_BUTTON;} else if (ADCdata < JoystickXZero-JOYSENSX) {ADCJoystickState |= LEFT_BUTTON;} // we determine the direction along the X axis
+				chan_selected=CHAN_AXISX;
+				chan_converted=CHAN_AXISY;
+			} else if (chan_converted ==CHAN_AXISY)   // if the conversion at the AC1 input is complete 
+			{ 
+				ADCJoystickState &= ~(UP_BUTTON | DOWN_BUTTON);
+				if (JoystickYZero>4096) {JoystickYZero=ADCdata;} // if first run
+				if (ADCdata > JoystickYZero+JOYSENSY) {ADCJoystickState |= UP_BUTTON;} else if (ADCdata < JoystickYZero-JOYSENSY) {ADCJoystickState |= DOWN_BUTTON;} // we determine the direction along the Y axis
+				chan_selected=CHAN_AXISY;
+				chan_converted=CHAN_AXISX;
+			} 
+			ANALOG_REG->ADC_SINGLE=1;
+			myADC_SEL_CHANNEL (chan_selected);
+		  } else // если не наш канал (канал рандомизатора )
+		  {
+			chan_converted=chan_selected;
+			chan_selected=CHAN_AXISX;
+			ANALOG_REG->ADC_SINGLE=1;
+			myADC_SEL_CHANNEL (chan_selected);
+		  }
+		}
+	#endif
+		if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
+		if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
 #endif
 
   return buttons;
@@ -1485,6 +1562,7 @@ unsigned long Arduboy2Core::generateRandomSeed()
 {
   unsigned long seed;
 
+#ifndef (ELBEARBOY)
   power_adc_enable(); // ADC on
 
   // do an ADC read from an unconnected input pin
@@ -1496,7 +1574,13 @@ unsigned long Arduboy2Core::generateRandomSeed()
   #ifndef JOYSTICKANALOG
   power_adc_disable(); // disable power saving for ADC
   #endif
+#else
 
+	chan_selected=2; // канал рандомизации
+    myADC_SEL_CHANNEL(chan_selected); //переключаемся на канал для рандомизации
+	while (!ANALOG_REG->ADC_VALID) {};
+    ANALOG_REG->ADC_SINGLE=1; //считаем новый рандом
+#endif
   return seed;
 }
 
@@ -1517,6 +1601,7 @@ void Arduboy2Core::delayByte(uint8_t ms)
 
 void Arduboy2Core::exitToBootloader()
 {
+#if !defined  (ELBEARBOY) 
   cli();
  #ifdef ARDUBOY_CORE
   asm volatile 
@@ -1524,7 +1609,7 @@ void Arduboy2Core::exitToBootloader()
     "jmp exit_to_bootloader \n" // resuse ISR exit to bootloader code
   );
  #else
-#if !defined (ECONSOLE)  
+#if !defined  (ECONSOLE) 
 // set bootloader magic key
   // storing two uint8_t instead of one uint16_t saves an instruction
   //  when high and low bytes of the magic key are the same
@@ -1537,6 +1622,7 @@ void Arduboy2Core::exitToBootloader()
   WDTCSR = _BV(WDE);
   while (true) { }
  #endif
+#endif
 }
 
 // Replacement main() that eliminates the USB stack code.
@@ -1549,7 +1635,7 @@ void Arduboy2Core::exitToBootloader()
 
 void Arduboy2NoUSB::mainNoUSB()
 {
-#if !defined (ECONSOLE)
+#if !defined  ((ECONSOLE) && !defined  (ELBEARBOY)
   // disable USB
   UDCON = _BV(DETACH);
   UDIEN = 0;

@@ -313,7 +313,7 @@
 
 	#else
 
-	#ifndef JOYSTICDISCRETE // ECOSOLE KEYS
+	#ifndef JOYSTICDISCRETE // ECONSOLE KEYS
 	#define PIN_LEFT_BUTTON 2
 	#define LEFT_BUTTON_PORT PORTD
 	#define LEFT_BUTTON_PORTIN PIND
@@ -389,14 +389,22 @@
 		
 	#endif // END KEYS
 #elif defined (ELBEARBOY)
+
+	#define ADC_CONFIG_SAH_TIME_MY          (0x3F << ADC_CONFIG_SAH_TIME_S) //Время выборки очередного отсчета в тактах АЦП - используем значение по-умолчанию
+	// нумерация каналов ADC - сквозная 0,1,2:
+	#define myADC_SEL_CHANNEL(channel_selection) (ANALOG_REG->ADC_CONFIG = ((ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) & (~ADC_CONFIG_SEL_M)) | ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) | ((channel_selection) << ADC_CONFIG_SEL_S))
+	#define ADC_EXTREF_OFF      0       /* Встроенный источник опорного напряжения 1,2 В */
+	#define ADC_EXTREF_ON       1       /* Внешний источник опорного напряжения */
+	#define ADC_EXTCLB_CLBREF      0       /* Настраиваемый ОИН */
+	#define ADC_EXTCLB_ADCREF      1       /* Внешний вывод */
+
+
 	#if defined (JOYSTICKANALOG)
-		#define ADC_CONFIG_SAH_TIME_MY          (0x3F << ADC_CONFIG_SAH_TIME_S)
-		#define myADC_SEL_CHANNEL(channel_selection) (ANALOG_REG->ADC_CONFIG = ((ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) & (~ADC_CONFIG_SEL_M)) | ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) | ((channel_selection) << ADC_CONFIG_SEL_S))
-		#define PIN_BUTTON_B 0 // D3/0 port_0_0
-		#define GPIO_BUTTON_B 0		
-		
-		#define PIN_BUTTON_A 8 // D4/8 port_0_8
-		#define GPIO_BUTTON_A 0 		
+
+		#define B_BUTTON_BIT 0 // D3/0 port_0_0
+		#define B_BUTTON_PORTIN GPIO_0->STATE
+		#define A_BUTTON_BIT 8 // D4/8 port_0_8
+		#define A_BUTTON_PORTIN GPIO_0->STATE
 		
 		#define PIN_AXISX 7 // Ось X port_1_5
 		#define PIN_AXISY 5 // Ось Y port_1_7
@@ -405,38 +413,42 @@
 		#define CHAN_AXISY 0 // Ось Y port_1_7
 		#define CHAN_RANDOM 0 // Ось Y port_0_4
 			#ifndef JOYSTICDISCRETE // ECOSOLE KEYS
-			#else // JOYSTICDISCRETE KEYS 
-				#define PIN_BUTTON_B 8 // D7/8 port_1_8
-				#define B_BUTTON_PORT GPIO_1->STATE
-				#define B_BUTTON_BIT 8
+				#define B_BUTTON_BIT 8 // +D7/8 port_1_8
 				#define B_BUTTON_PORTIN GPIO_1->STATE
 				
-				#define PIN_BUTTON_A 9 	 // D8/9 port_1_9
-				#define A_BUTTON_PORT GPIO_1->STATE
-				#define A_BUTTON_BIT 9
+				#define A_BUTTON_BIT 8 // +D4/8 port_0_8
 				#define A_BUTTON_PORTIN GPIO_1->STATE
-				
-				#define PIN_LEFT_BUTTON 1 // D5/1 port_0_1
-				#define LEFT_BUTTON_PORT GPIO_0->STATE 
-				#define LEFT_BUTTON_BIT 1
-				#define LEFT_BUTTON_PORTIN GPIO_1->STATE
-				
-				#define PIN_RIGHT_BUTTON 0 // D3/0 port_0_0
-				#define RIGHT_BUTTON_PORT GPIO_0->STATE 
-				#define RIGHT_BUTTON_BIT 0
+
+				#define LEFT_BUTTON_BIT 1 // +D2/10 port_0_10
+				#define LEFT_BUTTON_PORTIN GPIO_0->STATE
+
+				#define RIGHT_BUTTON_BIT 2 // D6/0 port_0_2
 				#define RIGHT_BUTTON_PORTIN GPIO_0->STATE
-				
-				#define PIN_UP_BUTTON 10 // D2/10 port_0_10
-				#define UP_BUTTON_PORT GPIO_0->STATE 
-				#define UP_BUTTON_BIT 10
+ 
+				#define UP_BUTTON_BIT 0 // D3/0 port_0_0
 				#define UP_BUTTON_PORTIN GPIO_0->STATE
-				
-				#define PIN_DOWN_BUTTON 8 // D4/8 port_0_8
-				#define DOWN_BUTTON_PORT GPIO_0->STATE 
-				#define DOWN_BUTTON_BIT 8
+
+				#define DOWN_BUTTON_BIT 1 // D5/1 port_0_1
 				#define DOWN_BUTTON_PORTIN GPIO_0->STATE
+			#else // JOYSTICDISCRETE KEYS 
+				#define B_BUTTON_BIT 8 // D7/8 port_1_8
+				#define B_BUTTON_PORTIN GPIO_1->STATE
 				
-				#endif // END KEYS
+				#define A_BUTTON_BIT 9 // D8/9 port_1_9
+				#define A_BUTTON_PORTIN GPIO_1->STATE
+
+				#define LEFT_BUTTON_BIT 1 // D5/1 port_0_1
+				#define LEFT_BUTTON_PORTIN GPIO_0->STATE
+
+				#define RIGHT_BUTTON_BIT 0 // D3/0 port_0_0
+				#define RIGHT_BUTTON_PORTIN GPIO_0->STATE
+ 
+				#define UP_BUTTON_BIT 10 // D2/10 port_0_10
+				#define UP_BUTTON_PORTIN GPIO_0->STATE
+
+				#define DOWN_BUTTON_BIT 8 // D4/8 port_0_8
+				#define DOWN_BUTTON_PORTIN GPIO_0->STATE
+			#endif // END KEYS
 	#endif
 #else
 #if defined (MICROCADE)
@@ -1457,7 +1469,11 @@ class Arduboy2Core : public Arduboy2NoUSB
      * \see ARDUBOY_NO_USB
      */
     static void exitToBootloader();
-	 #if defined (JOYSTICKANALOG)
+	#if define (ELBEARBOY)
+		uint8_t chan_converted;
+		uint8_t chan_selected;
+	#endif
+	#if defined (JOYSTICKANALOG)
 	 static uint8_t ADCJoystickState;
 	 static unsigned int JoystickXZero;
 	 static unsigned int JoystickYZero;
