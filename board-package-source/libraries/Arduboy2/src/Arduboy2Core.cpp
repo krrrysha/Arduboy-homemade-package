@@ -8,8 +8,8 @@
 
 #ifdef JOYSTICKANALOG
 uint8_t Arduboy2Core::ADCJoystickState = 0;
-unsigned int Arduboy2Core::JoystickXZero = 2000; // first run indicator. number greater than 1^10
-unsigned int Arduboy2Core::JoystickYZero = 2000; // first run indicator. number greater than 1^10
+unsigned int Arduboy2Core::JoystickXZero = 5000; // first run indicator. number greater than 1^10 (greater than 1^12 for mik32)
+unsigned int Arduboy2Core::JoystickYZero = 5000; // first run indicator. number greater than 1^10 (greater than 1^12 for mik32)
 #endif
 #ifdef ELBEARBOY
 	uint8_t chan_converted = 0;
@@ -1551,6 +1551,7 @@ buttons |= ADCJoystickState;
 		  }
 		}
 	#endif
+		buttons |= ADCJoystickState;
 		if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
 		if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
 #endif
