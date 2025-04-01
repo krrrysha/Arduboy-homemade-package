@@ -1577,7 +1577,7 @@ unsigned long Arduboy2Core::generateRandomSeed()
   #endif
 #else
 
-	chan_selected=2; // канал рандомизации
+	chan_selected=3; // канал рандомизации
     myADC_SEL_CHANNEL(chan_selected); //переключаемся на канал для рандомизации
 	while (!ANALOG_REG->ADC_VALID) {};
     ANALOG_REG->ADC_SINGLE=1; //считаем новый рандом

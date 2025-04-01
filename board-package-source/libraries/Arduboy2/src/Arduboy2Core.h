@@ -397,7 +397,8 @@
 	#define ADC_EXTREF_ON       1       /* Внешний источник опорного напряжения */
 	#define ADC_EXTCLB_CLBREF      0       /* Настраиваемый ОИН */
 	#define ADC_EXTCLB_ADCREF      1       /* Внешний вывод */
-
+	#define PIN_RANDOM 4 // ACD3 port_0_4
+	#define CHAN_RANDOM 0 // ACD3 port_0_4
 
 	#if defined (JOYSTICKANALOG)
 
@@ -408,18 +409,18 @@
 		
 		#define PIN_AXISX 7 // Ось X port_1_5
 		#define PIN_AXISY 5 // Ось Y port_1_7
-		#define PIN_RANDOM 4 // Ось Y port_0_9
+
 		#define CHAN_AXISX 1 // Ось X port_1_5
 		#define CHAN_AXISY 0 // Ось Y port_1_7
-		#define CHAN_RANDOM 0 // Ось Y port_0_4
+
 			#ifndef JOYSTICDISCRETE // ECOSOLE KEYS
-				#define B_BUTTON_BIT 8 // +D7/8 port_1_8
+				#define B_BUTTON_BIT 8 // D7/8 port_1_8
 				#define B_BUTTON_PORTIN GPIO_1->STATE
 				
-				#define A_BUTTON_BIT 8 // +D4/8 port_0_8
+				#define A_BUTTON_BIT 8 // D4/8 port_0_8
 				#define A_BUTTON_PORTIN GPIO_1->STATE
 
-				#define LEFT_BUTTON_BIT 1 // +D2/10 port_0_10
+				#define LEFT_BUTTON_BIT 1 // D2/10 port_0_10
 				#define LEFT_BUTTON_PORTIN GPIO_0->STATE
 
 				#define RIGHT_BUTTON_BIT 2 // D6/0 port_0_2
