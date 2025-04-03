@@ -16,7 +16,9 @@ unsigned int Arduboy2Core::JoystickYZero = 5000; // first run indicator. number 
 	uint8_t chan_selected = 0;  
 #endif
 
-#include <avr/wdt.h>
+#ifndef ELBEARBOY
+	#include <avr/wdt.h>
+#endif
 
 #ifndef OLED_CONTRAST
 # define OLED_CONTRAST 0x80 // 0xCF for high contrast or 0x80 low contrast
@@ -561,7 +563,7 @@ void Arduboy2Core::i2c_start(uint8_t mode)
 
 void Arduboy2Core::i2c_sendByte(uint8_t byte)
 {
-  #ifndef (ELBEARBOY)
+  #ifndef ELBEARBOY
   uint8_t sda_clr = I2C_PORT & ~((1 << I2C_SDA) | (1 << I2C_SCL));
   uint8_t scl = 1 << I2C_SCL;
   uint8_t sda = 1 << I2C_SDA;
@@ -1328,7 +1330,7 @@ void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
 #endif
 
 
-#ifdef defined(ECONSOLE) || (ELBEARBOY)
+#if defined(ECONSOLE) || defined(ELBEARBOY)
   // only blue on DevKit, which is not PWM capable
   (void)red;    // parameter unused
   (void)green;  // parameter unused
@@ -1373,7 +1375,7 @@ void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
 
 void Arduboy2Core::setRGBled(uint8_t color, uint8_t val)
 {
-#ifdef defined(ECONSOLE) || (ELBEARBOY)
+#if defined(ECONSOLE) || defined(ELBEARBOY)
    (void)blue;  // parameter unused
 #elif ARDUBOY_10
   if (color == RED_LED)
@@ -1597,7 +1599,7 @@ unsigned long Arduboy2Core::generateRandomSeed()
 {
   unsigned long seed;
 
-#ifndef (ELBEARBOY)
+#ifndef ELBEARBOY
   power_adc_enable(); // ADC on
 
   // do an ADC read from an unconnected input pin

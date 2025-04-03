@@ -7,19 +7,14 @@
 #ifndef ARDUBOY2_CORE_H
 #define ARDUBOY2_CORE_H
 
-#include <Arduino.h>
-#include <avr/power.h>
-#include <avr/sleep.h>
-
-//ifdef __AVR_ATmega328P__
-
 #ifdef MCU_MIK32_Amur
 #define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
 #define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 #define ELBEARBOY
 #warning ELBEARBOY!
-
 #endif
+
+//ifdef __AVR_ATmega328P__
 /*
 #ifdef MCU_MIK32_Amur
 #define ELBEARBOY
@@ -27,6 +22,12 @@
 #define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 #endif
 */
+
+#include <Arduino.h>
+#if !defined(ELBEARBOY)
+	#include <avr/power.h>
+	#include <avr/sleep.h>
+#endif
 
 #ifdef JOYSTICKANALOG
 	#define JOYSENSX 150 //Joystick sensitivity. X axis
@@ -58,7 +59,7 @@
 // ----- Arduboy pins -----
 #ifdef ARDUBOY_10
 
-#ifndef (ELBEARBOY) 
+#ifndef ELBEARBOY 
 #if defined(ECONSOLE) 
 	#define PIN_CS 12       // Display CS Arduino pin number
 	#define CS_PORT PORTD   // Display CS port
@@ -200,7 +201,7 @@
  #define SSD1306_I2C_DATA 0x40
 #endif
 #endif
-#ifndef (ELBEARBOY)
+#ifndef ELBEARBOY
 #if defined (ECONSOLE)
 	#define RED_LED 13   /**< The pin number for the red color in the RGB LED. */
 	#define GREEN_LED 17 /**< The pin number for the greem color in the RGB LED. */
@@ -679,7 +680,7 @@
 
 // Unconnected analog input used for noise by initRandomSeed()
 #ifndef SUPPORT_XY_BUTTONS
-	#ifndef (ELBEARBOY)
+	#ifndef ELBEARBOY
 	#define RAND_SEED_IN A4
 	#define RAND_SEED_IN_PORT PORTF
 	#define RAND_SEED_IN_BIT PORTF1
@@ -1479,7 +1480,7 @@ class Arduboy2Core : public Arduboy2NoUSB
      * \see ARDUBOY_NO_USB
      */
     static void exitToBootloader();
-	#if define (ELBEARBOY)
+	#if defined (ELBEARBOY)
 		uint8_t chan_converted;
 		uint8_t chan_selected;
 	#endif

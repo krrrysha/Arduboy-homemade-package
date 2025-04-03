@@ -258,7 +258,7 @@ class BeepPin1
    */
   static constexpr uint16_t freq(const float hz)
   {
-#ifndef (ELBEARBOY) 
+#ifndef ELBEARBOY 
     return (uint16_t) (((F_CPU / 8 / 2) + (hz / 2)) / hz) - 1;
 #else
 	return (uint16_t) ((F_CPU/32/hz)-(1/2)) ; 
@@ -367,7 +367,7 @@ class BeepPin2
    */
   static constexpr uint16_t freq(const float hz)
   {
-#ifndef (ELBEARBOY) 
+#ifndef ELBEARBOY 
     return (uint16_t) (((F_CPU / 128 / 2) + (hz / 2)) / hz) - 1;
 #else
 	return (uint16_t) ((F_CPU/32/hz)-(1/2)) ; 

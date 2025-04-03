@@ -61,7 +61,7 @@ void Arduboy2Base::beginDoFirst()
 
 void Arduboy2Base::flashlight()
 {
-#ifndef ECONSOLE 
+#if !defined(ECONSOLE ) && !defined(ELBEARBOY)
   if (!pressed(UP_BUTTON)) {
     return;
   }
@@ -308,7 +308,7 @@ bool Arduboy2Base::nextFrame()
   return true;
 }
 
-#ifndef ECONSOLE
+#if !defined (ECONSOLE) && !defined(ELBEARBOY)
 bool Arduboy2Base::nextFrameDEV()
 {
   bool ret = nextFrame();

@@ -7,8 +7,16 @@
 #ifndef ARDUBOY2_H
 #define ARDUBOY2_H
 
+
+#ifdef MCU_MIK32_Amur
+#define ELBEARBOY
+#warning ELBEARBOY!
+#endif
+
 #include <Arduino.h>
-#include <avr/eeprom.h>
+#if !defined(ELBEARBOY)
+	#include <avr/eeprom.h>
+#endif	
 #include "Arduboy2Core.h"
 #include "Arduboy2Audio.h"
 #include "Arduboy2Beep.h"

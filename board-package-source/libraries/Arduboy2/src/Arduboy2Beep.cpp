@@ -15,7 +15,7 @@ uint8_t BeepPin1::duration = 0;
 
 void BeepPin1::begin()
 {
-#ifndef (ELBEARBOY) 
+#ifndef ELBEARBOY 
 #ifdef ECONSOLE
   TCCR1A = 0;
   TCCR1B = (bit(WGM12) | bit(CS11)); // CTC mode. Divide by 8 clock prescale
@@ -45,7 +45,7 @@ void BeepPin1::tone(uint16_t count)
 void BeepPin1::tone(uint16_t count, uint8_t dur)
 {
   duration = dur;
-#ifndef (ELBEARBOY) 
+#ifndef ELBEARBOY 
 #ifdef ECONSOLE
   TCCR1A = bit(COM1A0); // set toggle on compare mode (which connects the pin)
   OCR1A = count; // load the count (16 bits), which determines the frequency
@@ -64,7 +64,7 @@ void BeepPin1::tone(uint16_t count, uint8_t dur)
 void BeepPin1::timer()
 {
   if (duration && (--duration == 0)) {
-#ifndef (ELBEARBOY)
+#ifndef ELBEARBOY
   #ifdef ECONSOLE
     TCCR1A = 0; // set normal mode (which disconnects the pin)	  
   #else
@@ -79,7 +79,7 @@ void BeepPin1::timer()
 void BeepPin1::noTone()
 {
   duration = 0;
-#ifndef (ELBEARBOY)
+#ifndef ELBEARBOY
   #ifdef ECONSOLE
   TCCR1A = 0; // set normal mode (which disconnects the pin)	  
   #else  
@@ -97,7 +97,7 @@ uint8_t BeepPin2::duration = 0;
 
 void BeepPin2::begin()
 {
-#ifndef (ELBEARBOY) 
+#ifndef ELBEARBOY 
 #ifdef ECONSOLE
   TCCR2A = 0; // normal mode. Disable PWM
   TCCR2B = bit(CS22) | bit(CS20); // divide by 128 clock prescale
@@ -135,7 +135,7 @@ void BeepPin2::tone(uint16_t count, uint8_t dur)
 {
 
   duration = dur;
-#ifndef (ELBEARBOY)
+#ifndef ELBEARBOY
  #ifdef ECONSOLE
   TCCR2A = bit(WGM21) | bit(COM2A0); // CTC mode, toggle on compare mode (which connects the pin)
   OCR2A = lowByte(count); //  which determines the frequency
@@ -166,7 +166,7 @@ void BeepPin2::timer()
 void BeepPin2::noTone()
 {
   duration = 0;
-#ifndef (ELBEARBOY)
+#ifndef ELBEARBOY
 #ifdef ECONSOLE
   TCCR2A = 0; // set normal mode (which disconnects the pin)
 #else     
