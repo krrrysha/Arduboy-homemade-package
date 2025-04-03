@@ -234,6 +234,19 @@ void Arduboy2Core::bootPins()
 	
 	//включаем тактирование GPIO_0, GPIO_1, ADC
 	PM->CLK_APB_P_SET |=  PM_CLOCK_APB_P_GPIO_0_M | PM_CLOCK_APB_P_GPIO_1_M | PM_CLOCK_APB_P_ANALOG_REGS_M; 
+	//включаем тактирование контроллера выводов, Wake up, Power manager
+	PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M; 
+	// инициализация I2C
+	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SDA)); // Обнуление вывода 12 порта 1 (в режим GPIO)
+	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SCL)); // Обнуление вывода 13 порта 1 (в режим GPIO)
+	PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SDA)); // Обнуление. Отключается подтяжка при работе в режиме выхода
+	PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SCL)); // Обнуление. Отключается подтяжка при работе в режиме выхода
+	PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SDA)); // Обнуление.
+	PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SCL)); // Обнуление
+	PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SDA)); // Нагрузочная способность 8 мА
+	PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SCL)); // Нагрузочная способность 8 мА
+	i2c_stop();
+	
 	// инициализация ADC
 	chan_selected=0;
 
@@ -548,6 +561,7 @@ void Arduboy2Core::i2c_start(uint8_t mode)
 
 void Arduboy2Core::i2c_sendByte(uint8_t byte)
 {
+  #ifndef (ELBEARBOY)
   uint8_t sda_clr = I2C_PORT & ~((1 << I2C_SDA) | (1 << I2C_SCL));
   uint8_t scl = 1 << I2C_SCL;
   uint8_t sda = 1 << I2C_SDA;
@@ -577,6 +591,26 @@ void Arduboy2Core::i2c_sendByte(uint8_t byte)
      [sda]  "r" (sda),
      [sclb] "i" (scl_bit)
   );
+  #else
+	uint8_t i;
+	for (i=0;i<8;i++)
+		{
+			if (byte & 0x80) 
+			{ I2C_SDA_AS_INPUT();  // лог.1
+			} else 
+			{	I2C_SDA_LOW();
+			I2C_SDA_AS_OUTPUT(); // Выставить бит на SDA (лог.0
+			}
+			I2C_SCL_AS_INPUT();   // Записать его импульсом на SCL       // отпустить SCL (лог.1)
+			I2C_SCL_LOW();
+			I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)
+			byte<<=1; // сдвигаем на 1 бит влево
+		}
+		I2C_SDA_AS_INPUT(); // отпустить SDA (лог.1), чтобы ведомое устройство смогло сгенерировать ACK. В оригинальном тексте Arduboy2 тут выставляется лог.0. Вероятно, чтобы не дожидаться, пока это сделает ведомый?
+		I2C_SCL_AS_INPUT(); // отпустить SCL (лог.1), чтобы ведомое устройство передало ACK
+		I2C_SCL_LOW();
+		I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)  // приём ACK завершён
+  #endif
 }
 #endif
 
