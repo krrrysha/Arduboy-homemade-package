@@ -8,25 +8,26 @@
 #define ARDUBOY2_CORE_H
 
 #ifdef MCU_MIK32_Amur
-#define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
-#define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
-#define ELBEARBOY
-#warning ELBEARBOY!
+	//define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
+	#define OLED_SH1106_I2C
+	#define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
+	#define ELBEARBOY
+	#warning ELBEARBOY!
 #endif
 
-//ifdef __AVR_ATmega328P__
-/*
-#ifdef MCU_MIK32_Amur
-#define ELBEARBOY
-#warning ELBEARBOY!
-#define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
+#ifdef __AVR_ATmega328P__
+	#define ECONSOLE
+	#warning ECONSOLE!
+	#define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 #endif
-*/
+
 
 #include <Arduino.h>
 #if !defined(ELBEARBOY)
 	#include <avr/power.h>
 	#include <avr/sleep.h>
+#else
+	#include "analog_reg.h"
 #endif
 
 #ifdef JOYSTICKANALOG
@@ -60,37 +61,35 @@
 #ifdef ARDUBOY_10
 
 #ifndef ELBEARBOY 
-#if defined(ECONSOLE) 
-	#define PIN_CS 12       // Display CS Arduino pin number
-	#define CS_PORT PORTD   // Display CS port
-	#define CS_BIT PORTD6   // Display CS physical bit number
+	#if defined(ECONSOLE) 
+		#define PIN_CS 12       // Display CS Arduino pin number
+		#define CS_PORT PORTD   // Display CS port
+		#define CS_BIT PORTD6   // Display CS physical bit number
 
-	#define PIN_DC 4        // Display D/C Arduino pin number
-	#define DC_PORT PORTD   // Display D/C port
-	#define DC_BIT PORTD4   // Display D/C physical bit number
+		#define PIN_DC 4        // Display D/C Arduino pin number
+		#define DC_PORT PORTD   // Display D/C port
+		#define DC_BIT PORTD4   // Display D/C physical bit number
 
-	#define PIN_RST 6       // Display reset Arduino pin number
-	#define RST_PORT PORTD  // Display reset port
-	#define RST_BIT PORTD7  // Display reset physical bit number
-#else
-#ifdef AB_ALTERNATE_WIRING
-  #define PIN_CS 1        // Pro Micro alternative display CS pin (pin 12 not not available)
-  #define CS_PORT PORTD
-  #define CS_BIT PORTD3
+		#define PIN_RST 6       // Display reset Arduino pin number
+		#define RST_PORT PORTD  // Display reset port
+		#define RST_BIT PORTD7  // Display reset physical bit number
+	#elif defined (AB_ALTERNATE_WIRING)
+		  #define PIN_CS 1        // Pro Micro alternative display CS pin (pin 12 not not available)
+		  #define CS_PORT PORTD
+		  #define CS_BIT PORTD3
 
-  #define PIN_RST 2       // Pro Micro alternative display RST pin (pin 6 favoured for 2nd speaker pin)
-  #define RST_PORT PORTD
-  #define RST_BIT PORTD1
-#else
-  #define PIN_CS 12       // Display CS Arduino pin number
-  #define CS_PORT PORTD   // Display CS port
-  #define CS_BIT PORTD6   // Display CS physical bit number
+		  #define PIN_RST 2       // Pro Micro alternative display RST pin (pin 6 favoured for 2nd speaker pin)
+		  #define RST_PORT PORTD
+		  #define RST_BIT PORTD1
+	#else
+		  #define PIN_CS 12       // Display CS Arduino pin number
+		  #define CS_PORT PORTD   // Display CS port
+		  #define CS_BIT PORTD6   // Display CS physical bit number
 
-  #define PIN_RST 6       // Display reset Arduino pin number
-  #define RST_PORT PORTD  // Display reset port
-  #define RST_BIT PORTD7  // Display reset physical bit number
-#endif
-#endif
+		  #define PIN_RST 6       // Display reset Arduino pin number
+		  #define RST_PORT PORTD  // Display reset port
+		  #define RST_BIT PORTD7  // Display reset physical bit number
+	#endif
 
  #define PIN_DC 4        // Display D/C Arduino pin number
  #define DC_PORT PORTD   // Display D/C port
@@ -119,87 +118,84 @@
 
 
 #if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
-#if defined (ECONSOLE)
-	#define I2C_PORT  PORTC
-	#define I2C_DDR   DDRC
-	#define I2C_PIN   PINC
-	#define I2C_SCL PORTC5
-	#define I2C_SDA PORTC4
-	//port states
-	#define I2C_SDA_HIGH() I2C_PORT |=  (1 << I2C_SDA)
-	#define I2C_SCL_HIGH() I2C_PORT |=  (1 << I2C_SCL)
-	#define I2C_SDA_LOW()  I2C_PORT &= ~(1 << I2C_SDA)
-	#define I2C_SCL_LOW()  I2C_PORT &= ~(1 << I2C_SCL)
-
-	//port directions
-	#define I2C_SDA_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SDA)
-	#define I2C_SCL_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SCL)
-	#define I2C_SDA_AS_OUTPUT() I2C_DDR |= (1 << I2C_SDA)
-	#define I2C_SCL_AS_OUTPUT() I2C_DDR |= (1 << I2C_SCL)
-
-	// display address, commands
-	#define SSD1306_I2C_ADDR 0x3c //0x3c:default, 0x3d: alternative)
-	#define SSD1306_I2C_CMD  0x00
-	#define SSD1306_I2C_DATA 0x40
-#elif defined (ELBEARBOY)
-		
-		
-		#define I2C_PORT  GPIO_1->STATE
-		#define I2C_SCL 13 // D19  PORT 1.13
-		#define I2C_SDA 12 // D18  PORT 1.12 
-				
+	#if defined (ECONSOLE)
+		#warning ECONSOLE!!!!!
+		#define I2C_PORT  PORTC
+		#define I2C_DDR   DDRC
+		#define I2C_PIN   PINC
+		#define I2C_SCL PORTC5
+		#define I2C_SDA PORTC4
 		//port states
-		// INIT I2C as serial: PAD_CONFIG->PORT_1_CFG |= (0b01 << (2 * I2C_SCL));
-		//						PAD_CONFIG->PORT_1_CFG |= (0b01 << (2 * I2C_SDA));
 		#define I2C_SDA_HIGH() I2C_PORT |=  (1 << I2C_SDA)
 		#define I2C_SCL_HIGH() I2C_PORT |=  (1 << I2C_SCL)
 		#define I2C_SDA_LOW()  I2C_PORT &= ~(1 << I2C_SDA)
 		#define I2C_SCL_LOW()  I2C_PORT &= ~(1 << I2C_SCL)
 
 		//port directions
-		#define I2C_SDA_AS_INPUT()  GPIO_1->DIRECTION_IN =  (1 << I2C_SDA)	// установка SDA в 1
-		#define I2C_SCL_AS_INPUT()  GPIO_1->DIRECTION_IN =  (1 << I2C_SCL) // установка SCL в 1
+		#define I2C_SDA_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SDA)
+		#define I2C_SCL_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SCL)
+		#define I2C_SDA_AS_OUTPUT() I2C_DDR |= (1 << I2C_SDA)
+		#define I2C_SCL_AS_OUTPUT() I2C_DDR |= (1 << I2C_SCL)
 
-		// установка SDA в 0
-		#define I2C_SDA_AS_OUTPUT() GPIO_1->DIRECTION_OUT = (1 << I2C_SDA); 
-		#define I2C_SDA_LOW()   GPIO_1->CLEAR = (1 << I2C_SDA); 
-
-		// установка SCL в 0
-		#define I2C_SCL_AS_OUTPUT()  GPIO_1->DIRECTION_OUT = (1 << I2C_SCL); 
-		#define I2C_SCL_LOW()    GPIO_1->CLEAR = (1 << I2C_SCL); 
-	
+		// display address, commands
 		#define SSD1306_I2C_ADDR 0x3c //0x3c:default, 0x3d: alternative)
 		#define SSD1306_I2C_CMD  0x00
 		#define SSD1306_I2C_DATA 0x40
+	#elif defined (ELBEARBOY)
+			#define I2C_PORT  GPIO_1->STATE
+			#define I2C_SCL 13 // D19  PORT 1.13
+			#define I2C_SDA 12 // D18  PORT 1.12 
+					
+			//port states
+			// INIT I2C as serial: PAD_CONFIG->PORT_1_CFG |= (0b01 << (2 * I2C_SCL));
+			//						PAD_CONFIG->PORT_1_CFG |= (0b01 << (2 * I2C_SDA));
+			#define I2C_SDA_HIGH() I2C_PORT |=  (1 << I2C_SDA)
+			#define I2C_SCL_HIGH() I2C_PORT |=  (1 << I2C_SCL)
+			#define I2C_SDA_LOW()  I2C_PORT &= ~(1 << I2C_SDA)
+			#define I2C_SCL_LOW()  I2C_PORT &= ~(1 << I2C_SCL)
 
-	
-#else
- #define I2C_PORT  PORTD
- #define I2C_DDR   DDRD
- #define I2C_PIN   PIND
- #ifdef AB_ALTERNATE_WIRING
-  #define I2C_SCL PORTD3
- #else
-  #define I2C_SCL PORTD7
- #endif
- #define I2C_SDA PORTD4
- //port states
- #define I2C_SDA_HIGH() I2C_PORT |=  (1 << I2C_SDA)
- #define I2C_SCL_HIGH() I2C_PORT |=  (1 << I2C_SCL)
- #define I2C_SDA_LOW()  I2C_PORT &= ~(1 << I2C_SDA)
- #define I2C_SCL_LOW()  I2C_PORT &= ~(1 << I2C_SCL)
+			//port directions
+			#define I2C_SDA_AS_INPUT()  GPIO_1->DIRECTION_IN =  (1 << I2C_SDA)	// установка SDA в 1
+			#define I2C_SCL_AS_INPUT()  GPIO_1->DIRECTION_IN =  (1 << I2C_SCL) // установка SCL в 1
 
- //port directions
- #define I2C_SDA_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SDA)
- #define I2C_SCL_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SCL)
- #define I2C_SDA_AS_OUTPUT() I2C_DDR |= (1 << I2C_SDA)
- #define I2C_SCL_AS_OUTPUT() I2C_DDR |= (1 << I2C_SCL)
+			// установка SDA в 0
+			#define I2C_SDA_AS_OUTPUT() GPIO_1->DIRECTION_OUT = (1 << I2C_SDA); 
+			#define I2C_SDA_LOW()   GPIO_1->CLEAR = (1 << I2C_SDA); 
 
- // display address, commands
- #define SSD1306_I2C_ADDR 0x3c //0x3c:default, 0x3d: alternative)
- #define SSD1306_I2C_CMD  0x00
- #define SSD1306_I2C_DATA 0x40
-#endif
+			// установка SCL в 0
+			#define I2C_SCL_AS_OUTPUT()  GPIO_1->DIRECTION_OUT = (1 << I2C_SCL); 
+			#define I2C_SCL_LOW()    GPIO_1->CLEAR = (1 << I2C_SCL); 
+		
+			#define SSD1306_I2C_ADDR 0x3c //0x3c:default, 0x3d: alternative)
+			#define SSD1306_I2C_CMD  0x00
+			#define SSD1306_I2C_DATA 0x40
+	#else
+		 #define I2C_PORT  PORTD
+		 #define I2C_DDR   DDRD
+		 #define I2C_PIN   PIND
+		 #ifdef AB_ALTERNATE_WIRING
+			#define I2C_SCL PORTD3
+		 #else
+			#define I2C_SCL PORTD7
+		 #endif
+		 #define I2C_SDA PORTD4
+		 //port states
+		 #define I2C_SDA_HIGH() I2C_PORT |=  (1 << I2C_SDA)
+		 #define I2C_SCL_HIGH() I2C_PORT |=  (1 << I2C_SCL)
+		 #define I2C_SDA_LOW()  I2C_PORT &= ~(1 << I2C_SDA)
+		 #define I2C_SCL_LOW()  I2C_PORT &= ~(1 << I2C_SCL)
+
+		 //port directions
+		 #define I2C_SDA_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SDA)
+		 #define I2C_SCL_AS_INPUT()  I2C_DDR &= ~(1 << I2C_SCL)
+		 #define I2C_SDA_AS_OUTPUT() I2C_DDR |= (1 << I2C_SDA)
+		 #define I2C_SCL_AS_OUTPUT() I2C_DDR |= (1 << I2C_SCL)
+
+		 // display address, commands
+		 #define SSD1306_I2C_ADDR 0x3c //0x3c:default, 0x3d: alternative)
+		 #define SSD1306_I2C_CMD  0x00
+		 #define SSD1306_I2C_DATA 0x40
+	#endif
 #endif
 #ifndef ELBEARBOY
 #if defined (ECONSOLE)
@@ -295,106 +291,101 @@
 #if defined (ECONSOLE)
 		
 	#if defined (JOYSTICKANALOG)
-	#define PIN_Y_AXIS A1 //3v3 341..342=0, 0..200=down, 400..674=up; 5V: 518..519=0, 0..200=down, 600..1023=up
-	#define X_AXIS_PORT PORTC
-	#define X_AXIS_PORTIN PINC
-	#define X_AXIS_DDR DDRC
-	#define X_AXIS_BIT PORTC0
-	
-	#define PIN_X_AXIS A0  //3v3 340..341=0, 0..124=left, 540..674=right; 5V 530=0, 0..200=left, 900..1023=rigth
-	#define Y_AXIS_PORT PORTC
-	#define Y_AXIS_PORTIN PINC
-	#define Y_AXIS_DDR DDRC
-	#define Y_AXIS_BIT PORTC1
-
-	#define PIN_A_BUTTON 4
-	#define A_BUTTON_PORT PORTD
-	#define A_BUTTON_PORTIN PIND
-	#define A_BUTTON_DDR DDRD
-	#define A_BUTTON_BIT PORTD4
-
-	#define PIN_B_BUTTON 3
-	#define B_BUTTON_PORT PORTD
-	#define B_BUTTON_PORTIN PIND
-	#define B_BUTTON_DDR DDRD
-	#define B_BUTTON_BIT PORTD3
-
-	#else
-
-	#ifndef JOYSTICDISCRETE // ECONSOLE KEYS
-	#define PIN_LEFT_BUTTON 2
-	#define LEFT_BUTTON_PORT PORTD
-	#define LEFT_BUTTON_PORTIN PIND
-	#define LEFT_BUTTON_DDR DDRD
-	#define LEFT_BUTTON_BIT PORTD2
-
-	#define PIN_RIGHT_BUTTON 6
-	#define RIGHT_BUTTON_PORT PORTD
-	#define RIGHT_BUTTON_PORTIN PIND
-	#define RIGHT_BUTTON_DDR DDRD
-	#define RIGHT_BUTTON_BIT PORTD6
-
-	#define PIN_UP_BUTTON 3
-	#define UP_BUTTON_PORT PORTD
-	#define UP_BUTTON_PORTIN PIND
-	#define UP_BUTTON_DDR DDRD
-	#define UP_BUTTON_BIT PORTD3
-
-	#define PIN_DOWN_BUTTON 5
-	#define DOWN_BUTTON_PORT PORTD
-	#define DOWN_BUTTON_PORTIN PIND
-	#define DOWN_BUTTON_DDR DDRD
-	#define DOWN_BUTTON_BIT PORTD5
-
-	#define PIN_A_BUTTON 4
-	#define A_BUTTON_PORT PORTD
-	#define A_BUTTON_PORTIN PIND
-	#define A_BUTTON_DDR DDRD
-	#define A_BUTTON_BIT PORTD4
-
-	#define PIN_B_BUTTON 7
-	#define B_BUTTON_PORT PORTD
-	#define B_BUTTON_PORTIN PIND
-	#define B_BUTTON_DDR DDRD
-	#define B_BUTTON_BIT PORTD7
-	#else // JOYSTICDISCRETE KEYS 
-	
-	#define PIN_LEFT_BUTTON 5
-	#define LEFT_BUTTON_PORT PORTD
-	#define LEFT_BUTTON_PORTIN PIND
-	#define LEFT_BUTTON_DDR DDRD
-	#define LEFT_BUTTON_BIT PORTD5
-
-	#define PIN_RIGHT_BUTTON 3
-	#define RIGHT_BUTTON_PORT PORTD
-	#define RIGHT_BUTTON_PORTIN PIND
-	#define RIGHT_BUTTON_DDR DDRD
-	#define RIGHT_BUTTON_BIT PORTD3
-
-	#define PIN_UP_BUTTON 2
-	#define UP_BUTTON_PORT PORTD
-	#define UP_BUTTON_PORTIN PIND
-	#define UP_BUTTON_DDR DDRD
-	#define UP_BUTTON_BIT PORTD2
-
-	#define PIN_DOWN_BUTTON 4
-	#define DOWN_BUTTON_PORT PORTD
-	#define DOWN_BUTTON_PORTIN PIND
-	#define DOWN_BUTTON_DDR DDRD
-	#define DOWN_BUTTON_BIT PORTD4
-
-	#define PIN_A_BUTTON 8
-	#define A_BUTTON_PORT PORTB
-	#define A_BUTTON_PORTIN PINB
-	#define A_BUTTON_DDR DDRB
-	#define A_BUTTON_BIT PORTB0
-
-	#define PIN_B_BUTTON 7
-	#define B_BUTTON_PORT PORTD
-	#define B_BUTTON_PORTIN PIND
-	#define B_BUTTON_DDR DDRD
-	#define B_BUTTON_BIT PORTD7
+		#define PIN_Y_AXIS A1 //3v3 341..342=0, 0..200=down, 400..674=up; 5V: 518..519=0, 0..200=down, 600..1023=up
+		#define X_AXIS_PORT PORTC
+		#define X_AXIS_PORTIN PINC
+		#define X_AXIS_DDR DDRC
+		#define X_AXIS_BIT PORTC0
 		
+		#define PIN_X_AXIS A0  //3v3 340..341=0, 0..124=left, 540..674=right; 5V 530=0, 0..200=left, 900..1023=rigth
+		#define Y_AXIS_PORT PORTC
+		#define Y_AXIS_PORTIN PINC
+		#define Y_AXIS_DDR DDRC
+		#define Y_AXIS_BIT PORTC1
+
+		#define PIN_A_BUTTON 4
+		#define A_BUTTON_PORT PORTD
+		#define A_BUTTON_PORTIN PIND
+		#define A_BUTTON_DDR DDRD
+		#define A_BUTTON_BIT PORTD4
+
+		#define PIN_B_BUTTON 3
+		#define B_BUTTON_PORT PORTD
+		#define B_BUTTON_PORTIN PIND
+		#define B_BUTTON_DDR DDRD
+		#define B_BUTTON_BIT PORTD3
+	#elif !defined (JOYSTICDISCRETE) // ECONSOLE KEYS
+		#define PIN_LEFT_BUTTON 2
+		#define LEFT_BUTTON_PORT PORTD
+		#define LEFT_BUTTON_PORTIN PIND
+		#define LEFT_BUTTON_DDR DDRD
+		#define LEFT_BUTTON_BIT PORTD2
+
+		#define PIN_RIGHT_BUTTON 6
+		#define RIGHT_BUTTON_PORT PORTD
+		#define RIGHT_BUTTON_PORTIN PIND
+		#define RIGHT_BUTTON_DDR DDRD
+		#define RIGHT_BUTTON_BIT PORTD6
+
+		#define PIN_UP_BUTTON 3
+		#define UP_BUTTON_PORT PORTD
+		#define UP_BUTTON_PORTIN PIND
+		#define UP_BUTTON_DDR DDRD
+		#define UP_BUTTON_BIT PORTD3
+
+		#define PIN_DOWN_BUTTON 5
+		#define DOWN_BUTTON_PORT PORTD
+		#define DOWN_BUTTON_PORTIN PIND
+		#define DOWN_BUTTON_DDR DDRD
+		#define DOWN_BUTTON_BIT PORTD5
+
+		#define PIN_A_BUTTON 4
+		#define A_BUTTON_PORT PORTD
+		#define A_BUTTON_PORTIN PIND
+		#define A_BUTTON_DDR DDRD
+		#define A_BUTTON_BIT PORTD4
+
+		#define PIN_B_BUTTON 7
+		#define B_BUTTON_PORT PORTD
+		#define B_BUTTON_PORTIN PIND
+		#define B_BUTTON_DDR DDRD
+		#define B_BUTTON_BIT PORTD7
+	#else // JOYSTICDISCRETE KEYS 
+		#define PIN_LEFT_BUTTON 5
+		#define LEFT_BUTTON_PORT PORTD
+		#define LEFT_BUTTON_PORTIN PIND
+		#define LEFT_BUTTON_DDR DDRD
+		#define LEFT_BUTTON_BIT PORTD5
+
+		#define PIN_RIGHT_BUTTON 3
+		#define RIGHT_BUTTON_PORT PORTD
+		#define RIGHT_BUTTON_PORTIN PIND
+		#define RIGHT_BUTTON_DDR DDRD
+		#define RIGHT_BUTTON_BIT PORTD3
+
+		#define PIN_UP_BUTTON 2
+		#define UP_BUTTON_PORT PORTD
+		#define UP_BUTTON_PORTIN PIND
+		#define UP_BUTTON_DDR DDRD
+		#define UP_BUTTON_BIT PORTD2
+
+		#define PIN_DOWN_BUTTON 4
+		#define DOWN_BUTTON_PORT PORTD
+		#define DOWN_BUTTON_PORTIN PIND
+		#define DOWN_BUTTON_DDR DDRD
+		#define DOWN_BUTTON_BIT PORTD4
+
+		#define PIN_A_BUTTON 8
+		#define A_BUTTON_PORT PORTB
+		#define A_BUTTON_PORTIN PINB
+		#define A_BUTTON_DDR DDRB
+		#define A_BUTTON_BIT PORTB0
+
+		#define PIN_B_BUTTON 7
+		#define B_BUTTON_PORT PORTD
+		#define B_BUTTON_PORTIN PIND
+		#define B_BUTTON_DDR DDRD
+		#define B_BUTTON_BIT PORTD7
 	#endif // END KEYS
 #elif defined (ELBEARBOY)
 
@@ -421,43 +412,43 @@
 		#define CHAN_AXISX 1 // Ось X port_1_5
 		#define CHAN_AXISY 0 // Ось Y port_1_7
 
-			#ifndef JOYSTICDISCRETE // ECOSOLE KEYS
-				#define B_BUTTON_BIT 8 // D7/8 port_1_8
-				#define B_BUTTON_PORTIN GPIO_1->STATE
-				
-				#define A_BUTTON_BIT 8 // D4/8 port_0_8
-				#define A_BUTTON_PORTIN GPIO_1->STATE
+		#ifndef JOYSTICDISCRETE // ECOSOLE KEYS
+			#define B_BUTTON_BIT 8 // D7/8 port_1_8
+			#define B_BUTTON_PORTIN GPIO_1->STATE
+			
+			#define A_BUTTON_BIT 8 // D4/8 port_0_8
+			#define A_BUTTON_PORTIN GPIO_1->STATE
 
-				#define LEFT_BUTTON_BIT 1 // D2/10 port_0_10
-				#define LEFT_BUTTON_PORTIN GPIO_0->STATE
+			#define LEFT_BUTTON_BIT 1 // D2/10 port_0_10
+			#define LEFT_BUTTON_PORTIN GPIO_0->STATE
 
-				#define RIGHT_BUTTON_BIT 2 // D6/0 port_0_2
-				#define RIGHT_BUTTON_PORTIN GPIO_0->STATE
- 
-				#define UP_BUTTON_BIT 0 // D3/0 port_0_0
-				#define UP_BUTTON_PORTIN GPIO_0->STATE
+			#define RIGHT_BUTTON_BIT 2 // D6/0 port_0_2
+			#define RIGHT_BUTTON_PORTIN GPIO_0->STATE
 
-				#define DOWN_BUTTON_BIT 1 // D5/1 port_0_1
-				#define DOWN_BUTTON_PORTIN GPIO_0->STATE
-			#else // JOYSTICDISCRETE KEYS 
-				#define B_BUTTON_BIT 8 // D7/8 port_1_8
-				#define B_BUTTON_PORTIN GPIO_1->STATE
-				
-				#define A_BUTTON_BIT 9 // D8/9 port_1_9
-				#define A_BUTTON_PORTIN GPIO_1->STATE
+			#define UP_BUTTON_BIT 0 // D3/0 port_0_0
+			#define UP_BUTTON_PORTIN GPIO_0->STATE
 
-				#define LEFT_BUTTON_BIT 1 // D5/1 port_0_1
-				#define LEFT_BUTTON_PORTIN GPIO_0->STATE
+			#define DOWN_BUTTON_BIT 1 // D5/1 port_0_1
+			#define DOWN_BUTTON_PORTIN GPIO_0->STATE
+		#else // JOYSTICDISCRETE KEYS 
+			#define B_BUTTON_BIT 8 // D7/8 port_1_8
+			#define B_BUTTON_PORTIN GPIO_1->STATE
+			
+			#define A_BUTTON_BIT 9 // D8/9 port_1_9
+			#define A_BUTTON_PORTIN GPIO_1->STATE
 
-				#define RIGHT_BUTTON_BIT 0 // D3/0 port_0_0
-				#define RIGHT_BUTTON_PORTIN GPIO_0->STATE
- 
-				#define UP_BUTTON_BIT 10 // D2/10 port_0_10
-				#define UP_BUTTON_PORTIN GPIO_0->STATE
+			#define LEFT_BUTTON_BIT 1 // D5/1 port_0_1
+			#define LEFT_BUTTON_PORTIN GPIO_0->STATE
 
-				#define DOWN_BUTTON_BIT 8 // D4/8 port_0_8
-				#define DOWN_BUTTON_PORTIN GPIO_0->STATE
-			#endif // END KEYS
+			#define RIGHT_BUTTON_BIT 0 // D3/0 port_0_0
+			#define RIGHT_BUTTON_PORTIN GPIO_0->STATE
+
+			#define UP_BUTTON_BIT 10 // D2/10 port_0_10
+			#define UP_BUTTON_PORTIN GPIO_0->STATE
+
+			#define DOWN_BUTTON_BIT 8 // D4/8 port_0_8
+			#define DOWN_BUTTON_PORTIN GPIO_0->STATE
+		#endif // END KEYS
 	#endif
 #else
 #if defined (MICROCADE)
@@ -874,11 +865,13 @@ class Arduboy2Core : public Arduboy2NoUSB
      */
     static void inline LCDDataMode() __attribute__((always_inline))
     {
-     #if defined(GU12864_800B)
-      bitClear(DC_PORT, DC_BIT);
-     #else
-      bitSet(DC_PORT, DC_BIT);
-     #endif
+     #ifndef ELBEARBOY
+		 #if defined(GU12864_800B)
+		  bitClear(DC_PORT, DC_BIT);
+		 #else
+		  bitSet(DC_PORT, DC_BIT);
+		 #endif
+	#endif
     }
     /** \brief
      * Put the display into command mode.
@@ -904,11 +897,13 @@ class Arduboy2Core : public Arduboy2NoUSB
      */
     static void inline LCDCommandMode() __attribute__((always_inline))
     {
-     #ifdef GU12864_800B
-      bitSet(DC_PORT, DC_BIT);
-     #else
-      bitClear(DC_PORT, DC_BIT);
-     #endif
+     #ifndef ELBEARBOY
+		 #ifdef GU12864_800B
+		  bitSet(DC_PORT, DC_BIT);
+		 #else
+		  bitClear(DC_PORT, DC_BIT);
+		 #endif
+	 #endif
     }
     /** \brief
      * Transfer a byte to the display.
@@ -1481,8 +1476,8 @@ class Arduboy2Core : public Arduboy2NoUSB
      */
     static void exitToBootloader();
 	#if defined (ELBEARBOY)
-		uint8_t chan_converted;
-		uint8_t chan_selected;
+	static	uint8_t chan_converted;
+	static	uint8_t chan_selected;
 	#endif
 	#if defined (JOYSTICKANALOG)
 	 static uint8_t ADCJoystickState;

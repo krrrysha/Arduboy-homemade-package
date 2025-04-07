@@ -301,7 +301,7 @@ void Sprites::drawBitmap(int16_t x, int16_t y,
       }
       break;
 
-
+#ifndef ELBEARBOY
     case SPRITE_PLUS_MASK:
       // *2 because we use double the bits (mask + bitmap)
       bofs = (uint8_t *)(bitmap + ((start_h * w) + xOffset) * 2);
@@ -418,5 +418,45 @@ void Sprites::drawBitmap(int16_t x, int16_t y,
         : // pushes/clobbers/pops r28 and r29 (y)
       );
       break;
+#else
+		case SPRITE_PLUS_MASK:
+		{
+			// Указатель на начало данных битовой карты и маски
+			const uint8_t *bofs = bitmap + ((start_h * w) + xOffset) * 2;
+
+			// Буфер экрана Arduboy
+			uint8_t *buffer = Arduboy2Base::sBuffer + ofs;
+
+			// Цикл по строкам спрайта
+			for (int yi = 0; yi < loop_h; yi++) {
+				int sRow = start_h + yi; // Текущая строка спрайта
+
+				// Указатель на текущую строку в буфере экрана
+				uint8_t *buffer_row = buffer + (sRow / 8) * WIDTH + (yOffset % 8);
+
+				// Цикл по столбцам спрайта
+				for (int xi = 0; xi < rendered_width; xi++) {
+					// Загрузка данных битовой карты и маски
+					uint8_t bitmap_data = pgm_read_byte(bofs++); // Данные битовой карты
+					uint8_t mask_data = pgm_read_byte(bofs++);   // Данные маски
+
+					// Применение маски
+					if (mask_data & (1 << (yOffset % 8))) {
+						// Если маска разрешает, рисуем пиксель из битовой карты
+						if (bitmap_data & (1 << (yOffset % 8))) {
+							buffer_row[xi] |= (1 << (sRow % 8)); // Установить пиксель
+						} else {
+							buffer_row[xi] &= ~(1 << (sRow % 8)); // Сбросить пиксель
+						}
+					}
+				}
+
+				// Переход к следующей строке
+				bofs += (w - rendered_width) * 2; // Смещение для следующей строки
+				buffer += WIDTH; // Переход к следующей строке в буфере экрана
+			}
+		}
+		break;
+#endif
   }
 }

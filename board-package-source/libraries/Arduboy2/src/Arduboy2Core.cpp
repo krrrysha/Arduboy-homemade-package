@@ -12,8 +12,8 @@ unsigned int Arduboy2Core::JoystickXZero = 5000; // first run indicator. number 
 unsigned int Arduboy2Core::JoystickYZero = 5000; // first run indicator. number greater than 2^10 (greater than 2^12 for mik32)
 #endif
 #ifdef ELBEARBOY
-	uint8_t chan_converted = 0;
-	uint8_t chan_selected = 0;  
+	uint8_t Arduboy2Core::chan_converted = 0;
+	uint8_t Arduboy2Core::chan_selected = 0;  
 #endif
 
 #ifndef ELBEARBOY
@@ -177,12 +177,17 @@ void Arduboy2Core::boot()
   #endif
 
   // Select the ADC input here so a delay isn't required in generateRandomSeed()
+  #ifndef ELBEARBOY
   ADMUX = RAND_SEED_IN_ADMUX;
 
   bootPins();
   bootSPI();
   bootOLED();
   bootPowerSaving();
+  #else
+  bootPins();
+  bootOLED();	  
+  #endif
 }
 
 #ifdef ARDUBOY_SET_CPU_8MHZ
@@ -531,14 +536,17 @@ void Arduboy2Core::bootOLED()
 // Initialize the SPI interface for the display
 void Arduboy2Core::bootSPI()
 {
+#ifndef ELBEARBOY
 // master, mode 0, MSB first, CPU clock / 2 (8MHz)
   SPCR = _BV(SPE) | _BV(MSTR);
   SPSR = _BV(SPI2X);
+#endif  
 }
 
 // Write to the SPI bus (MOSI pin)
 void Arduboy2Core::SPItransfer(uint8_t data)
 {
+#ifndef ELBEARBOY
   SPDR = data;
   /*
    * The following NOP introduces a small delay that can prevent the wait
@@ -548,6 +556,7 @@ void Arduboy2Core::SPItransfer(uint8_t data)
    */
   asm volatile("nop");
   while (!(SPSR & _BV(SPIF))) { } // wait
+#endif
 }
 
 #if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
@@ -618,18 +627,20 @@ void Arduboy2Core::i2c_sendByte(uint8_t byte)
 
 void Arduboy2Core::safeMode()
 {
+
   if (buttonsState() == UP_BUTTON)
   {
     setRGBledRedOn();
-
+#ifndef ELBEARBOY
 #ifndef ARDUBOY_CORE // for Arduboy core timer 0 should remain enabled
     // prevent the bootloader magic number from being overwritten by timer 0
     // when a timer variable overlaps the magic number location
     power_timer0_disable();
 #endif
-
+ #endif 
     while (true) { }
   }
+
 }
 
 
@@ -637,13 +648,16 @@ void Arduboy2Core::safeMode()
 
 void Arduboy2Core::idle()
 {
+#ifndef ELBEARBOY
   SMCR = _BV(SE); // select idle mode and enable sleeping
   sleep_cpu();
   SMCR = 0; // disable sleeping
+#endif
 }
 
 void Arduboy2Core::bootPowerSaving()
 {
+#ifndef ELBEARBOY
   #if defined(PRR) && !defined(PRR0)
 	#if defined (JOYSTICKANALOG)  // disable power saving for ADC
 	PRR = _BV(PRTWI);
@@ -658,6 +672,7 @@ void Arduboy2Core::bootPowerSaving()
   // disable USART1
   PRR1 = _BV(PRUSART1);
   #endif
+#endif 
 }
 
 #if defined(GU12864_800B)
@@ -1375,107 +1390,115 @@ void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
 
 void Arduboy2Core::setRGBled(uint8_t color, uint8_t val)
 {
-#if defined(ECONSOLE) || defined(ELBEARBOY)
-   (void)blue;  // parameter unused
-#elif ARDUBOY_10
-  if (color == RED_LED)
-  {
-   #ifdef LCD_ST7565
-    OCR1BL = 255 - val;
-   #else
-    OCR1BL = val;
-   #endif
-  }
-  else if (color == GREEN_LED)
-  {
-   #ifndef AB_ALTERNATE_WIRING
-    OCR0A = 255 - val;
-   #else
-    #ifdef LCD_ST7565
-	OCR0B = val;            
-    #else
-	OCR0B = 255 - val;            
-    #endif
-   #endif
-  }
-  else if (color == BLUE_LED)
-  {
-   #ifdef LCD_ST7565
-    OCR1AL = 255 - val;
-   #else
-    OCR1AL = val;
-   #endif
-  }
-#elif defined(AB_DEVKIT)
-  // only blue on DevKit, which is not PWM capable
-  if (color == BLUE_LED)
-  {
-    bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val ? RGB_ON : RGB_OFF);
-  }
+#ifndef ELBEARBOY
+	#if defined(ECONSOLE) 
+	   (void)blue;  // parameter unused
+	#elif defined (ARDUBOY_10)
+	  if (color == RED_LED)
+	  {
+	   #ifdef LCD_ST7565
+		OCR1BL = 255 - val;
+	   #else
+		OCR1BL = val;
+	   #endif
+	  }
+	  else if (color == GREEN_LED)
+	  {
+	   #ifndef AB_ALTERNATE_WIRING
+		OCR0A = 255 - val;
+	   #else
+		#ifdef LCD_ST7565
+		OCR0B = val;            
+		#else
+		OCR0B = 255 - val;            
+		#endif
+	   #endif
+	  }
+	  else if (color == BLUE_LED)
+	  {
+	   #ifdef LCD_ST7565
+		OCR1AL = 255 - val;
+	   #else
+		OCR1AL = val;
+	   #endif
+	  }
+	#elif defined(AB_DEVKIT)
+	  // only blue on DevKit, which is not PWM capable
+	  if (color == BLUE_LED)
+	  {
+		bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val ? RGB_ON : RGB_OFF);
+	  }
+	#endif
 #endif
 }
 
 void Arduboy2Core::freeRGBled()
 {
-#ifdef ARDUBOY_10
-  // clear the COM bits to return the pins to normal I/O mode
-  TCCR0A = _BV(WGM01) | _BV(WGM00);
-  TCCR1A = _BV(WGM10);
+#ifndef ELBEARBOY
+	#ifdef ARDUBOY_10
+		  // clear the COM bits to return the pins to normal I/O mode
+		  TCCR0A = _BV(WGM01) | _BV(WGM00);
+		  TCCR1A = _BV(WGM10);
+	#endif  
 #endif
 }
 
 void Arduboy2Core::digitalWriteRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
-#if defined (LCD_ST7565) || (MICROCADE)
-  if ((red & green & blue) == RGB_OFF) //prevent backlight off 
-  {
-    red   = RGB_ON;
-    green = RGB_ON;
-    blue  = RGB_ON;
-  }
-  bitWrite(RED_LED_PORT, RED_LED_BIT, !red);
-  bitWrite(GREEN_LED_PORT, GREEN_LED_BIT, !green);
-  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, !blue);
-#else
- #ifdef ARDUBOY_10
-  bitWrite(RED_LED_PORT, RED_LED_BIT, red);
-  bitWrite(GREEN_LED_PORT, GREEN_LED_BIT, green);
-  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue);
- #elif defined(AB_DEVKIT)
-  // only blue on DevKit
-  (void)red;    // parameter unused
-  (void)green;  // parameter unused
-  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue);
-  #elif defined(ECONSOLE)
-  // only blue on DevKit, which is not PWM capable
-  (void)red;    // parameter unused
-  (void)green;  // parameter unused
-   (void)blue;  // parameter unused
- #endif
+#ifndef ELBEARBOY
+	#if defined (LCD_ST7565) || (MICROCADE)
+	  if ((red & green & blue) == RGB_OFF) //prevent backlight off 
+	  {
+		red   = RGB_ON;
+		green = RGB_ON;
+		blue  = RGB_ON;
+	  }
+	  bitWrite(RED_LED_PORT, RED_LED_BIT, !red);
+	  bitWrite(GREEN_LED_PORT, GREEN_LED_BIT, !green);
+	  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, !blue);
+	#else
+	 #ifdef ARDUBOY_10
+	  bitWrite(RED_LED_PORT, RED_LED_BIT, red);
+	  bitWrite(GREEN_LED_PORT, GREEN_LED_BIT, green);
+	  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue);
+	 #elif defined(AB_DEVKIT)
+	  // only blue on DevKit
+	  (void)red;    // parameter unused
+	  (void)green;  // parameter unused
+	  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue);
+	  #elif defined(ECONSOLE)
+	  // only blue on DevKit, which is not PWM capable
+	  (void)red;    // parameter unused
+	  (void)green;  // parameter unused
+	   (void)blue;  // parameter unused
+	 #endif
+	#endif
 #endif
 }
 
 void Arduboy2Core::digitalWriteRGB(uint8_t color, uint8_t val)
 {
-#ifdef ARDUBOY_10
-  if (color == RED_LED)
-  {
-    bitWrite(RED_LED_PORT, RED_LED_BIT, val);
-  }
-  else if (color == GREEN_LED)
-  {
-    bitWrite(GREEN_LED_PORT, GREEN_LED_BIT, val);
-  }
-  else if (color == BLUE_LED)
-  {
-    bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val);
-  }
-#elif defined(AB_DEVKIT)
-  // only blue on DevKit
-  if (color == BLUE_LED)
-  {
-    bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val);
-  }
+#ifndef ELBEARBOY
+	#ifdef ARDUBOY_10
+	  if (color == RED_LED)
+	  {
+		bitWrite(RED_LED_PORT, RED_LED_BIT, val);
+	  }
+	  else if (color == GREEN_LED)
+	  {
+		bitWrite(GREEN_LED_PORT, GREEN_LED_BIT, val);
+	  }
+	  else if (color == BLUE_LED)
+	  {
+		bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val);
+	  }
+	#elif defined(AB_DEVKIT)
+	  // only blue on DevKit
+	  if (color == BLUE_LED)
+	  {
+		bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val);
+	  }
+	#endif
 #endif
 }
 
@@ -1487,41 +1510,81 @@ uint8_t Arduboy2Core::buttonsState()
 
 #ifdef ARDUBOY_10
   #if defined (ECONSOLE)
-   #ifndef JOYSTICKANALOG
-  buttons = 0;
-  if (bitRead(UP_BUTTON_PORTIN, UP_BUTTON_BIT) == 0) { buttons |= UP_BUTTON; }
-  if (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT) == 0) { buttons |= DOWN_BUTTON; }
-  if (bitRead(LEFT_BUTTON_PORTIN, LEFT_BUTTON_BIT) == 0) { buttons |= LEFT_BUTTON; }
-  if (bitRead(RIGHT_BUTTON_PORTIN, RIGHT_BUTTON_BIT) == 0) { buttons |= RIGHT_BUTTON; }
+	#ifndef JOYSTICKANALOG
+	buttons = 0;
+	if (bitRead(UP_BUTTON_PORTIN, UP_BUTTON_BIT) == 0) { buttons |= UP_BUTTON; }
+	if (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT) == 0) { buttons |= DOWN_BUTTON; }
+	if (bitRead(LEFT_BUTTON_PORTIN, LEFT_BUTTON_BIT) == 0) { buttons |= LEFT_BUTTON; }
+	if (bitRead(RIGHT_BUTTON_PORTIN, RIGHT_BUTTON_BIT) == 0) { buttons |= RIGHT_BUTTON; }
 	#else
     // JOYSTICKANALOG
 	buttons = 0;  
-  //buttons &= ~(A_BUTTON| B_BUTTON);
-  if (ADCSRA & (1 << ADIF)) {
-    unsigned int ADCdata=(ADCL|ADCH << 8);
+    //buttons &= ~(A_BUTTON| B_BUTTON);
+	if (ADCSRA & (1 << ADIF)) {
+		unsigned int ADCdata=(ADCL|ADCH << 8);
     if ((ADMUX & 0b00001111) ==0 ) { // if the conversion at the AC0 input is complete
-	 ADCJoystickState &= ~(RIGHT_BUTTON | LEFT_BUTTON);
-	 if (JoystickXZero>1024) {JoystickXZero=ADCdata;} // if first run
-	 if (ADCdata > JoystickXZero+JOYSENSX) {ADCJoystickState |= RIGHT_BUTTON;} else if (ADCdata < JoystickXZero-JOYSENSX) {ADCJoystickState |= LEFT_BUTTON;} // we determine the direction along the X axis
-     ADMUX = 0x41; // we will measure the signal at the AC1 input; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=1; AMUX= 0x41
-     ADCSRA |= (1 << ADSC);  // start conversionе
-	  } else if ((ADMUX & 0b00001111) ==1)   // if the conversion at the AC1 input is complete 
-	  { 
-		ADCJoystickState &= ~(UP_BUTTON | DOWN_BUTTON);
-		if (JoystickYZero>1024) {JoystickYZero=ADCdata;} // if first run
-		if (ADCdata > JoystickYZero+JOYSENSY) {ADCJoystickState |= UP_BUTTON;} else if (ADCdata < JoystickYZero-JOYSENSY) {ADCJoystickState |= DOWN_BUTTON;} // we determine the direction along the Y axis
-		ADMUX = 0x40; // we will measure the signal at the AC0 input; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=0; AMUX= 0x40
+		ADCJoystickState &= ~(RIGHT_BUTTON | LEFT_BUTTON);
+		if (JoystickXZero>1024) {JoystickXZero=ADCdata;} // if first run
+		if (ADCdata > JoystickXZero+JOYSENSX) {ADCJoystickState |= RIGHT_BUTTON;} else if (ADCdata < JoystickXZero-JOYSENSX) {ADCJoystickState |= LEFT_BUTTON;} // we determine the direction along the X axis
+		ADMUX = 0x41; // we will measure the signal at the AC1 input; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=1; AMUX= 0x41
 		ADCSRA |= (1 << ADSC);  // start conversionе
-    } else 
-	{
-		ADMUX = 0x40; // снимать сигнал будем с входа AC0; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=0; AMUX= 0x40
-		ADCSRA |= (1 << ADSC); 
-	}
-  } 
-buttons |= ADCJoystickState;
+	} else if ((ADMUX & 0b00001111) ==1)   // if the conversion at the AC1 input is complete 
+		{ 
+			ADCJoystickState &= ~(UP_BUTTON | DOWN_BUTTON);
+			if (JoystickYZero>1024) {JoystickYZero=ADCdata;} // if first run
+			if (ADCdata > JoystickYZero+JOYSENSY) {ADCJoystickState |= UP_BUTTON;} else if (ADCdata < JoystickYZero-JOYSENSY) {ADCJoystickState |= DOWN_BUTTON;} // we determine the direction along the Y axis
+			ADMUX = 0x40; // we will measure the signal at the AC0 input; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=0; AMUX= 0x40
+			ADCSRA |= (1 << ADSC);  // start conversionе
+		} else 
+		{
+			ADMUX = 0x40; // снимать сигнал будем с входа AC0; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=0; AMUX= 0x40
+			ADCSRA |= (1 << ADSC); 
+		}
+	} 
+	buttons |= ADCJoystickState;
 	#endif
-  if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
-  if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
+	if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
+	if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
+	#elif defined(ELBEARBOY)
+	buttons = 0;
+		#ifndef JOYSTICKANALOG
+		if (bitRead(UP_BUTTON_PORTIN, UP_BUTTON_BIT) == 0) { buttons |= UP_BUTTON; }
+		if (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT) == 0) { buttons |= DOWN_BUTTON; }
+		if (bitRead(LEFT_BUTTON_PORTIN, LEFT_BUTTON_BIT) == 0) { buttons |= LEFT_BUTTON; }
+		if (bitRead(RIGHT_BUTTON_PORTIN, RIGHT_BUTTON_BIT) == 0) { buttons |= RIGHT_BUTTON; }
+		#else
+		if (ANALOG_REG->ADC_VALID) {
+			if ((chan_converted == CHAN_AXISX | chan_converted==CHAN_AXISY ) & (chan_selected==CHAN_AXISY|chan_selected==CHAN_AXISX))  
+			{  // последний заданный канал и рассчитанный канал- один из наших
+				unsigned int ADCdata=ANALOG_REG->ADC_VALUE; // данные от прошлого расчета, возможно на канале за пределами используемых
+				if (chan_converted ==CHAN_AXISX ) { // if the conversion at the AC0 input is complete
+					ADCJoystickState &= ~(RIGHT_BUTTON | LEFT_BUTTON);
+					if (JoystickXZero>4096) {JoystickXZero=ADCdata;} // if first run
+					if (ADCdata > JoystickXZero+JOYSENSX) {ADCJoystickState |= RIGHT_BUTTON;} else if (ADCdata < JoystickXZero-JOYSENSX) {ADCJoystickState |= LEFT_BUTTON;} // we determine the direction along the X axis
+					chan_selected=CHAN_AXISX;
+					chan_converted=CHAN_AXISY;
+				} else if (chan_converted ==CHAN_AXISY)   // if the conversion at the AC1 input is complete 
+					{ 
+					ADCJoystickState &= ~(UP_BUTTON | DOWN_BUTTON);
+					if (JoystickYZero>4096) {JoystickYZero=ADCdata;} // if first run
+					if (ADCdata > JoystickYZero+JOYSENSY) {ADCJoystickState |= UP_BUTTON;} else if (ADCdata < JoystickYZero-JOYSENSY) {ADCJoystickState |= DOWN_BUTTON;} // we determine the direction along the Y axis
+					chan_selected=CHAN_AXISY;
+					chan_converted=CHAN_AXISX;
+					} 
+				ANALOG_REG->ADC_SINGLE=1;
+				myADC_SEL_CHANNEL (chan_selected);
+			} else // если не наш канал (канал рандомизатора )
+			{
+				chan_converted=chan_selected;
+				chan_selected=CHAN_AXISX;
+				ANALOG_REG->ADC_SINGLE=1;
+				myADC_SEL_CHANNEL (chan_selected);
+			}
+		}
+	#endif
+		buttons |= ADCJoystickState;
+		if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
+		if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
   #else
   // up, right, left, down
   buttons = ((~PINF) &
@@ -1550,46 +1613,6 @@ buttons |= ADCJoystickState;
   if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
   // B
   if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
-#elif defined(ELBEARBOY)
-	  buttons = 0;
-	#ifndef JOYSTICKANALOG
-		if (bitRead(UP_BUTTON_PORTIN, UP_BUTTON_BIT) == 0) { buttons |= UP_BUTTON; }
-		if (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT) == 0) { buttons |= DOWN_BUTTON; }
-		if (bitRead(LEFT_BUTTON_PORTIN, LEFT_BUTTON_BIT) == 0) { buttons |= LEFT_BUTTON; }
-		if (bitRead(RIGHT_BUTTON_PORTIN, RIGHT_BUTTON_BIT) == 0) { buttons |= RIGHT_BUTTON; }
-	#else
-		if (ANALOG_REG->ADC_VALID) {
-		  if ((chan_converted == CHAN_AXISX | chan_converted==CHAN_AXISY ) & (chan_selected==CHAN_AXISY|chan_selected==CHAN_AXISX))  
-		  {  // последний заданный канал и рассчитанный канал- один из наших
-			unsigned int ADCdata=ANALOG_REG->ADC_VALUE; // данные от прошлого расчета, возможно на канале за пределами используемых
-			if (chan_converted ==CHAN_AXISX ) { // if the conversion at the AC0 input is complete
-				ADCJoystickState &= ~(RIGHT_BUTTON | LEFT_BUTTON);
-				if (JoystickXZero>4096) {JoystickXZero=ADCdata;} // if first run
-				if (ADCdata > JoystickXZero+JOYSENSX) {ADCJoystickState |= RIGHT_BUTTON;} else if (ADCdata < JoystickXZero-JOYSENSX) {ADCJoystickState |= LEFT_BUTTON;} // we determine the direction along the X axis
-				chan_selected=CHAN_AXISX;
-				chan_converted=CHAN_AXISY;
-			} else if (chan_converted ==CHAN_AXISY)   // if the conversion at the AC1 input is complete 
-			{ 
-				ADCJoystickState &= ~(UP_BUTTON | DOWN_BUTTON);
-				if (JoystickYZero>4096) {JoystickYZero=ADCdata;} // if first run
-				if (ADCdata > JoystickYZero+JOYSENSY) {ADCJoystickState |= UP_BUTTON;} else if (ADCdata < JoystickYZero-JOYSENSY) {ADCJoystickState |= DOWN_BUTTON;} // we determine the direction along the Y axis
-				chan_selected=CHAN_AXISY;
-				chan_converted=CHAN_AXISX;
-			} 
-			ANALOG_REG->ADC_SINGLE=1;
-			myADC_SEL_CHANNEL (chan_selected);
-		  } else // если не наш канал (канал рандомизатора )
-		  {
-			chan_converted=chan_selected;
-			chan_selected=CHAN_AXISX;
-			ANALOG_REG->ADC_SINGLE=1;
-			myADC_SEL_CHANNEL (chan_selected);
-		  }
-		}
-	#endif
-		buttons |= ADCJoystickState;
-		if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
-		if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
 #endif
 
   return buttons;
@@ -1672,7 +1695,7 @@ void Arduboy2Core::exitToBootloader()
 
 void Arduboy2NoUSB::mainNoUSB()
 {
-#if !defined  ((ECONSOLE) && !defined  (ELBEARBOY)
+#if !defined  (ECONSOLE) && !defined  (ELBEARBOY)
   // disable USB
   UDCON = _BV(DETACH);
   UDIEN = 0;

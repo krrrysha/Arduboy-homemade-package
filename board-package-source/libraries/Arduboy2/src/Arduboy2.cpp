@@ -112,7 +112,11 @@ void Arduboy2Base::sysCtrlSound(uint8_t buttons, uint8_t led, uint8_t eeVal)
     setRGBledBlueOff();
     delayByte(200);
     digitalWriteRGB(led, RGB_ON); // turn on "acknowledge" LED
+#ifndef ELBEARBOY
     eeprom_update_byte((uint8_t*)eepromAudioOnOff, eeVal);
+#else
+    update_byte(eepromAudioOnOff, eeVal);
+#endif
     delayShort(500);
     digitalWriteRGB(led, RGB_OFF); // turn off "acknowledge" LED
 
@@ -182,6 +186,7 @@ void Arduboy2Base::drawLogoSpritesBOverwrite(int16_t y)
 
 // bootLogoText() should be kept in sync with bootLogoShell()
 // if changes are made to one, equivalent changes should be made to the other
+/*
 bool Arduboy2Base::bootLogoShell(void (&drawLogo)(int16_t))
 {
   bool showLEDs = readShowBootLogoLEDsFlag();
@@ -238,6 +243,21 @@ bool Arduboy2Base::bootLogoShell(void (&drawLogo)(int16_t))
  #endif
   return true;
 }
+*/
+
+bool Arduboy2Base::bootLogoShell(void (&drawLogo)(int16_t))
+{
+    // Using display(CLEAR_BUFFER) instead of clear() may save code space.
+    // The extra time it takes to repaint the previous logo isn't an issue.
+  for (int16_t y = -15; y <= 24; y++) {
+    display(CLEAR_BUFFER);
+    (*drawLogo)(y); // call the function that actually draws the logo
+    display();
+    delayByte(15);
+  }
+  delayShort(400);
+  return true;
+}
 
 // wait for all buttons to be released
 void Arduboy2Base::waitNoButtons()
@@ -266,7 +286,11 @@ bool Arduboy2Base::everyXFrames(uint8_t frames)
 
 bool Arduboy2Base::nextFrame()
 {
+#ifndef ELBEARBOY
   uint8_t now = *((uint8_t*)(&timer0_millis));
+#else
+	uint8_t now = (uint8_t)(my_timer0_millis);
+#endif
   uint8_t frameDurationMs = now - thisFrameStart;
 
   if (justRendered) {
@@ -590,7 +614,8 @@ void Arduboy2Base::drawFastVLine
 (int16_t x, int16_t y, uint8_t h, uint8_t color)
 {
   int end = y+h;
-  for (int a = max(0,y); a < min(end,HEIGHT); a++)
+  for (int a = max((int16_t)0,y); a < min(end,HEIGHT); a++)
+
   {
     drawPixel(x,a,color);
   }
@@ -659,6 +684,7 @@ void Arduboy2Base::fillRect
 
 void Arduboy2Base::fillScreen(uint8_t color)
 {
+
   // C version:
   //
   // if (color != BLACK)
@@ -676,39 +702,51 @@ void Arduboy2Base::fillScreen(uint8_t color)
   // which can be declared a read-write operand
   uint8_t* bPtr = sBuffer;
 
-  asm volatile
-  (
-    // if value is zero, skip assigning to 0xff
-    "cpse %[color], __zero_reg__\n"
-    "ldi %[color], 0xFF\n"
-    // counter = WIDTH * HEIGHT / 8 / 8
-    "ldi r24, %[cnt]\n"
-    "1:\n"
-    // (4x/8x) store color into screen buffer,
-    // then increment buffer position
-    "st Z+, %[color]\n"
-    "st Z+, %[color]\n"
-    "st Z+, %[color]\n"
-    "st Z+, %[color]\n"
-#if defined(OLED_96X96) || defined(OLED_128X96) || defined(OLED_128X128) || defined(OLED_128X96_ON_128X128) || defined(OLED_96X96_ON_128X128)
-    "st Z+, %[color]\n"
-    "st Z+, %[color]\n"
-    "st Z+, %[color]\n"
-    "st Z+, %[color]\n"
-#endif    
-    // decrease counter
-    "subi r24, 1\n"
-    // repeat for 256, 144 or 192 loops depending on screen resolution
-    "brcc 1b\n"
-    : [color] "+d" (color),
-      "+z" (bPtr)
-#if defined(OLED_96X96) || defined(OLED_128X96) || defined(OLED_128X128) || defined(OLED_128X96_ON_128X128) || defined(OLED_96X96_ON_128X128)
-    : [cnt] "M" (WIDTH * HEIGHT / 8 / 8 - 1)
-#else    
-    : [cnt] "M" (WIDTH * HEIGHT / 8 / 4 - 1)
+#ifndef ELBEARBOY
+	  asm volatile
+	  (
+		// if value is zero, skip assigning to 0xff
+		"cpse %[color], __zero_reg__\n"
+		"ldi %[color], 0xFF\n"
+		// counter = WIDTH * HEIGHT / 8 / 8
+		"ldi r24, %[cnt]\n"
+		"1:\n"
+		// (4x/8x) store color into screen buffer,
+		// then increment buffer position
+		"st Z+, %[color]\n"
+		"st Z+, %[color]\n"
+		"st Z+, %[color]\n"
+		"st Z+, %[color]\n"
+	#if defined(OLED_96X96) || defined(OLED_128X96) || defined(OLED_128X128) || defined(OLED_128X96_ON_128X128) || defined(OLED_96X96_ON_128X128)
+		"st Z+, %[color]\n"
+		"st Z+, %[color]\n"
+		"st Z+, %[color]\n"
+		"st Z+, %[color]\n"
+	#endif    
+		// decrease counter
+		"subi r24, 1\n"
+		// repeat for 256, 144 or 192 loops depending on screen resolution
+		"brcc 1b\n"
+		: [color] "+d" (color),
+		  "+z" (bPtr)
+	#if defined(OLED_96X96) || defined(OLED_128X96) || defined(OLED_128X128) || defined(OLED_128X96_ON_128X128) || defined(OLED_96X96_ON_128X128)
+		: [cnt] "M" (WIDTH * HEIGHT / 8 / 8 - 1)
+	#else    
+		: [cnt] "M" (WIDTH * HEIGHT / 8 / 4 - 1)
+	#endif
+		: "r24"
+	  );
+#else
+	  // C version:
+   if (color != BLACK)
+   {
+     color = 0xFF; // all pixels on
+   }
+   for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+   {
+      sBuffer[i] = color;
+	}
 #endif
-    : "r24"
-  );
 }
 
 void Arduboy2Base::drawRoundRect
@@ -1100,25 +1138,43 @@ bool Arduboy2Base::collide(Rect rect1, Rect rect2)
 
 uint16_t Arduboy2Base::readUnitID()
 {
+#ifndef ELBEARBOY
   return eeprom_read_byte((uint8_t*)eepromUnitID) |
          (((uint16_t)(eeprom_read_byte((uint8_t*)(eepromUnitID + 1)))) << 8);
+#else	
+  return read_byte(eepromUnitID) |
+         (((uint16_t)(read_byte((eepromUnitID + 1)))) << 8);
+
+#endif	
 }
 
 void Arduboy2Base::writeUnitID(uint16_t id)
 {
+#ifndef ELBEARBOY
   eeprom_update_byte((uint8_t*)eepromUnitID, (uint8_t)(id & 0xff));
   eeprom_update_byte((uint8_t*)eepromUnitID + 1, (uint8_t)(id >> 8));
+#else  
+  update_byte(eepromUnitID, (uint8_t)(id & 0xff));
+  update_byte(eepromUnitID + 1, (uint8_t)(id >> 8));
+#endif
 }
 
 uint8_t Arduboy2Base::readUnitName(char* name)
 {
   char val;
   uint8_t dest;
+#ifndef ELBEARBOY  
   uint8_t* src = (uint8_t*)eepromUnitName;
-
+#else
+	int src = eepromUnitName;
+#endif	
   for (dest = 0; dest < ARDUBOY_UNIT_NAME_LEN; dest++)
   {
+#ifndef ELBEARBOY
     val = eeprom_read_byte(src);
+#else
+	val = read_byte(src);
+#endif		
     name[dest] = val;
     src++;
     if (val == 0x00 || (byte)val == 0xFF) {
@@ -1133,56 +1189,90 @@ uint8_t Arduboy2Base::readUnitName(char* name)
 void Arduboy2Base::writeUnitName(const char* name)
 {
   bool done = false;
+#ifndef ELBEARBOY
   uint8_t* dest = (uint8_t*)eepromUnitName;
-
+#else
+  int dest = eepromUnitName;
+#endif	
   for (uint8_t src = 0; src < ARDUBOY_UNIT_NAME_LEN; src++)
   {
     if (name[src] == 0x00) {
       done = true;
     }
     // write character or 0 pad if finished
+#ifndef ELBEARBOY
     eeprom_update_byte(dest, done ? 0x00 : name[src]);
+#else
+	 update_byte(dest, done ? 0x00 : name[src]);
+#endif	
     dest++;
   }
 }
 
 bool Arduboy2Base::readShowBootLogoFlag()
 {
+#ifndef ELBEARBOY
   return (eeprom_read_byte((uint8_t*)eepromSysFlags) & sysFlagShowLogoMask);
+#else
+  return (read_byte(eepromSysFlags) & sysFlagShowLogoMask);
+#endif
 }
 
 void Arduboy2Base::writeShowBootLogoFlag(bool val)
 {
+#ifndef ELBEARBOY
   uint8_t flags = eeprom_read_byte((uint8_t*)eepromSysFlags);
-
   bitWrite(flags, sysFlagShowLogoBit, val);
   eeprom_update_byte((uint8_t*)eepromSysFlags, flags);
+#else
+  uint8_t flags = read_byte(eepromSysFlags);
+  bitWrite(flags, sysFlagShowLogoBit, val);
+  update_byte(eepromSysFlags, flags);
+#endif	
 }
 
 bool Arduboy2Base::readShowUnitNameFlag()
 {
+#ifndef ELBEARBOY
   return (eeprom_read_byte((uint8_t*)eepromSysFlags) & sysFlagUnameMask);
+#else
+  return (read_byte(eepromSysFlags) & sysFlagUnameMask);
+#endif	
 }
 
 void Arduboy2Base::writeShowUnitNameFlag(bool val)
 {
+#ifndef ELBEARBOY
   uint8_t flags = eeprom_read_byte((uint8_t*)eepromSysFlags);
-
   bitWrite(flags, sysFlagUnameBit, val);
   eeprom_update_byte((uint8_t*)eepromSysFlags, flags);
+#else
+  uint8_t flags = read_byte(eepromSysFlags);
+  bitWrite(flags, sysFlagUnameBit, val);
+  update_byte(eepromSysFlags, flags);
+#endif	
 }
 
 bool Arduboy2Base::readShowBootLogoLEDsFlag()
 {
+#ifndef ELBEARBOY
   return (eeprom_read_byte((uint8_t*)eepromSysFlags) & sysFlagShowLogoLEDsMask);
+#else
+  return (read_byte(eepromSysFlags) & sysFlagShowLogoLEDsMask);	
+#endif
 }
 
 void Arduboy2Base::writeShowBootLogoLEDsFlag(bool val)
 {
+#ifndef ELBEARBOY
   uint8_t flags = eeprom_read_byte((uint8_t*)eepromSysFlags);
-
   bitWrite(flags, sysFlagShowLogoLEDsBit, val);
   eeprom_update_byte((uint8_t*)eepromSysFlags, flags);
+#else
+  uint8_t flags = read_byte(eepromSysFlags);
+  bitWrite(flags, sysFlagShowLogoLEDsBit, val);
+  update_byte(eepromSysFlags, flags);
+#endif
 }
 
 void Arduboy2Base::swapInt16(int16_t& a, int16_t& b)
@@ -1332,22 +1422,32 @@ void Arduboy2::bootLogoExtra()
   {
     return;
   }
-
+#ifndef ELBEARBOY
   c = eeprom_read_byte((uint8_t*)eepromUnitName);
-
   if (c != 0xFF && c != 0x00)
   {
     uint8_t* i = (uint8_t*)eepromUnitName;
     cursor_x = 50 - (64 - WIDTH / 2);
     cursor_y = 56;
-
     do
     {
       write(c);
       c = eeprom_read_byte(++i);
     }
+#else
+  c = read_byte(eepromUnitName);
+  if (c != 0xFF && c != 0x00)
+  {
+    int i = eepromUnitName;
+    cursor_x = 50 - (64 - WIDTH / 2);
+    cursor_y = 56;
+    do
+    {
+      write(c);
+      c = read_byte(++i);
+    }
+#endif
     while ((uint16_t)i < eepromUnitName + ARDUBOY_UNIT_NAME_LEN);
-
     display();
     delayShort(1000);
   }
@@ -1508,7 +1608,7 @@ uint8_t Arduboy2::getTextBackground()
 void Arduboy2::setTextSize(uint8_t s)
 {
   // size must always be 1 or higher
-  textSize = max(1, s);
+  textSize = max((uint8_t)1, s);
 }
 
 uint8_t Arduboy2::getTextSize()

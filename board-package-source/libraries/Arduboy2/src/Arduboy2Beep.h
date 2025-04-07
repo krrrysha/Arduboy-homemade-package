@@ -8,14 +8,14 @@
 #define ARDUBOY2_BEEP_H
 
 #ifdef __AVR_ATmega328P__
-#define ECONSOLE
-#warning ECONSOLE!
+	#define ECONSOLE
+	#warning ECONSOLE!
 #endif						 
 
 #ifdef MCU_MIK32_Amur
-#define ELBEARBOY
-#warning ELBEARBOY!
-
+	#define ELBEARBOY
+	#warning ELBEARBOY!
+#endif	
 /** \brief
  * Play simple square wave tones using speaker pin 1.
  *

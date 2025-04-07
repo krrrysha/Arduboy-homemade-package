@@ -4,6 +4,12 @@
  * A class for drawing animated sprites from image and mask bitmaps.
  */
 
+#ifdef MCU_MIK32_Amur
+	#define ELBEARBOY
+	#warning ELBEARBOY!
+#endif
+
+
 #ifndef Sprites_h
 #define Sprites_h
 
