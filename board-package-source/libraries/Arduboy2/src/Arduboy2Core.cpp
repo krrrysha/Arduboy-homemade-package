@@ -253,32 +253,55 @@ void Arduboy2Core::bootPins()
 	PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SDA)); // Нагрузочная способность 8 мА
 	PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SCL)); // Нагрузочная способность 8 мА
 	i2c_stop();
-	
+	// инициализация EEPROM
+	#define EEPROM_START_word_ADDR 0x700
+	EEPROM_REGS->EECON = 0;
 	// инициализация ADC
-	chan_selected=0;
+	//Serial.println("==INIT ADC START==");
+	chan_selected = CHAN_RANDOM;
+
+    //Serial.println("! chan_sel:");     Serial.println(chan_selected);
 
 	PAD_CONFIG->PORT_0_CFG |= (0b11 << (2 * PIN_RANDOM)); // аналоговый сигнал. порт A2=0.4
-
+	PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A01.5
+	PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
+	GPIO_0->DIRECTION_IN = 1 << PIN_RANDOM; // 
+	GPIO_1->DIRECTION_IN = 1 << PIN_AXISX; // 
+	GPIO_1->DIRECTION_IN = 1 << PIN_AXISY; // 
+	
 	ANALOG_REG->ADC_CONFIG = 0x3c00; // последовательность для инициализации ADC MIK32 из HAL
 	//HAL_ADC_Enable(&hadc);
-	ANALOG_REG->ADC_CONFIG = (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) |
-                                 ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) |
+	ANALOG_REG->ADC_CONFIG = (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_M)) |
+                                 ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_M) |
                                  (1 << ADC_CONFIG_EN_S);
 	//HAL_ADC_ResetEnable:
-	ANALOG_REG->ADC_CONFIG = (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) |
-                                 ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) |
+	ANALOG_REG->ADC_CONFIG = (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_M)) |
+                                 ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_M) |
                                  (1 << ADC_CONFIG_RESETN_S);
-	// HAL_ADC_ChannelSet
 	myADC_SEL_CHANNEL (chan_selected);
-	ANALOG_REG->ADC_CONFIG |= (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) |
-                                 ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) |
+	// HAL_ADC_ChannelSet
+	ANALOG_REG->ADC_CONFIG |= (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_M)) |
+                                 ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_M) |
                                  (ADC_EXTREF_OFF << ADC_CONFIG_EXTREF_S) |   // Настройка источника опорного напряжения 
                                  (ADC_EXTCLB_ADCREF << ADC_CONFIG_EXTPAD_EN_S); // Выбор внешнего источника опорного напряжения 
 	chan_converted=chan_selected;
-	ANALOG_REG->ADC_SINGLE=1; //считаем хз что
+	ANALOG_REG->ADC_SINGLE=1;  // считаем ерунду
+	myADC_SEL_CHANNEL (chan_selected); // переключаем канал
+	while (!ANALOG_REG->ADC_VALID) {};
+	ANALOG_REG->ADC_SINGLE=1; // считаем канал 3
+	while (!ANALOG_REG->ADC_VALID) {};
 
-
-
+	/*
+	delay(3000);
+	Serial.print(" chan_conv:");     Serial.print(chan_converted);
+    Serial.print(" chan_sel:");     Serial.print(chan_selected);
+	Serial.print(" ADC_VALUE:"); 	Serial.print(ANALOG_REG->ADC_VALUE);
+    Serial.print(" JoystickXZero:");	Serial.print(JoystickXZero);
+	Serial.print(" JoystickYZero:");  Serial.print(JoystickYZero);
+    Serial.println();
+	Serial.println("==INIT ADC COMPLETE==");
+	*/
+	
   #ifndef  JOYSTICKANALOG //JOYSTICDISCRETE
 	// Port  INPUT_PULLUP
 	// SDA and SCL as inputs without pullups
@@ -296,8 +319,10 @@ void Arduboy2Core::bootPins()
   GPIO_1->DIRECTION_OUT = _BV(RED_LED_BIT);
 
   #else // JOYSTICKANALOG
-	PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A0=1.5
-	PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
+	//PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A0=1.5
+	//PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
+
+
   #endif	
 #else
   // Port B INPUT_PULLUP or HIGH
@@ -618,9 +643,12 @@ void Arduboy2Core::i2c_sendByte(uint8_t byte)
 			byte<<=1; // сдвигаем на 1 бит влево
 		}
 		I2C_SDA_AS_INPUT(); // отпустить SDA (лог.1), чтобы ведомое устройство смогло сгенерировать ACK. В оригинальном тексте Arduboy2 тут выставляется лог.0. Вероятно, чтобы не дожидаться, пока это сделает ведомый?
+		Delay_us(4);
 		I2C_SCL_AS_INPUT(); // отпустить SCL (лог.1), чтобы ведомое устройство передало ACK
+		Delay_us(4);
 		I2C_SCL_LOW();
 		I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)  // приём ACK завершён
+		Delay_us(4);
   #endif
 }
 #endif
@@ -1545,16 +1573,17 @@ uint8_t Arduboy2Core::buttonsState()
 	#endif
 	if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
 	if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
-	#elif defined(ELBEARBOY)
+  #elif defined(ELBEARBOY)
 	buttons = 0;
-		#ifndef JOYSTICKANALOG
+	#ifndef JOYSTICKANALOG
 		if (bitRead(UP_BUTTON_PORTIN, UP_BUTTON_BIT) == 0) { buttons |= UP_BUTTON; }
 		if (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT) == 0) { buttons |= DOWN_BUTTON; }
 		if (bitRead(LEFT_BUTTON_PORTIN, LEFT_BUTTON_BIT) == 0) { buttons |= LEFT_BUTTON; }
 		if (bitRead(RIGHT_BUTTON_PORTIN, RIGHT_BUTTON_BIT) == 0) { buttons |= RIGHT_BUTTON; }
-		#else
+	#else
 		if (ANALOG_REG->ADC_VALID) {
 			if ((chan_converted == CHAN_AXISX | chan_converted==CHAN_AXISY ) & (chan_selected==CHAN_AXISY|chan_selected==CHAN_AXISX))  
+	   
 			{  // последний заданный канал и рассчитанный канал- один из наших
 				unsigned int ADCdata=ANALOG_REG->ADC_VALUE; // данные от прошлого расчета, возможно на канале за пределами используемых
 				if (chan_converted ==CHAN_AXISX ) { // if the conversion at the AC0 input is complete
@@ -1564,25 +1593,44 @@ uint8_t Arduboy2Core::buttonsState()
 					chan_selected=CHAN_AXISX;
 					chan_converted=CHAN_AXISY;
 				} else if (chan_converted ==CHAN_AXISY)   // if the conversion at the AC1 input is complete 
-					{ 
+				{ 
 					ADCJoystickState &= ~(UP_BUTTON | DOWN_BUTTON);
 					if (JoystickYZero>4096) {JoystickYZero=ADCdata;} // if first run
 					if (ADCdata > JoystickYZero+JOYSENSY) {ADCJoystickState |= UP_BUTTON;} else if (ADCdata < JoystickYZero-JOYSENSY) {ADCJoystickState |= DOWN_BUTTON;} // we determine the direction along the Y axis
 					chan_selected=CHAN_AXISY;
 					chan_converted=CHAN_AXISX;
-					} 
+				} 
+				myADC_SEL_CHANNEL (chan_selected);
 				ANALOG_REG->ADC_SINGLE=1;
 				myADC_SEL_CHANNEL (chan_selected);
 			} else // если не наш канал (канал рандомизатора )
 			{
+
 				chan_converted=chan_selected;
-				chan_selected=CHAN_AXISX;
+				chan_selected=CHAN_AXISY;
+				myADC_SEL_CHANNEL (chan_selected);
 				ANALOG_REG->ADC_SINGLE=1;
 				myADC_SEL_CHANNEL (chan_selected);
+
 			}
+			
+	/*
+    Serial.print(" chan_conv:");
+    Serial.print(chan_converted);
+    Serial.print(" chan_sel:");
+    Serial.print(chan_selected);
+ Serial.print(" ADC_VALUE:");
+ Serial.print(ANALOG_REG->ADC_VALUE);
+    Serial.print(" JoystickXZero:");
+ Serial.print(JoystickXZero);
+Serial.print(" JoystickYZero:");  Serial.print(JoystickYZero);
+     Serial.println();
+     */
+			
+			
 		}
-	#endif
 		buttons |= ADCJoystickState;
+	#endif
 		if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
 		if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
   #else
@@ -1635,11 +1683,14 @@ unsigned long Arduboy2Core::generateRandomSeed()
   power_adc_disable(); // disable power saving for ADC
   #endif
 #else
-
-	chan_selected=3; // канал рандомизации
-    myADC_SEL_CHANNEL(chan_selected); //переключаемся на канал для рандомизации
+	chan_selected=CHAN_RANDOM; // канал рандомизации
+	myADC_SEL_CHANNEL(chan_selected); //переключаемся на канал для рандомизации
+    ANALOG_REG->ADC_SINGLE=1;
+	myADC_SEL_CHANNEL(chan_selected); //переключаемся на канал для рандомизации
 	while (!ANALOG_REG->ADC_VALID) {};
     ANALOG_REG->ADC_SINGLE=1; //считаем новый рандом
+	while (!ANALOG_REG->ADC_VALID) {};
+	seed = ((unsigned long) ANALOG_REG->ADC_VALUE << 16) + micros();
 #endif
   return seed;
 }
@@ -1658,6 +1709,59 @@ void Arduboy2Core::delayByte(uint8_t ms)
 {
   delayShort(ms);
 }
+
+#ifdef ELBEARBOY
+
+void inline Arduboy2Core::Delay_us (uint32_t us) //Функция задержки в микросекундах us
+{
+        uint32_t i;
+      for (i=0;i<us;i++)
+      {
+       i++;
+       i--;
+      }
+
+}
+
+uint32_t Arduboy2Core::read_eeprom_word(uint8_t idx) {
+      EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + idx)<<2;
+      //uint32_t a32=EEPROM_REGS->EEDAT;
+      //uint8_t a = (uint8_t)a32;
+  return EEPROM_REGS->EEDAT;
+}
+
+void Arduboy2Core::update_eeprom_1st_page_word(uint8_t idx, uint32_t val){
+  if (idx<32) {
+      uint32_t timeout=100000;
+      EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + idx)<<2;
+      //uint32_t a32=EEPROM_REGS->EEDAT;
+      //uint8_t a = (uint8_t)a32;
+      uint32_t exist_val= EEPROM_REGS->EEDAT;
+      if (exist_val != val) {
+        //erase
+        EEPROM_REGS->EECON |= EEPROM_EECON_BWE_M;
+        EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + idx)<<2;
+        EEPROM_REGS->EEDAT= exist_val;
+        EEPROM_REGS->EECON |= EEPROM_EECON_OP(EEPROM_EECON_OP_ER) | EEPROM_EECON_EX_M;
+        while (timeout)
+        {
+          timeout--;
+          if (!(EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M)) { break;}
+        }
+        //update
+        EEPROM_REGS->EECON |= EEPROM_EECON_BWE_M;
+        EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + idx)<<2;
+        EEPROM_REGS->EEDAT= val;
+        EEPROM_REGS->EECON |= EEPROM_EECON_OP(EEPROM_EECON_OP_PR) | EEPROM_EECON_EX_M;
+        while (timeout)
+        {
+          timeout--;
+          if (!(EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M)) { break;}
+        }
+      }
+  } 
+}
+#endif
 
 void Arduboy2Core::exitToBootloader()
 {

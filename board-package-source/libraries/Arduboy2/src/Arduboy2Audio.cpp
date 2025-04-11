@@ -52,12 +52,20 @@ void Arduboy2Audio::toggle()
 
 void Arduboy2Audio::saveOnOff()
 {
+#ifndef ELBEARBOY
   EEPROM.update(Arduboy2Base::eepromAudioOnOff, audio_enabled);
+#else
+	Arduboy2Core::update_eeprom_1st_page_word(Arduboy2Base::eepromAudioOnOff, audio_enabled);
+#endif
 }
 
 void Arduboy2Audio::begin()
 {
+#ifndef ELBEARBOY
   if (EEPROM.read(Arduboy2Base::eepromAudioOnOff))
+#else
+  if (Arduboy2Core::read_eeprom_word(Arduboy2Base::eepromAudioOnOff))
+#endif
     on();
   else
     off();

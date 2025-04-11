@@ -28,11 +28,13 @@
 	#include <avr/sleep.h>
 #else
 	#include "analog_reg.h"
+	//#include <EEPROM.h>
+	#include <eeprom_def.h>
 #endif
 
 #ifdef JOYSTICKANALOG
-	#define JOYSENSX 150 //Joystick sensitivity. X axis
-	#define JOYSENSY 150 //Joystick sensitivity. Y axis
+	#define JOYSENSX 200 //Joystick sensitivity. X axis
+	#define JOYSENSY 200 //Joystick sensitivity. Y axis
 #endif
 
 // main hardware compile flags
@@ -289,7 +291,6 @@
 #endif
 
 #if defined (ECONSOLE)
-		
 	#if defined (JOYSTICKANALOG)
 		#define PIN_Y_AXIS A1 //3v3 341..342=0, 0..200=down, 400..674=up; 5V: 518..519=0, 0..200=down, 600..1023=up
 		#define X_AXIS_PORT PORTC
@@ -314,43 +315,8 @@
 		#define B_BUTTON_PORTIN PIND
 		#define B_BUTTON_DDR DDRD
 		#define B_BUTTON_BIT PORTD3
-	#elif !defined (JOYSTICDISCRETE) // ECONSOLE KEYS
-		#define PIN_LEFT_BUTTON 2
-		#define LEFT_BUTTON_PORT PORTD
-		#define LEFT_BUTTON_PORTIN PIND
-		#define LEFT_BUTTON_DDR DDRD
-		#define LEFT_BUTTON_BIT PORTD2
-
-		#define PIN_RIGHT_BUTTON 6
-		#define RIGHT_BUTTON_PORT PORTD
-		#define RIGHT_BUTTON_PORTIN PIND
-		#define RIGHT_BUTTON_DDR DDRD
-		#define RIGHT_BUTTON_BIT PORTD6
-
-		#define PIN_UP_BUTTON 3
-		#define UP_BUTTON_PORT PORTD
-		#define UP_BUTTON_PORTIN PIND
-		#define UP_BUTTON_DDR DDRD
-		#define UP_BUTTON_BIT PORTD3
-
-		#define PIN_DOWN_BUTTON 5
-		#define DOWN_BUTTON_PORT PORTD
-		#define DOWN_BUTTON_PORTIN PIND
-		#define DOWN_BUTTON_DDR DDRD
-		#define DOWN_BUTTON_BIT PORTD5
-
-		#define PIN_A_BUTTON 4
-		#define A_BUTTON_PORT PORTD
-		#define A_BUTTON_PORTIN PIND
-		#define A_BUTTON_DDR DDRD
-		#define A_BUTTON_BIT PORTD4
-
-		#define PIN_B_BUTTON 7
-		#define B_BUTTON_PORT PORTD
-		#define B_BUTTON_PORTIN PIND
-		#define B_BUTTON_DDR DDRD
-		#define B_BUTTON_BIT PORTD7
-	#else // JOYSTICDISCRETE KEYS 
+	#elif defined (JOYSTICDISCRETE) 
+		// JOYSTICDISCRETE KEYS 
 		#define PIN_LEFT_BUTTON 5
 		#define LEFT_BUTTON_PORT PORTD
 		#define LEFT_BUTTON_PORTIN PIND
@@ -386,18 +352,56 @@
 		#define B_BUTTON_PORTIN PIND
 		#define B_BUTTON_DDR DDRD
 		#define B_BUTTON_BIT PORTD7
+	#else // ECONSOLE KEYS
+		#define PIN_LEFT_BUTTON 2
+		#define LEFT_BUTTON_PORT PORTD
+		#define LEFT_BUTTON_PORTIN PIND
+		#define LEFT_BUTTON_DDR DDRD
+		#define LEFT_BUTTON_BIT PORTD2
+
+		#define PIN_RIGHT_BUTTON 6
+		#define RIGHT_BUTTON_PORT PORTD
+		#define RIGHT_BUTTON_PORTIN PIND
+		#define RIGHT_BUTTON_DDR DDRD
+		#define RIGHT_BUTTON_BIT PORTD6
+
+		#define PIN_UP_BUTTON 3
+		#define UP_BUTTON_PORT PORTD
+		#define UP_BUTTON_PORTIN PIND
+		#define UP_BUTTON_DDR DDRD
+		#define UP_BUTTON_BIT PORTD3
+
+		#define PIN_DOWN_BUTTON 5
+		#define DOWN_BUTTON_PORT PORTD
+		#define DOWN_BUTTON_PORTIN PIND
+		#define DOWN_BUTTON_DDR DDRD
+		#define DOWN_BUTTON_BIT PORTD5
+
+		#define PIN_A_BUTTON 4
+		#define A_BUTTON_PORT PORTD
+		#define A_BUTTON_PORTIN PIND
+		#define A_BUTTON_DDR DDRD
+		#define A_BUTTON_BIT PORTD4
+
+		#define PIN_B_BUTTON 7
+		#define B_BUTTON_PORT PORTD
+		#define B_BUTTON_PORTIN PIND
+		#define B_BUTTON_DDR DDRD
+		#define B_BUTTON_BIT PORTD7
 	#endif // END KEYS
 #elif defined (ELBEARBOY)
 
-	#define ADC_CONFIG_SAH_TIME_MY          (0x3F << ADC_CONFIG_SAH_TIME_S) //Время выборки очередного отсчета в тактах АЦП - используем значение по-умолчанию
+	//define ADC_CONFIG_SAH_TIME_MY          (0x3F << ADC_CONFIG_SAH_TIME_S) //Время выборки очередного отсчета в тактах АЦП - используем значение по-умолчанию
 	// нумерация каналов ADC - сквозная 0,1,2:
-	#define myADC_SEL_CHANNEL(channel_selection) (ANALOG_REG->ADC_CONFIG = ((ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) & (~ADC_CONFIG_SEL_M)) | ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) | ((channel_selection) << ADC_CONFIG_SEL_S))
+	//define myADC_SEL_CHANNEL(channel_selection) (ANALOG_REG->ADC_CONFIG = ((ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) & (~ADC_CONFIG_SEL_M)) | ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) | ((channel_selection) << ADC_CONFIG_SEL_S))
+	#define myADC_SEL_CHANNEL(channel_selection) (ANALOG_REG->ADC_CONFIG = ((ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_M)) & (~ADC_CONFIG_SEL_M)) | ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_M) | ((channel_selection) << ADC_CONFIG_SEL_S))
+	
 	#define ADC_EXTREF_OFF      0       /* Встроенный источник опорного напряжения 1,2 В */
 	#define ADC_EXTREF_ON       1       /* Внешний источник опорного напряжения */
 	#define ADC_EXTCLB_CLBREF      0       /* Настраиваемый ОИН */
 	#define ADC_EXTCLB_ADCREF      1       /* Внешний вывод */
 	#define PIN_RANDOM 4 // ACD3 port_0_4
-	#define CHAN_RANDOM 0 // ACD3 port_0_4
+	#define CHAN_RANDOM 3 // ACD3 port_0_4
 
 	#if defined (JOYSTICKANALOG)
 
@@ -406,50 +410,49 @@
 		#define A_BUTTON_BIT 8 // D4/8 port_0_8
 		#define A_BUTTON_PORTIN GPIO_0->STATE
 		
-		#define PIN_AXISX 7 // Ось X port_1_5
-		#define PIN_AXISY 5 // Ось Y port_1_7
+		#define PIN_AXISX 5 // Ось X port_1_5
+		#define PIN_AXISY 7 // Ось Y port_1_7
 
-		#define CHAN_AXISX 1 // Ось X port_1_5
-		#define CHAN_AXISY 0 // Ось Y port_1_7
-
-		#ifndef JOYSTICDISCRETE // ECOSOLE KEYS
-			#define B_BUTTON_BIT 8 // D7/8 port_1_8
-			#define B_BUTTON_PORTIN GPIO_1->STATE
+		#define CHAN_AXISX 0 // Ось X port_1_5
+		#define CHAN_AXISY 1 // Ось Y port_1_7
+	#elif defined (JOYSTICDISCRET) // JOYSTICDISCRETE KEYS 
+		#define B_BUTTON_BIT 8 // D7/8 port_1_8
+		#define B_BUTTON_PORTIN GPIO_1->STATE
 			
-			#define A_BUTTON_BIT 8 // D4/8 port_0_8
-			#define A_BUTTON_PORTIN GPIO_1->STATE
+		#define A_BUTTON_BIT 9 // D8/9 port_1_9
+		#define A_BUTTON_PORTIN GPIO_1->STATE
 
-			#define LEFT_BUTTON_BIT 1 // D2/10 port_0_10
-			#define LEFT_BUTTON_PORTIN GPIO_0->STATE
+		#define LEFT_BUTTON_BIT 1 // D5/1 port_0_1
+		#define LEFT_BUTTON_PORTIN GPIO_0->STATE
 
-			#define RIGHT_BUTTON_BIT 2 // D6/0 port_0_2
-			#define RIGHT_BUTTON_PORTIN GPIO_0->STATE
+		#define RIGHT_BUTTON_BIT 0 // D3/0 port_0_0
+		#define RIGHT_BUTTON_PORTIN GPIO_0->STATE
 
-			#define UP_BUTTON_BIT 0 // D3/0 port_0_0
-			#define UP_BUTTON_PORTIN GPIO_0->STATE
+		#define UP_BUTTON_BIT 10 // D2/10 port_0_10
+		#define UP_BUTTON_PORTIN GPIO_0->STATE
 
-			#define DOWN_BUTTON_BIT 1 // D5/1 port_0_1
-			#define DOWN_BUTTON_PORTIN GPIO_0->STATE
-		#else // JOYSTICDISCRETE KEYS 
-			#define B_BUTTON_BIT 8 // D7/8 port_1_8
-			#define B_BUTTON_PORTIN GPIO_1->STATE
+		#define DOWN_BUTTON_BIT 8 // D4/8 port_0_8
+		#define DOWN_BUTTON_PORTIN GPIO_0->STATE
+	
+	#else // ECOSOLE KEYS
+		#define B_BUTTON_BIT 8 // D7/8 port_1_8
+		#define B_BUTTON_PORTIN GPIO_1->STATE
 			
-			#define A_BUTTON_BIT 9 // D8/9 port_1_9
-			#define A_BUTTON_PORTIN GPIO_1->STATE
+		#define A_BUTTON_BIT 8 // D4/8 port_0_8
+		#define A_BUTTON_PORTIN GPIO_1->STATE
 
-			#define LEFT_BUTTON_BIT 1 // D5/1 port_0_1
-			#define LEFT_BUTTON_PORTIN GPIO_0->STATE
+		#define LEFT_BUTTON_BIT 1 // D2/10 port_0_10
+		#define LEFT_BUTTON_PORTIN GPIO_0->STATE
 
-			#define RIGHT_BUTTON_BIT 0 // D3/0 port_0_0
-			#define RIGHT_BUTTON_PORTIN GPIO_0->STATE
+		#define RIGHT_BUTTON_BIT 2 // D6/0 port_0_2
+		#define RIGHT_BUTTON_PORTIN GPIO_0->STATE
 
-			#define UP_BUTTON_BIT 10 // D2/10 port_0_10
-			#define UP_BUTTON_PORTIN GPIO_0->STATE
+		#define UP_BUTTON_BIT 0 // D3/0 port_0_0
+		#define UP_BUTTON_PORTIN GPIO_0->STATE
 
-			#define DOWN_BUTTON_BIT 8 // D4/8 port_0_8
-			#define DOWN_BUTTON_PORTIN GPIO_0->STATE
-		#endif // END KEYS
-	#endif
+		#define DOWN_BUTTON_BIT 1 // D5/1 port_0_1
+		#define DOWN_BUTTON_PORTIN GPIO_0->STATE
+	#endif // END KEYS
 #else
 #if defined (MICROCADE)
 #define PIN_LEFT_BUTTON A1
@@ -945,7 +948,11 @@ class Arduboy2Core : public Arduboy2NoUSB
 #if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
     static void i2c_start(uint8_t mode);
 	#if defined(ELBEARBOY)
-		static void inline Delay_us (uint32_t us) __attribute__((always_inline));
+		/* small delay for i2c
+	*/
+		#define __NOP() __asm volatile ("ADDI x0, x0, 0")
+		static void  Delay_us (uint32_t us);
+		
     #endif
 	static void inline i2c_stop() __attribute__((always_inline))
     {
@@ -1478,6 +1485,15 @@ class Arduboy2Core : public Arduboy2NoUSB
 	#if defined (ELBEARBOY)
 	static	uint8_t chan_converted;
 	static	uint8_t chan_selected;
+	
+	
+	/* read 256 eeprom words (32bit) from number 1792 to 2047
+	*/
+	static uint32_t read_eeprom_word(uint8_t idx);
+	/* update 32 (one page) eeprom words (32bit) from number 1792 to 1823
+	*/
+	static void update_eeprom_1st_page_word(uint8_t idx, uint32_t val);
+	
 	#endif
 	#if defined (JOYSTICKANALOG)
 	 static uint8_t ADCJoystickState;

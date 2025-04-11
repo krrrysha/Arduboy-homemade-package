@@ -17,7 +17,6 @@
 #if !defined(ELBEARBOY)
 	#include <avr/eeprom.h>
 #else	
-	#include <EEPROM.h>
 	#include <wiring_time.h>
 #endif
 #include "Arduboy2Core.h"

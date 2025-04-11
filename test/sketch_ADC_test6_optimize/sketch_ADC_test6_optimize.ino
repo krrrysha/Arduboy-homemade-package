@@ -33,7 +33,7 @@ uint32_t time;
 
 #define CHAN_AXISX 1 // Ось X port_1_5
 #define CHAN_AXISY 0 // Ось Y port_1_7
-#define CHAN_RANDOM 0 // Ось Y port_0_4
+#define CHAN_RANDOM 3 // Ось Y port_0_4
 
 uint8_t chan_converted = 0;
 uint8_t chan_selected = 0;  
@@ -46,21 +46,22 @@ Serial.begin(9600);
 
 GPIO_0->DIRECTION_IN = 1 << PIN_BUTTON_A; // Установка направления вывода A  на вход
 GPIO_0->DIRECTION_IN = 1 << PIN_BUTTON_B; // Установка направления вывода B  на вход
-GPIO_0->DIRECTION_IN = 1 << CHAN_RANDOM; // 
-GPIO_1->DIRECTION_IN = 1 << CHAN_AXISX; // 
-GPIO_1->DIRECTION_IN = 1 << CHAN_AXISY; // 
+GPIO_0->DIRECTION_IN = 1 << PIN_RANDOM; // 
+GPIO_1->DIRECTION_IN = 1 << PIN_AXISX; // 
+GPIO_1->DIRECTION_IN = 1 << PIN_AXISY; // 
 
 // ADC init!
-chan_selected=0;
+chan_selected=3;
 PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A0=1.5
 PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
 PAD_CONFIG->PORT_0_CFG |= (0b11 << (2 * PIN_RANDOM)); // аналоговый сигнал. порт A2=0.4
 //PAD_CONFIG->PORT_0_CFG &= (0b00 << (2 * PIN_BUTTON_B)); // дискрет . порт D3=0.0
 //PAD_CONFIG->PORT_0_CFG &= (0b00 << (2 * PIN_BUTTON_A)); // дискрет . порт D4=0.8
-Serial.print("PORT_0_CFG:");
-Serial.println(PAD_CONFIG->PORT_0_CFG,HEX);
-Serial.print("PORT_1_CFG");
-Serial.println(PAD_CONFIG->PORT_1_CFG,HEX);
+
+//Serial.print("PORT_0_CFG:");
+//Serial.println(PAD_CONFIG->PORT_0_CFG,HEX);
+//Serial.print("PORT_1_CFG");
+//Serial.println(PAD_CONFIG->PORT_1_CFG,HEX);
 
 /*
 ADC_HandleTypeDef hadc;
@@ -72,22 +73,22 @@ ADC_HandleTypeDef hadc;
  //  HAL_ADC_Init(&hadc);
   //   HAL_ADC_MspInit(&hadc);
   PM->CLK_APB_P_SET = PM_CLOCK_APB_P_ANALOG_REGS_M;
-  Serial.print(" ADC_CONFIG-1:");
-   Serial.println(ANALOG_REG->ADC_CONFIG,HEX);
+ // Serial.print(" ADC_CONFIG-1:");
+ //  Serial.println(ANALOG_REG->ADC_CONFIG,HEX);
 
 ANALOG_REG->ADC_CONFIG = 0x3C00;
 
 //HAL_ADC_Enable(&hadc);
-  Serial.print(" ADC_CONFIG-0:");
-   Serial.println(ANALOG_REG->ADC_CONFIG,HEX);
+//  Serial.print(" ADC_CONFIG-0:");
+//   Serial.println(ANALOG_REG->ADC_CONFIG,HEX);
 
 ANALOG_REG->ADC_CONFIG = (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_M)) |
                                  ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_M) |
                                  (1 << ADC_CONFIG_EN_S);
      
 //ANALOG_REG->ADC_CONFIG |= ADC_CONFIG_EN_M;
-    Serial.print(" ADC_ENA:");
-    Serial.println(ANALOG_REG->ADC_CONFIG,HEX);
+   // Serial.print(" ADC_ENA:");
+   // Serial.println(ANALOG_REG->ADC_CONFIG,HEX);
 //HAL_ADC_ResetEnable:
 
 ANALOG_REG->ADC_CONFIG = (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_M)) |
@@ -95,13 +96,13 @@ ANALOG_REG->ADC_CONFIG = (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_M)) |
                                  (1 << ADC_CONFIG_RESETN_S);
  
  //   ANALOG_REG->ADC_CONFIG |=ADC_CONFIG_RESETN_M;
-    Serial.print(" ADC_RST:");
-    Serial.println(ANALOG_REG->ADC_CONFIG,HEX);
+   // Serial.print(" ADC_RST:");
+   // Serial.println(ANALOG_REG->ADC_CONFIG,HEX);
 
 // HAL_ADC_ChannelSet
 myADC_SEL_CHANNEL (chan_selected);
-    Serial.print(" CFG_SEL:");
-    Serial.println(ANALOG_REG->ADC_CONFIG,HEX);
+ //   Serial.print(" CFG_SEL:");
+   // Serial.println(ANALOG_REG->ADC_CONFIG,HEX);
 
 ANALOG_REG->ADC_CONFIG |= (ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_M)) |
                                  ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_M) |
@@ -130,13 +131,14 @@ while (!ANALOG_REG->ADC_VALID) {};
     Serial.println(ANALOG_REG->ADC_CONFIG,HEX);
   ANALOG_REG->ADC_SINGLE=1; //считаем новый рандом
 
-  //ADC_SEL_CHANNEL(hadc.Instance, CHAN_AXISX); //переключаемся на канал клавишwhile (~ANALOG_REG->!ADC_VALID) {};
+  //ADC_SEL_CHANNEL(hadc.Instance, CHAN_AXISX); //переключаемся на канал клавиш while (~ANALOG_REG->!ADC_VALID) {};
  while (!ANALOG_REG->ADC_VALID) {};
  //Serial.print(" ADC_VALU_2:");
  //Serial.println(ANALOG_REG->ADC_VALUE);
     Serial.print(" CFG_RN2:");
     Serial.println(ANALOG_REG->ADC_CONFIG,HEX);
 }
+
 void loop() {
 uint8_t curbuttons;
 
@@ -209,8 +211,7 @@ uint8_t buttonsState()
  Serial.print(ANALOG_REG->ADC_VALUE);
     Serial.print(" JoystickXZero:");
  Serial.print(JoystickXZero);
-     Serial.print(" JoystickYZero:");
- Serial.print(JoystickYZero);
+Serial.print(" JoystickYZero:");  Serial.print(JoystickYZero);
      Serial.println();
      */
 } 
