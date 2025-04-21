@@ -261,7 +261,8 @@ class BeepPin1
 #ifndef ELBEARBOY 
     return (uint16_t) (((F_CPU / 8 / 2) + (hz / 2)) / hz) - 1;
 #else
-	return (uint16_t) ((F_CPU/32/hz)-(1/2)) ; 
+	//return (uint16_t) ((F_CPU/32/hz)-(1/2)) ; 
+	return (uint16_t) (((F_CPU / 16 / 2) + (hz / 2)) / hz) - 1;
 #endif
   }
 };
@@ -370,7 +371,8 @@ class BeepPin2
 #ifndef ELBEARBOY 
     return (uint16_t) (((F_CPU / 128 / 2) + (hz / 2)) / hz) - 1;
 #else
-	return (uint16_t) ((F_CPU/32/hz)-(1/2)) ; 
+	//return (uint16_t) ((F_CPU/32/hz)-(1/2)) ; 
+	return (uint16_t) (((F_CPU / 16 / 2) + (hz / 2)) / hz) - 1;
 #endif
   }
 };

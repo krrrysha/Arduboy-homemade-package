@@ -171,6 +171,8 @@ const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
 
 void Arduboy2Core::boot()
 {
+
+  
   #ifdef ARDUBOY_SET_CPU_8MHZ
   // ARDUBOY_SET_CPU_8MHZ will be set by the IDE using boards.txt
   setCPUSpeed8MHz();
@@ -178,12 +180,17 @@ void Arduboy2Core::boot()
 
   // Select the ADC input here so a delay isn't required in generateRandomSeed()
   #ifndef ELBEARBOY
+
+
+
   ADMUX = RAND_SEED_IN_ADMUX;
 
   bootPins();
   bootSPI();
   bootOLED();
-  bootPowerSaving();
+  
+  bootPowerSaving(); 
+    
   #else
   bootPins();
   bootOLED();	  
@@ -234,6 +241,8 @@ void Arduboy2Core::bootPins()
     DDRD &= ~(_BV(B_BUTTON_BIT) | _BV(A_BUTTON_BIT));
     ADMUX = 0x42;
 	ADCSRA=0b10010011; // ADEN=1, ADSC=0 (stop conversion), ADATE=0, ADIF=1 (conversion complete), ADIE=0 (no interputs), ADPS=011 CK/8
+	ADCSRA |= _BV(ADSC); // start conversion (ADMUX has been pre-set in boot())
+	while (bit_is_set(ADCSRA, ADSC)) { } // wait for conversion complete
 	#endif
   // switch off LEDs by default
   PORTC &= ~(_BV(GREEN_LED_BIT)   | _BV(BLUE_LED_BIT) | _BV(RED_LED_BIT));
@@ -643,12 +652,12 @@ void Arduboy2Core::i2c_sendByte(uint8_t byte)
 			byte<<=1; // сдвигаем на 1 бит влево
 		}
 		I2C_SDA_AS_INPUT(); // отпустить SDA (лог.1), чтобы ведомое устройство смогло сгенерировать ACK. В оригинальном тексте Arduboy2 тут выставляется лог.0. Вероятно, чтобы не дожидаться, пока это сделает ведомый?
-		Delay_us(4);
+		//Delay_us(4);
 		I2C_SCL_AS_INPUT(); // отпустить SCL (лог.1), чтобы ведомое устройство передало ACK
-		Delay_us(4);
+		//Delay_us(4);
 		I2C_SCL_LOW();
 		I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)  // приём ACK завершён
-		Delay_us(4);
+		//Delay_us(4);
   #endif
 }
 #endif
@@ -692,13 +701,13 @@ void Arduboy2Core::bootPowerSaving()
 	#else
 	PRR = _BV(PRTWI) | _BV(PRADC);
 	#endif
-  PRR = _BV(PRUSART0);
+  PRR |= _BV(PRUSART0);
   #else
   // disable Two Wire Interface (I2C) and the ADC
   // All other bits will be written with 0 so will be enabled
  PRR0 = _BV(PRTWI) | _BV(PRADC);
   // disable USART1
-  PRR1 = _BV(PRUSART1);
+  PRR1 |= _BV(PRUSART1);
   #endif
 #endif 
 }
@@ -1420,7 +1429,7 @@ void Arduboy2Core::setRGBled(uint8_t color, uint8_t val)
 {
 #ifndef ELBEARBOY
 	#if defined(ECONSOLE) 
-	   (void)blue;  // parameter unused
+	   //(void)blue;  // parameter unused
 	#elif defined (ARDUBOY_10)
 	  if (color == RED_LED)
 	  {
@@ -1548,8 +1557,10 @@ uint8_t Arduboy2Core::buttonsState()
     // JOYSTICKANALOG
 	buttons = 0;  
     //buttons &= ~(A_BUTTON| B_BUTTON);
+
 	if (ADCSRA & (1 << ADIF)) {
 		unsigned int ADCdata=(ADCL|ADCH << 8);
+
     if ((ADMUX & 0b00001111) ==0 ) { // if the conversion at the AC0 input is complete
 		ADCJoystickState &= ~(RIGHT_BUTTON | LEFT_BUTTON);
 		if (JoystickXZero>1024) {JoystickXZero=ADCdata;} // if first run
@@ -1573,6 +1584,8 @@ uint8_t Arduboy2Core::buttonsState()
 	#endif
 	if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
 	if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
+
+
   #elif defined(ELBEARBOY)
 	buttons = 0;
 	#ifndef JOYSTICKANALOG
@@ -1600,7 +1613,7 @@ uint8_t Arduboy2Core::buttonsState()
 					chan_selected=CHAN_AXISY;
 					chan_converted=CHAN_AXISX;
 				} 
-				myADC_SEL_CHANNEL (chan_selected);
+				myADC_SEL_CHANNEL (chan_selected); //можно попробовать исключить для ускорения
 				ANALOG_REG->ADC_SINGLE=1;
 				myADC_SEL_CHANNEL (chan_selected);
 			} else // если не наш канал (канал рандомизатора )
@@ -1608,7 +1621,7 @@ uint8_t Arduboy2Core::buttonsState()
 
 				chan_converted=chan_selected;
 				chan_selected=CHAN_AXISY;
-				myADC_SEL_CHANNEL (chan_selected);
+				myADC_SEL_CHANNEL (chan_selected); // необходимая строка. без нее переключение с канала рандомайзера происходит с задержкой на несколько циклов вычисления. Вероятно эта строка нужна при переключении одного GPIO на другой.
 				ANALOG_REG->ADC_SINGLE=1;
 				myADC_SEL_CHANNEL (chan_selected);
 
@@ -1626,8 +1639,6 @@ uint8_t Arduboy2Core::buttonsState()
 Serial.print(" JoystickYZero:");  Serial.print(JoystickYZero);
      Serial.println();
      */
-			
-			
 		}
 		buttons |= ADCJoystickState;
 	#endif
@@ -1714,13 +1725,21 @@ void Arduboy2Core::delayByte(uint8_t ms)
 
 void inline Arduboy2Core::Delay_us (uint32_t us) //Функция задержки в микросекундах us
 {
+/*
         uint32_t i;
       for (i=0;i<us;i++)
       {
        i++;
        i--;
       }
-
+*/
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
 }
 
 uint32_t Arduboy2Core::read_eeprom_word(uint8_t idx) {

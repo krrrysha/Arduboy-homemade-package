@@ -16,6 +16,7 @@
 #endif
 
 #ifdef __AVR_ATmega328P__
+	#define OLED_SH1106_I2C
 	#define ECONSOLE
 	#warning ECONSOLE!
 	#define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 

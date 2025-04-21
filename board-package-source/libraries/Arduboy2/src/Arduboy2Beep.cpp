@@ -54,10 +54,11 @@ void BeepPin1::tone(uint16_t count, uint8_t dur)
   OCR3A = count; // load the count (16 bits), which determines the frequency
 #endif
 #else
+	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | ~(TIMER32_ENABLE_TIM_EN_M); // без  этого таймер временно "зависает" при быстрой смене TOP/OCR
 	TIMER32_1->TOP = (count*32);
 	TIMER32_1->CHANNELS[3].OCR = TIMER32_1->TOP>>1;
-	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M;
-	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_EN_M;
+	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | TIMER32_ENABLE_TIM_EN_M;
+	//TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_EN_M;
 #endif	
 }
 
@@ -149,10 +150,11 @@ void BeepPin2::tone(uint16_t count, uint8_t dur)
   OCR4C = lowByte(count); //  which determines the frequency
 #endif 
 #else
+	TIMER32_2->ENABLE = TIMER32_ENABLE_TIM_CLR_M | ~(TIMER32_ENABLE_TIM_EN_M);
 	TIMER32_2->TOP = (count*32);
 	TIMER32_2->CHANNELS[1].OCR = TIMER32_2->TOP>>1;
-	TIMER32_2->ENABLE = TIMER32_ENABLE_TIM_CLR_M;
-	TIMER32_2->ENABLE = TIMER32_ENABLE_TIM_EN_M;
+	TIMER32_2->ENABLE = TIMER32_ENABLE_TIM_CLR_M | TIMER32_ENABLE_TIM_EN_M;
+	//TIMER32_2->ENABLE = TIMER32_ENABLE_TIM_EN_M;
 #endif	
 }
 

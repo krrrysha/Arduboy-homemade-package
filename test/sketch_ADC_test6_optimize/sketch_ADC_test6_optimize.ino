@@ -140,8 +140,9 @@ while (!ANALOG_REG->ADC_VALID) {};
 }
 
 void loop() {
-uint8_t curbuttons;
 
+/*
+uint8_t curbuttons;
 time=micros(); 
 for (int i=0;i<count; i++)
 {
@@ -161,9 +162,14 @@ Serial.print(curbuttons,BIN);
 Serial.println();
 Serial.print(" time_mid:");
 Serial.println(time_mid);
+*/
+Serial.println(ANALOG_REG->ADC_VALUE);
+while (!ANALOG_REG->ADC_VALID) {};
+  ANALOG_REG->ADC_SINGLE=1; //считаем новый рандом
 
 
-delay(500); // пауза перед следующим считыванием данных
+
+delay(1000); // пауза перед следующим считыванием данных
 }
 
 
@@ -193,12 +199,14 @@ uint8_t buttonsState()
     chan_selected=CHAN_AXISY;
     chan_converted=CHAN_AXISX;
     } 
+    myADC_SEL_CHANNEL (chan_selected);
     ANALOG_REG->ADC_SINGLE=1;
     myADC_SEL_CHANNEL (chan_selected);
   } else // если не наш канал
   {
     chan_converted=chan_selected;
     chan_selected=CHAN_AXISX;
+    myADC_SEL_CHANNEL (chan_selected);
     ANALOG_REG->ADC_SINGLE=1;
     myADC_SEL_CHANNEL (chan_selected);
   }

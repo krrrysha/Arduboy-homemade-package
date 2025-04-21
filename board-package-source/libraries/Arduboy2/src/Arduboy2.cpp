@@ -30,7 +30,7 @@ bool Arduboy2Base::justRendered = false;
 // Aruduboy2::begin()
 void Arduboy2Base::begin()
 {
-  beginDoFirst();
+ beginDoFirst();
 
   bootLogo();
   // alternative logo functions. Work the same as bootLogo() but may reduce
@@ -47,13 +47,15 @@ void Arduboy2Base::begin()
 
 void Arduboy2Base::beginDoFirst()
 {
-  boot(); // raw hardware
 
+  boot(); // raw hardware
   display(); // blank the display (sBuffer is global, so cleared automatically)
+
 
   flashlight(); // light the RGB LED and screen if UP button is being held.
 
   // check for and handle buttons held during start up for system control
+
   systemButtons();
 
   audio.begin();
@@ -61,15 +63,23 @@ void Arduboy2Base::beginDoFirst()
 
 void Arduboy2Base::flashlight()
 {
-#if !defined(ECONSOLE ) && !defined(ELBEARBOY)
+
+#if defined(JOYSTICKANALOG) 
+for (uint8_t i=0;i<254;i++)
+{
+	buttonsState();
+	delayShort(10);
+}
+#endif	
   if (!pressed(UP_BUTTON)) {
     return;
   }
- #ifdef GU12864_800B
-  allPixelsOn(true);
- #else
-  sendLCDCommand(OLED_ALL_PIXELS_ON); // smaller than allPixelsOn()
- #endif
+ #if !defined(ECONSOLE) && !defined(ELBEARBOY)
+	 #ifdef GU12864_800B
+	  allPixelsOn(true);
+	 #else
+	  sendLCDCommand(OLED_ALL_PIXELS_ON); // smaller than allPixelsOn()
+	 #endif
   setRGBledRedOn();
   setRGBledGreenOn();
   setRGBledBlueOn();
@@ -82,12 +92,16 @@ void Arduboy2Base::flashlight()
   while (true) {
     idle();
   }
+#else
+	sendLCDCommand(OLED_ALL_PIXELS_ON);
 #endif
 }
 
 void Arduboy2Base::systemButtons()
 {
+
   while (pressed(B_BUTTON)) {
+   
    #if defined(MICROCADE)
      setRGBledRedOff();
      setRGBledGreenOff();
@@ -1310,7 +1324,8 @@ bool Arduboy2::textRaw = false;
 // Aruduboy2Base::begin()
 void Arduboy2::begin()
 {
-  beginDoFirst();
+
+ beginDoFirst();
 
   bootLogo();
   // alternative logo functions. Work the same as bootLogo() but may reduce
