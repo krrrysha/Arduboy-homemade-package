@@ -45,6 +45,13 @@ THE SOFTWARE.
 #warning ECONSOLE!
 #define ECONSOLE
 #endif
+
+#ifdef MCU_MIK32_Amur
+#define ELBEARBOY
+#warning ELBEARBOY!
+#include <mik32_hal_irq.h>
+#endif
+
 // ************************************************************
 // ***** Values to use as function parameters in sketches *****
 // ************************************************************
@@ -124,18 +131,26 @@ THE SOFTWARE.
 #define MAX_TONES 3
 
 #ifdef ECONSOLE
-// ECONSOLE speaker pin 1 = Arduino pin 9 = ATmega328 PB1
-#define TONE_PIN_PIN PINB
-#define TONE_PIN_PORT PORTB
-#define TONE_PIN_DDR DDRB
-#define TONE_PIN PORTB1
-#define TONE_PIN_MASK _BV(TONE_PIN)
-// ECONSOLE speaker pin 2 = Arduino pin 11 = ATmega328 PB3
-#define TONE_PIN2_PIN PINB
-#define TONE_PIN2_PORT PORTB
-#define TONE_PIN2_DDR DDRB
-#define TONE_PIN2 PORTB3
-#define TONE_PIN2_MASK _BV(TONE_PIN2)
+	// ECONSOLE speaker pin 1 = Arduino pin 9 = ATmega328 PB1
+	#define TONE_PIN_PIN PINB
+	#define TONE_PIN_PORT PORTB
+	#define TONE_PIN_DDR DDRB
+	#define TONE_PIN PORTB1
+	#define TONE_PIN_MASK _BV(TONE_PIN)
+	// ECONSOLE speaker pin 2 = Arduino pin 11 = ATmega328 PB3
+	#define TONE_PIN2_PIN PINB
+	#define TONE_PIN2_PORT PORTB
+	#define TONE_PIN2_DDR DDRB
+	#define TONE_PIN2 PORTB3
+	#define TONE_PIN2_MASK _BV(TONE_PIN2)
+#elif defined (ELBEARBOY)
+	#define TONE_PIN 3  // D9/3 port_0_3
+	#define TONE_PIN_PORT GPIO_0->STATE
+	#define TONE_PIN_MASK _BV(TONE_PIN)
+
+	#define TONE_PIN2 1 //D11/1 port_1_1
+	#define TONE_PIN2_PORT GPIO_1->STATE
+	#define TONE_PIN2_MASK _BV(TONE_PIN2)
 #else
 #ifndef AB_DEVKIT
   // Arduboy speaker pin 1 = Arduino pin 5 = ATmega32u4 PC6

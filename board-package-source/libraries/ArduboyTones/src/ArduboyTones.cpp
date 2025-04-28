@@ -56,43 +56,88 @@ static volatile uint16_t toneSequence[MAX_TONES * 2 + 1];
 static volatile bool inProgmem;
 
 
-ArduboyTones::ArduboyTones(boolean (*outEn)())
+ArduboyTones::ArduboyTones(bool (*outEn)())
 {
   outputEnabled = outEn;
 
   toneSequence[MAX_TONES * 2] = TONES_END;
 
-  bitClear(TONE_PIN_PORT, TONE_PIN); // set the pin low
-  bitSet(TONE_PIN_DDR, TONE_PIN); // set the pin to output mode
-#ifdef TONES_2_SPEAKER_PINS
-  bitClear(TONE_PIN2_PORT, TONE_PIN2); // set pin 2 low
-  bitSet(TONE_PIN2_DDR, TONE_PIN2); // set pin 2 to output mode
-#endif
+#ifndef ELBEARBOY
+	  bitClear(TONE_PIN_PORT, TONE_PIN); // set the pin low
+	  bitSet(TONE_PIN_DDR, TONE_PIN); // set the pin to output mode
+	#ifdef TONES_2_SPEAKER_PINS
+	  bitClear(TONE_PIN2_PORT, TONE_PIN2); // set pin 2 low
+	  bitSet(TONE_PIN2_DDR, TONE_PIN2); // set pin 2 to output mode
+	#endif
+#else	 // ELBEARBOY
+	// Timer32_1_ch4, D9= PORT 0.3 
+	PM->CLK_APB_P_SET |= PM_CLOCK_APB_P_TIMER32_1_M | PM_CLOCK_APB_P_GPIO_0_M;
+	PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M | PM_CLOCK_APB_M_EPIC_M;
+	
+	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
+	GPIO_0->DIRECTION_OUT = 1 << TONE_PIN; //
+	GPIO_0->CLEAR = 1 << TONE_PIN;
+
+	TIMER32_1->CHANNELS[3].CNTRL &=  TIMER32_CH_CNTRL_DISABLE_M;
+
+	TIMER32_1->INT_MASK = TIMER32_INT_OVERFLOW_M;
+	TIMER32_1->INT_CLEAR =   0xFFFFFFFF;
+	TIMER32_1->PRESCALER =  0; //Divide by 16 clock prescale
+	
+	//Блок инициализации канала
+	
+	TIMER32_1->CHANNELS[3].OCR = 0;
+	TIMER32_1->CHANNELS[3].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
+
+	TIMER32_1->CHANNELS[3].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
+	
+	
+	
+	#ifdef TONES_2_SPEAKER_PINS
+		// // Timer32_2_ch2, D11= PORT 1.1 
+		PM->CLK_APB_P_SET |=  PM_CLOCK_APB_P_GPIO_1_M;
+		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
+		GPIO_1->DIRECTION_OUT = 1 << TONE_PIN2; //
+		GPIO_1->CLEAR = 1 << TONE_PIN2;
+
+	#endif
+#endif	
 }
 
 void ArduboyTones::tone(uint16_t freq, uint16_t dur)
 {
-#ifdef ECONSOLE
-  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
-#else
-  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
-#endif
-  inProgmem = false;
-  tonesStart = tonesIndex = toneSequence; // set to start of sequence array
-  toneSequence[0] = freq;
-  toneSequence[1] = dur;
-  toneSequence[2] = TONES_END; // set end marker
-  nextTone(); // start playing
+#ifndef ELBEARBOY
+	#ifdef ECONSOLE
+	  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
+	#else
+	  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
+	#endif
+#else // ELBEARBOY
+	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+#endif	
+	  inProgmem = false;
+	  tonesStart = tonesIndex = toneSequence; // set to start of sequence array
+	  toneSequence[0] = freq;
+	  toneSequence[1] = dur;
+	  toneSequence[2] = TONES_END; // set end marker
+	  nextTone(); // start playing
 }
 
 void ArduboyTones::tone(uint16_t freq1, uint16_t dur1,
                         uint16_t freq2, uint16_t dur2)
 {
-#ifdef ECONSOLE
-  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
-#else
-  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
-#endif
+#ifndef ELBEARBOY
+	#ifdef ECONSOLE
+	  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
+	#else
+	  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
+	#endif
+#else // ELBEARBOY
+	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
+
+	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+#endif	
   inProgmem = false;
   tonesStart = tonesIndex = toneSequence; // set to start of sequence array
   toneSequence[0] = freq1;
@@ -107,11 +152,17 @@ void ArduboyTones::tone(uint16_t freq1, uint16_t dur1,
                         uint16_t freq2, uint16_t dur2,
                         uint16_t freq3, uint16_t dur3)
 {
-#ifdef ECONSOLE
-  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
-#else
-  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
-#endif
+#ifndef ELBEARBOY
+	#ifdef ECONSOLE
+	  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
+	#else
+	  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
+	#endif
+#else // ELBEARBOY
+	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
+ 
+	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+#endif		
   inProgmem = false;
   tonesStart = tonesIndex = toneSequence; // set to start of sequence array
   toneSequence[0] = freq1;
@@ -126,11 +177,17 @@ void ArduboyTones::tone(uint16_t freq1, uint16_t dur1,
 
 void ArduboyTones::tones(const uint16_t *tones)
 {
-#ifdef ECONSOLE
-  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
-#else
-  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
-#endif
+#ifndef ELBEARBOY
+	#ifdef ECONSOLE
+	  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
+	#else
+	  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
+	#endif
+#else // ELBEARBOY
+	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
+
+	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+#endif		
   inProgmem = true;
   tonesStart = tonesIndex = (uint16_t *)tones; // set to start of sequence array
   nextTone(); // start playing
@@ -138,11 +195,17 @@ void ArduboyTones::tones(const uint16_t *tones)
 
 void ArduboyTones::tonesInRAM(uint16_t *tones)
 {
-#ifdef ECONSOLE
-  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
-#else
-  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
-#endif
+#ifndef ELBEARBOY
+	#ifdef ECONSOLE
+	  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
+	#else
+	  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
+	#endif
+#else // ELBEARBOY
+	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
+
+	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+#endif		
   inProgmem = false;
   tonesStart = tonesIndex = tones; // set to start of sequence array
   nextTone(); // start playing
@@ -150,19 +213,30 @@ void ArduboyTones::tonesInRAM(uint16_t *tones)
 
 void ArduboyTones::noTone()
 {
-#ifdef ECONSOLE
-  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
-  TCCR1B = 0; // stop the counter
-#else
-  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
-  TCCR3B = 0; // stop the counter
-#endif
-  
-  bitClear(TONE_PIN_PORT, TONE_PIN); // set the pin low
-#ifdef TONES_VOLUME_CONTROL
-  bitClear(TONE_PIN2_PORT, TONE_PIN2); // set pin 2 low
-#endif
-  tonesPlaying = false;
+#ifndef ELBEARBOY
+	#ifdef ECONSOLE
+	  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
+	  TCCR1B = 0; // stop the counter
+	#else
+	  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
+	  TCCR3B = 0; // stop the counter
+	#endif
+    bitClear(TONE_PIN_PORT, TONE_PIN); // set the pin low
+	#ifdef TONES_VOLUME_CONTROL
+	  bitClear(TONE_PIN2_PORT, TONE_PIN2); // set pin 2 low
+	#endif
+#else // ELBEARBOY
+	//Serial.println("!STOP HERE!");
+	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
+
+	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+  	GPIO_0->CLEAR = 1 << TONE_PIN;
+	#ifdef TONES_VOLUME_CONTROL
+	  //bitClear(TONE_PIN2_PORT, TONE_PIN2); // set pin 2 low
+	   GPIO_1->CLEAR = 1 << TONE_PIN2;
+	#endif
+#endif	
+ tonesPlaying = false;
 }
 
 void ArduboyTones::volumeMode(uint8_t mode)
@@ -220,54 +294,67 @@ void ArduboyTones::nextTone()
 
   freq &= ~TONE_HIGH_VOLUME; // strip volume indicator from frequency
 
-#ifdef TONES_ADJUST_PRESCALER
-  if (freq >= MIN_NO_PRESCALE_FREQ) {
-#ifdef ECONSOLE
-    tccrxbValue = _BV(WGM12) | _BV(CS10); // CTC mode, no prescaling
-#else
-    tccrxbValue = _BV(WGM32) | _BV(CS30); // CTC mode, no prescaling
-#endif
-    ocrValue = F_CPU / freq / 2 - 1;
-    toneSilent = false;
-  }
-  else {
-#ifdef ECONSOLE
-    tccrxbValue = _BV(WGM12) | _BV(CS11); // CTC mode, prescaler /8
-#else
-    tccrxbValue = _BV(WGM32) | _BV(CS31); // CTC mode, prescaler /8
-#endif
-#endif
-    if (freq == 0) { // if tone is silent
-      ocrValue = F_CPU / 8 / SILENT_FREQ / 2 - 1; // dummy tone for silence
+#ifndef ELBEARBOY
+	#ifdef TONES_ADJUST_PRESCALER
+	  if (freq >= MIN_NO_PRESCALE_FREQ) {
+		#ifdef ECONSOLE
+			tccrxbValue = _BV(WGM12) | _BV(CS10); // CTC mode, no prescaling
+		#else
+			tccrxbValue = _BV(WGM32) | _BV(CS30); // CTC mode, no prescaling
+		#endif
+		ocrValue = F_CPU / freq / 2 - 1;
+		toneSilent = false;
+	  }
+	  else {
+		#ifdef ECONSOLE
+			tccrxbValue = _BV(WGM12) | _BV(CS11); // CTC mode, prescaler /8
+		#else
+			tccrxbValue = _BV(WGM32) | _BV(CS31); // CTC mode, prescaler /8
+		#endif
+	#endif
+		if (freq == 0) { // if tone is silent
+		  ocrValue = F_CPU / 8 / SILENT_FREQ / 2 - 1; // dummy tone for silence
+		  freq = SILENT_FREQ;
+		  toneSilent = true;
+		  bitClear(TONE_PIN_PORT, TONE_PIN); // set the pin low
+		}
+		else {
+		  ocrValue = F_CPU / 8 / freq / 2 - 1;
+		  toneSilent = false;
+		}
+	#ifdef TONES_ADJUST_PRESCALER
+	  }
+	#endif
+#else // ELBEARBOY
+	if (freq == 0) { // if tone is silent
+      ocrValue = F_CPU / SILENT_FREQ / 2 - 1; // dummy tone for silence
       freq = SILENT_FREQ;
       toneSilent = true;
-      bitClear(TONE_PIN_PORT, TONE_PIN); // set the pin low
+      GPIO_0->CLEAR = 1 << TONE_PIN; // set the pin low
     }
     else {
-      ocrValue = F_CPU / 8 / freq / 2 - 1;
+      ocrValue = F_CPU / freq / 2 - 1; // счет без делителя
       toneSilent = false;
     }
-#ifdef TONES_ADJUST_PRESCALER
-  }
 #endif
-
   if (!outputEnabled()) { // if sound has been muted
     toneSilent = true;
   }
 
 #ifdef TONES_VOLUME_CONTROL
-  if (toneHighVol && !toneSilent) {
+	if (toneHighVol && !toneSilent) {
     // set pin 2 to the compliment of pin 1
-    if (bitRead(TONE_PIN_PORT, TONE_PIN)) {
-      bitClear(TONE_PIN2_PORT, TONE_PIN2);
-    }
-    else {
-      bitSet(TONE_PIN2_PORT, TONE_PIN2);
-    }
-  }
-  else {
-    bitClear(TONE_PIN2_PORT, TONE_PIN2); // set pin 2 low for normal volume
-  }
+	#ifndef ELBEARBOY
+		if (bitRead(TONE_PIN_PORT, TONE_PIN)) { bitClear(TONE_PIN2_PORT, TONE_PIN2);}
+		else { bitSet(TONE_PIN2_PORT, TONE_PIN2);}
+	}
+	else { bitClear(TONE_PIN2_PORT, TONE_PIN2);} // set pin 2 low for normal volume
+  	#else // ELBEARBOY
+		if (GPIO_0->STATE & (1 << TONE_PIN)) {GPIO_0->CLEAR = 1 << TONE_PIN2;}
+		else {GPIO_0->SET = 1 << TONE_PIN2;}
+	}
+	else {GPIO_1->CLEAR = 1 << TONE_PIN2;} // set pin 2 low for normal volume		
+	#endif
 #endif
 
   dur = getNext(); // get tone duration
@@ -281,26 +368,59 @@ void ArduboyTones::nextTone()
     toggleCount = -1; // indicate infinite duration
   }
 
-#ifdef ECONSOLE
-  TCCR1A = 0;
-#ifdef TONES_ADJUST_PRESCALER
-  TCCR1B = tccrxbValue;
-#else
-  TCCR1B = _BV(WGM12) | _BV(CS11); // CTC mode, prescaler /8
-#endif
-  OCR1A = ocrValue;
-  durationToggleCount = toggleCount;
-  bitWrite(TIMSK1, OCIE1A, 1); // enable the output compare match interrupt
-#else
-  TCCR3A = 0;
-#ifdef TONES_ADJUST_PRESCALER
-  TCCR3B = tccrxbValue;
-#else
-  TCCR3B = _BV(WGM32) | _BV(CS31); // CTC mode, prescaler /8
-#endif
-  OCR3A = ocrValue;
-  durationToggleCount = toggleCount;
-  bitWrite(TIMSK3, OCIE3A, 1); // enable the output compare match interrupt
+#ifndef ELBEARBOY
+	#ifdef ECONSOLE
+	  TCCR1A = 0;
+		#ifdef TONES_ADJUST_PRESCALER
+		  TCCR1B = tccrxbValue;
+		#else
+		  TCCR1B = _BV(WGM12) | _BV(CS11); // CTC mode, prescaler /8
+		#endif
+	  OCR1A = ocrValue;
+	  durationToggleCount = toggleCount;
+	  bitWrite(TIMSK1, OCIE1A, 1); // enable the output compare match interrupt
+	#else
+	  TCCR3A = 0;
+		#ifdef TONES_ADJUST_PRESCALER
+		  TCCR3B = tccrxbValue;
+		#else
+		  TCCR3B = _BV(WGM32) | _BV(CS31); // CTC mode, prescaler /8
+		#endif
+	  OCR3A = ocrValue;
+	  durationToggleCount = toggleCount;
+	  bitWrite(TIMSK3, OCIE3A, 1); // enable the output compare match interrupt
+	#endif
+#else // ELBEARBOY
+	// Timer32_1_ch4, D9= PORT 0.3 
+
+	// выполняем на случай, если audio.on/off переключит в неправильный режим
+	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
+	GPIO_0->DIRECTION_OUT = 1 << TONE_PIN; //
+	#ifdef TONES_VOLUME_CONTROL
+	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 1 порта 1 (в режим 0xb00).  Timer Disconnect!
+	GPIO_1->DIRECTION_OUT = 1 << TONE_PIN2; //
+	#endif
+	
+	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | ~(TIMER32_ENABLE_TIM_EN_M); // без  этого таймер временно "зависает" при быстрой смене TOP/OCR
+	TIMER32_1->TOP = (ocrValue); // счет без делителя, не умножаем на 2
+	TIMER32_1->CHANNELS[3].OCR = 0;
+	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | TIMER32_ENABLE_TIM_EN_M;
+
+	//Serial.print(" TIMER32_1->INT_MASK="); Serial.println( TIMER32_1->INT_MASK,BIN);
+	//Serial.print(" TIMER32_1->ENABLE="); Serial.println( TIMER32_1->ENABLE,BIN);
+	//Serial.print(" TIMER32_1->TOP="); Serial.println( TIMER32_1->TOP,HEX);
+	//Serial.print(" TIMER32_1->CHANNELS[3].OCR="); Serial.println( TIMER32_1->CHANNELS[3].OCR,HEX);
+	//Serial.print(" TIMER32_1->CHANNELS[3].CNTRL="); Serial.println( TIMER32_1->CHANNELS[3].CNTRL,HEX);
+	
+	
+	// enable the output compare match interrupt
+	durationToggleCount = toggleCount;
+	
+	EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK ;
+    
+	//HAL_IRQ_EnableInterrupts();
+	set_csr(mstatus, MSTATUS_MIE);
+    set_csr(mie, MIE_MEIE);
 #endif
 }
 
@@ -312,27 +432,45 @@ uint16_t ArduboyTones::getNext()
   return *tonesIndex++;
 }
 
-#ifdef ECONSOLE
-ISR(TIMER1_COMPA_vect)
-#else
-ISR(TIMER3_COMPA_vect)
-#endif
+#ifndef ELBEARBOY
+	#ifdef ECONSOLE
+	ISR(TIMER1_COMPA_vect)
+	#else
+	ISR(TIMER3_COMPA_vect)
+	#endif
+#else // ELBEARBOY
+	extern "C" void ISR()
+#endif	
 {
   long toggleCount = durationToggleCount;
+    //Serial.print(" toggleCount="); Serial.println(toggleCount);
   if (toggleCount != 0) {
     if (!toneSilent) {
-      bitSet(*(&TONE_PIN_PIN), TONE_PIN); // toggle the pin
-#ifdef TONES_VOLUME_CONTROL
-      if (toneHighVol) {
-        bitSet(*(&TONE_PIN2_PIN), TONE_PIN2); // toggle pin 2
-      }
-#endif
+	#ifndef ELBEARBOY
+			  bitSet(*(&TONE_PIN_PIN), TONE_PIN); // toggle the pin
+		#ifdef TONES_VOLUME_CONTROL
+			  if (toneHighVol) {
+				bitSet(*(&TONE_PIN2_PIN), TONE_PIN2); // toggle pin 2
+			  }
+		#endif
+	#else // ELBEARBOY
+		if (GPIO_0->STATE & (1 << TONE_PIN)) {GPIO_0->CLEAR = 1 << TONE_PIN;}
+		else {GPIO_0->SET = 1 << TONE_PIN;}
+		#ifdef TONES_VOLUME_CONTROL
+			if (GPIO_1->STATE & (1 << TONE_PIN2)) {GPIO_1->CLEAR = 1 << TONE_PIN2;}
+			else {GPIO_1->SET = 1 << TONE_PIN2;}
+		#endif
+	#endif
     }
     if (--toggleCount >= 0) {
       durationToggleCount = toggleCount;
     }
   }
   else {
-    ArduboyTones::nextTone();
+	ArduboyTones::nextTone();
   }
+  #ifdef ELBEARBOY
+
+	TIMER32_1->INT_CLEAR =   0xFFFFFFFF;
+  #endif
 }
