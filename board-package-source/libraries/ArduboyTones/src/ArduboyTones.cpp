@@ -467,7 +467,9 @@ uint16_t ArduboyTones::getNext()
     }
   }
   else {
-	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+  #ifdef ELBEARBOY
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+ #endif
 	ArduboyTones::nextTone();
   }
 
