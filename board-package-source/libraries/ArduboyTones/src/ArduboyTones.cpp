@@ -392,7 +392,6 @@ void ArduboyTones::nextTone()
 	#endif
 #else // ELBEARBOY
 	// Timer32_1_ch4, D9= PORT 0.3 
-
 	// выполняем на случай, если audio.on/off переключит в неправильный режим
 	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
 	GPIO_0->DIRECTION_OUT = 1 << TONE_PIN; //
@@ -401,18 +400,13 @@ void ArduboyTones::nextTone()
 	GPIO_1->DIRECTION_OUT = 1 << TONE_PIN2; //
 	#endif
 	
+	
+	
 	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | ~(TIMER32_ENABLE_TIM_EN_M); // без  этого таймер временно "зависает" при быстрой смене TOP/OCR
 	TIMER32_1->TOP = (ocrValue); // счет без делителя, не умножаем на 2
 	TIMER32_1->CHANNELS[3].OCR = 0;
 	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | TIMER32_ENABLE_TIM_EN_M;
 
-	//Serial.print(" TIMER32_1->INT_MASK="); Serial.println( TIMER32_1->INT_MASK,BIN);
-	//Serial.print(" TIMER32_1->ENABLE="); Serial.println( TIMER32_1->ENABLE,BIN);
-	//Serial.print(" TIMER32_1->TOP="); Serial.println( TIMER32_1->TOP,HEX);
-	//Serial.print(" TIMER32_1->CHANNELS[3].OCR="); Serial.println( TIMER32_1->CHANNELS[3].OCR,HEX);
-	//Serial.print(" TIMER32_1->CHANNELS[3].CNTRL="); Serial.println( TIMER32_1->CHANNELS[3].CNTRL,HEX);
-	
-	
 	// enable the output compare match interrupt
 	durationToggleCount = toggleCount;
 	
@@ -443,7 +437,10 @@ uint16_t ArduboyTones::getNext()
 #endif	
 {
   long toggleCount = durationToggleCount;
-    //Serial.print(" toggleCount="); Serial.println(toggleCount);
+  #ifdef ELBEARBOY
+	TIMER32_1->INT_CLEAR =   0xFFFFFFFF;
+  #endif 
+ //Serial.print(" toggleCount="); Serial.println(toggleCount);
   if (toggleCount != 0) {
     if (!toneSilent) {
 	#ifndef ELBEARBOY
@@ -467,10 +464,8 @@ uint16_t ArduboyTones::getNext()
     }
   }
   else {
+	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
 	ArduboyTones::nextTone();
   }
-  #ifdef ELBEARBOY
 
-	TIMER32_1->INT_CLEAR =   0xFFFFFFFF;
-  #endif
 }
