@@ -74,6 +74,10 @@ ArduboyTones::ArduboyTones(bool (*outEn)())
 	PM->CLK_APB_P_SET |= PM_CLOCK_APB_P_TIMER32_1_M | PM_CLOCK_APB_P_GPIO_0_M;
 	PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M | PM_CLOCK_APB_M_EPIC_M;
 	
+	// Глобальное включение прерываний (если часто дергать эти функции, то, кажется,  может зависнуть)
+	set_csr(mstatus, MSTATUS_MIE);
+    set_csr(mie, MIE_MEIE);
+	
 	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
 	GPIO_0->DIRECTION_OUT = 1 << TONE_PIN; //
 	GPIO_0->CLEAR = 1 << TONE_PIN;
@@ -88,10 +92,9 @@ ArduboyTones::ArduboyTones(bool (*outEn)())
 	
 	TIMER32_1->CHANNELS[3].OCR = 0;
 	TIMER32_1->CHANNELS[3].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
-
 	TIMER32_1->CHANNELS[3].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
 	
-	
+
 	
 	#ifdef TONES_2_SPEAKER_PINS
 		// // Timer32_2_ch2, D11= PORT 1.1 
@@ -404,7 +407,7 @@ void ArduboyTones::nextTone()
 	
 	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | ~(TIMER32_ENABLE_TIM_EN_M); // без  этого таймер временно "зависает" при быстрой смене TOP/OCR
 	TIMER32_1->TOP = (ocrValue); // счет без делителя, не умножаем на 2
-	TIMER32_1->CHANNELS[3].OCR = 0;
+	//TIMER32_1->CHANNELS[3].OCR = 0;
 	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | TIMER32_ENABLE_TIM_EN_M;
 
 	// enable the output compare match interrupt
@@ -413,8 +416,8 @@ void ArduboyTones::nextTone()
 	EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK ;
     
 	//HAL_IRQ_EnableInterrupts();
-	set_csr(mstatus, MSTATUS_MIE);
-    set_csr(mie, MIE_MEIE);
+	//set_csr(mstatus, MSTATUS_MIE);
+    //set_csr(mie, MIE_MEIE);
 #endif
 }
 
