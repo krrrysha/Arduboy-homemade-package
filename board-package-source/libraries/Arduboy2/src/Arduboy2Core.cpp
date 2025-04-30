@@ -598,10 +598,13 @@ void Arduboy2Core::i2c_start(uint8_t mode)
 {
   I2C_SDA_LOW();       // disable posible internal pullup, ensure SDA low on enabling output
   I2C_SDA_AS_OUTPUT(); // SDA low before SCL for start condition
+  Delay_us(10);
   I2C_SCL_LOW();
-  I2C_SCL_AS_OUTPUT();  
+  I2C_SCL_AS_OUTPUT();
+  Delay_us(10);
   i2c_sendByte(SSD1306_I2C_ADDR << 1);
   i2c_sendByte(mode);
+  
 }
 
 void Arduboy2Core::i2c_sendByte(uint8_t byte)
@@ -646,18 +649,23 @@ void Arduboy2Core::i2c_sendByte(uint8_t byte)
 			{	I2C_SDA_LOW();
 			I2C_SDA_AS_OUTPUT(); // Выставить бит на SDA (лог.0
 			}
+			Delay_us(10);
 			I2C_SCL_AS_INPUT();   // Записать его импульсом на SCL       // отпустить SCL (лог.1)
+			Delay_us(10);
 			I2C_SCL_LOW();
 			I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)
 			byte<<=1; // сдвигаем на 1 бит влево
 		}
 		I2C_SDA_AS_INPUT(); // отпустить SDA (лог.1), чтобы ведомое устройство смогло сгенерировать ACK. В оригинальном тексте Arduboy2 тут выставляется лог.0. Вероятно, чтобы не дожидаться, пока это сделает ведомый?
+		Delay_us(10);
 		//Delay_us(4);
 		I2C_SCL_AS_INPUT(); // отпустить SCL (лог.1), чтобы ведомое устройство передало ACK
+		Delay_us(10);
 		//Delay_us(4);
 		I2C_SCL_LOW();
 		I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)  // приём ACK завершён
 		//Delay_us(4);
+		Delay_us(10);
   #endif
 }
 #endif
@@ -912,7 +920,7 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
     }
   }
   displayDisable();
-#elif defined(OLED_SSD1306_I2C) || (OLED_SSD1306_I2CX)
+#elif (defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX)) && !defined(ELBEARBOY)
   uint16_t length = WIDTH * HEIGHT / 8;
   uint8_t sda_clr = I2C_PORT & ~((1 << I2C_SDA) | (1 << I2C_SCL));
   uint8_t scl = 1 << I2C_SCL;
@@ -1033,6 +1041,21 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
     :"r24"
   );
  #endif
+  i2c_stop();
+#elif ( defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX)) && defined(ELBEARBOY)
+  i2c_start(SSD1306_I2C_DATA);
+  if (clear)
+  {
+  	for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++){
+		//i2c_sendByte(pgm_read_byte(image+i));
+		i2c_sendByte(*(image++));
+		*(image++) = 0;
+	}
+  } else {
+	for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++)
+    //i2c_sendByte(pgm_read_byte(image+i));
+	i2c_sendByte(*(image++));
+  }
   i2c_stop();
 #elif  defined (OLED_SH1106_I2C)
   for (int page = 0; page < HEIGHT/8; page++)
@@ -1733,13 +1756,18 @@ void inline Arduboy2Core::Delay_us (uint32_t us) //Функция задержк
        i--;
       }
 */
-    __NOP();
-    __NOP();
-    __NOP();
-    __NOP();
-    __NOP();
-    __NOP();
-    __NOP();
+//    __NOP();
+//    __NOP();
+//    __NOP();
+//    __NOP();
+//    __NOP();
+//    __NOP();
+//    __NOP();
+
+
+   //us *=(F_CPU/1000000000);
+	while(us--){__NOP();};
+   
 }
 
 uint32_t Arduboy2Core::read_eeprom_word(uint8_t idx) {

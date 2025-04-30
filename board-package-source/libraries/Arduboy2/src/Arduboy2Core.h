@@ -10,6 +10,7 @@
 #ifdef MCU_MIK32_Amur
 	//define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
 	#define OLED_SH1106_I2C
+	//define OLED_SSD1306_I2C
 	#define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 	#define ELBEARBOY
 	#warning ELBEARBOY!
@@ -394,7 +395,7 @@
 
 	//define ADC_CONFIG_SAH_TIME_MY          (0x3F << ADC_CONFIG_SAH_TIME_S) //Время выборки очередного отсчета в тактах АЦП - используем значение по-умолчанию
 	// нумерация каналов ADC - сквозная 0,1,2:
-	//define myADC_SEL_CHANNEL(channel_selection) (ANALOG_REG->ADC_CONFIG = ((ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) & (~ADC_CONFIG_SEL_M)) | ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) | ((channel_selection) << ADC_CONFIG_SEL_S))
+    //define myADC_SEL_CHANNEL(channel_selection) (ANALOG_REG->ADC_CONFIG = ((ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_MY)) & (~ADC_CONFIG_SEL_M)) | ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_MY) | ((channel_selection) << ADC_CONFIG_SEL_S))
 	#define myADC_SEL_CHANNEL(channel_selection) (ANALOG_REG->ADC_CONFIG = ((ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_M)) & (~ADC_CONFIG_SEL_M)) | ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_M) | ((channel_selection) << ADC_CONFIG_SEL_S))
 	
 	#define ADC_EXTREF_OFF      0       /* Встроенный источник опорного напряжения 1,2 В */
@@ -959,6 +960,7 @@ class Arduboy2Core : public Arduboy2NoUSB
     {
       // SDA and SCL both are already low, from writing ACK bit no need to change state
       I2C_SDA_AS_INPUT(); // switch to input so SDA is pulled up externally first for stop condition
+	  Delay_us(10);
       I2C_SCL_AS_INPUT(); // pull up SCL externally
     }
 
