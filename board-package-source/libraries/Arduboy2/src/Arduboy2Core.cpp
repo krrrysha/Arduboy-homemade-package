@@ -253,12 +253,14 @@ void Arduboy2Core::bootPins()
 	//включаем тактирование контроллера выводов, Wake up, Power manager
 	PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M; 
 	// инициализация I2C
+	
+	// SDA and SCL as inputs without pullups
 	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SDA)); // Обнуление вывода 12 порта 1 (в режим GPIO)
 	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SCL)); // Обнуление вывода 13 порта 1 (в режим GPIO)
-	PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SDA)); // Обнуление. Отключается подтяжка при работе в режиме выхода
-	PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SCL)); // Обнуление. Отключается подтяжка при работе в режиме выхода
-	PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SDA)); // Обнуление.
-	PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SCL)); // Обнуление
+	//PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SDA)); // Обнуление. Отключается подтяжка при работе в режиме выхода
+	//PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SCL)); // Обнуление. Отключается подтяжка при работе в режиме выхода
+	//PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SDA)); // Обнуление.
+	//PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SCL)); // Обнуление
 	PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SDA)); // Нагрузочная способность 8 мА
 	PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SCL)); // Нагрузочная способность 8 мА
 	i2c_stop();
@@ -272,11 +274,31 @@ void Arduboy2Core::bootPins()
     //Serial.println("! chan_sel:");     Serial.println(chan_selected);
 
 	PAD_CONFIG->PORT_0_CFG |= (0b11 << (2 * PIN_RANDOM)); // аналоговый сигнал. порт A2=0.4
-	PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A01.5
-	PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
 	GPIO_0->DIRECTION_IN = 1 << PIN_RANDOM; // 
-	GPIO_1->DIRECTION_IN = 1 << PIN_AXISX; // 
-	GPIO_1->DIRECTION_IN = 1 << PIN_AXISY; // 
+	#ifdef  JOYSTICKANALOG
+		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A01.5
+		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
+		GPIO_1->DIRECTION_IN = 1 << PIN_AXISX; // 
+		GPIO_1->DIRECTION_IN = 1 << PIN_AXISY; //
+		PAD_CONFIG->PORT_0_PUPD |=  (0b01 << (2 * B_BUTTON_BIT) | 0b01 << (2 * A_BUTTON_BIT));
+	#elif defined (JOYSTICDISCRET)
+		//JOYSTICDISCRETE
+
+		  // Задаем направление без "|=", т.к. для установки DIRECTION - только запись "1"
+		  PAD_CONFIG->PORT_0_PUPD |=  (0b01 << (2 * LEFT_BUTTON_BIT) | 0b01 << (2 * RIGHT_BUTTON_BIT) | 0b01 << (2 * UP_BUTTON_BIT) | 0b01 << (2 * DOWN_BUTTON_BIT) );
+		  PAD_CONFIG->PORT_1_PUPD |=  (0b01 << (2 * B_BUTTON_BIT) | 0b01 << (2 * A_BUTTON_BIT));
+		  GPIO_0->DIRECTION_IN = _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
+		  GPIO_1->DIRECTION_IN = _BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT);
+	#else // ECOSOLE KEYS
+		  //PAD_CONFIG->PORT_0_PUPD &= ~ (0b11 << (2 * LEFT_BUTTON_BIT) | 0b11 << (2 * RIGHT_BUTTON_BIT) | 0b11 << (2 * UP_BUTTON_BIT) | 0b11 << (2 * DOWN_BUTTON_BIT) | 0b11 << (2 * A_BUTTON_BIT));
+		  //PAD_CONFIG->PORT_1_PUPD &= ~ (0b11 << (2 * B_BUTTON_BIT));
+		  PAD_CONFIG->PORT_0_PUPD |=  (0b01 << (2 * LEFT_BUTTON_BIT) | 0b01 << (2 * RIGHT_BUTTON_BIT) | 0b01 << (2 * UP_BUTTON_BIT) | 0b01 << (2 * DOWN_BUTTON_BIT) | 0b01 << (2 * A_BUTTON_BIT));
+		  PAD_CONFIG->PORT_1_PUPD |=  (0b01 << (2 * B_BUTTON_BIT));
+		  GPIO_0->DIRECTION_IN = _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT) | _BV(A_BUTTON_BIT);
+		  GPIO_1->DIRECTION_IN =  _BV(B_BUTTON_BIT);
+	#endif	
+	GPIO_0->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(BLUE_LED_BIT);
+	GPIO_1->DIRECTION_OUT = _BV(RED_LED_BIT);	
 	
 	ANALOG_REG->ADC_CONFIG = 0x3c00; // последовательность для инициализации ADC MIK32 из HAL
 	//HAL_ADC_Enable(&hadc);
@@ -311,28 +333,8 @@ void Arduboy2Core::bootPins()
 	Serial.println("==INIT ADC COMPLETE==");
 	*/
 	
-  #ifndef  JOYSTICKANALOG //JOYSTICDISCRETE
-	// Port  INPUT_PULLUP
-	// SDA and SCL as inputs without pullups
-  // для подтяжки используем значения по-умолчанию. Аналогично  - для типа "обычный дискретный пин"
-  //PAD_CONFIG->PAD1_PUPD &= ~ (0b00 << (2 * BUTTON_B_BIT) | 0b00 << (2 * BUTTON_A_BIT));
-  //PAD_CONFIG->PAD0_PUPD &= ~ (0b00 << (2 * LEFT_BUTTON_BIT) | 0b00 << (2 * RIGHT_BUTTON_BIT) | 0b00 << (2 * UP_BUTTON_BIT) | 0b00 << (2 * DOWN_BUTTON_BIT));
-  // todo - перенести настройку на Serial из *.h
-  // Задаем направление без "|=", т.к. для установки DIRECTION - только запись "1"
-
-  
-  GPIO_0->DIRECTION_IN = _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
-  GPIO_1->DIRECTION_IN = _BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT);
- 
-  GPIO_0->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(BLUE_LED_BIT);
-  GPIO_1->DIRECTION_OUT = _BV(RED_LED_BIT);
-
-  #else // JOYSTICKANALOG
-	//PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A0=1.5
-	//PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
 
 
-  #endif	
 #else
   // Port B INPUT_PULLUP or HIGH
   PORTB = (0
@@ -596,11 +598,11 @@ void Arduboy2Core::SPItransfer(uint8_t data)
 #if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
 void Arduboy2Core::i2c_start(uint8_t mode)
 {
-  I2C_SDA_LOW();       // disable posible internal pullup, ensure SDA low on enabling output
   I2C_SDA_AS_OUTPUT(); // SDA low before SCL for start condition
+  I2C_SDA_LOW();       // disable posible internal pullup, ensure SDA low on enabling output
   Delay_us(10);
-  I2C_SCL_LOW();
   I2C_SCL_AS_OUTPUT();
+  I2C_SCL_LOW();
   Delay_us(10);
   i2c_sendByte(SSD1306_I2C_ADDR << 1);
   i2c_sendByte(mode);

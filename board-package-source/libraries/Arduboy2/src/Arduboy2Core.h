@@ -11,7 +11,8 @@
 	//define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
 	#define OLED_SH1106_I2C
 	//define OLED_SSD1306_I2C
-	#define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
+	//define JOYSTICKANALOG // undef or JOYSTICKANALOG or JOYSTICDISCRETE.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
+	//define JOYSTICDISCRETE
 	#define ELBEARBOY
 	#warning ELBEARBOY!
 #endif
@@ -20,7 +21,7 @@
 	#define OLED_SH1106_I2C
 	#define ECONSOLE
 	#warning ECONSOLE!
-	#define JOYSTICKANALOG // undef or JOYSTICKANALOG.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
+	#define JOYSTICKANALOG // undef or JOYSTICKANALOG or JOYSTICDISCRETE  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 #endif
 
 
@@ -252,19 +253,33 @@
 #endif
 #else // ELBEARBOY
 
-	#define RED_LED 2  // D13 port 1.2
-	#define GREEN_LED 2 // D17 port 0.2
-	#define BLUE_LED 4  // D16 port 0.4
+	#if defined (JOYSTICDISCRETE) || defined (JOYSTICKANALOG)
+		#define RED_LED 2  // D13 port 1.2
+		#define GREEN_LED 2 // D17 port 0.2
+		#define BLUE_LED 4  // D16 port 0.4
 
-	#define RED_LED_PORT GPIO_1->STATE
-	#define RED_LED_BIT  2 //
+		#define RED_LED_PORT GPIO_1->STATE
+		#define RED_LED_BIT  2 //
 
-	#define GREEN_LED_PORT GPIO_0->STATE
-	#define GREEN_LED_BIT 2
+		#define GREEN_LED_PORT GPIO_0->STATE
+		#define GREEN_LED_BIT 2
 
-	#define BLUE_LED_PORT GPIO_0->STATE
-	#define BLUE_LED_BIT 4
+		#define BLUE_LED_PORT GPIO_0->STATE
+		#define BLUE_LED_BIT 4
+	#else // ECONSOLE KEYS
+		#define RED_LED 2  // D13 port 1.2
+		#define GREEN_LED 9 // D8/9 port_1_9
+		#define BLUE_LED 4  // D16 port 0.4
 
+		#define RED_LED_PORT GPIO_1->STATE
+		#define RED_LED_BIT  2 
+
+		#define GREEN_LED_PORT GPIO_1->STATE
+		#define GREEN_LED_BIT 9
+
+		#define BLUE_LED_PORT GPIO_0->STATE
+		#define BLUE_LED_BIT 4
+	#endif
 
 #define TX_LED_PORT PORTD
 #define TX_LED_BIT PORTD5 // D5
@@ -417,7 +432,7 @@
 
 		#define CHAN_AXISX 0 // Ось X port_1_5
 		#define CHAN_AXISY 1 // Ось Y port_1_7
-	#elif defined (JOYSTICDISCRET) // JOYSTICDISCRETE KEYS 
+	#elif defined (JOYSTICDISCRETE) // JOYSTICDISCRETE KEYS 
 		#define B_BUTTON_BIT 8 // D7/8 port_1_8
 		#define B_BUTTON_PORTIN GPIO_1->STATE
 			
@@ -437,13 +452,14 @@
 		#define DOWN_BUTTON_PORTIN GPIO_0->STATE
 	
 	#else // ECOSOLE KEYS
+		
 		#define B_BUTTON_BIT 8 // D7/8 port_1_8
 		#define B_BUTTON_PORTIN GPIO_1->STATE
 			
 		#define A_BUTTON_BIT 8 // D4/8 port_0_8
-		#define A_BUTTON_PORTIN GPIO_1->STATE
+		#define A_BUTTON_PORTIN GPIO_0->STATE
 
-		#define LEFT_BUTTON_BIT 1 // D2/10 port_0_10
+		#define LEFT_BUTTON_BIT 10 // D2/10 port_0_10
 		#define LEFT_BUTTON_PORTIN GPIO_0->STATE
 
 		#define RIGHT_BUTTON_BIT 2 // D6/0 port_0_2
@@ -454,6 +470,7 @@
 
 		#define DOWN_BUTTON_BIT 1 // D5/1 port_0_1
 		#define DOWN_BUTTON_PORTIN GPIO_0->STATE
+	
 	#endif // END KEYS
 #else
 #if defined (MICROCADE)
