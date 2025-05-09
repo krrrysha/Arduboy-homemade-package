@@ -806,12 +806,13 @@ void Arduboy2Core::paintScreen(const uint8_t *image)
     }
   }
   displayDisable();
+
 #elif defined(OLED_SSD1306_I2C) || (OLED_SSD1306_I2CX)
   i2c_start(SSD1306_I2C_DATA);
   for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++)
     i2c_sendByte(pgm_read_byte(image+i));
   i2c_stop();
-#elif  defined (OLED_SH1106_I2C)
+#elif  defined (OLED_SH1106_I2C) 
   for (int page = 0; page < HEIGHT/8; page++)
   {
     i2c_start(SSD1306_I2C_CMD);
@@ -1044,22 +1045,22 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
   );
  #endif
   i2c_stop();
-#elif ( defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX)) && defined(ELBEARBOY)
+#elif ( defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) ) && defined(ELBEARBOY)
+ 
   i2c_start(SSD1306_I2C_DATA);
   if (clear)
   {
   	for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++){
-		//i2c_sendByte(pgm_read_byte(image+i));
-		i2c_sendByte(*(image++));
+		i2c_sendByte(*(image));
 		*(image++) = 0;
 	}
   } else {
 	for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++)
-    //i2c_sendByte(pgm_read_byte(image+i));
 	i2c_sendByte(*(image++));
   }
   i2c_stop();
 #elif  defined (OLED_SH1106_I2C)
+
   for (int page = 0; page < HEIGHT/8; page++)
   {
     i2c_start(SSD1306_I2C_CMD);
