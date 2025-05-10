@@ -231,7 +231,9 @@ void Arduboy2Core::bootPins()
 	    _BV(DOWN_BUTTON_BIT));
   PORTD |= _BV(A_BUTTON_BIT);
   DDRD &= ~(_BV(A_BUTTON_BIT)); 
-  DDRC  |= _BV(GREEN_LED_BIT)   | _BV(BLUE_LED_BIT) | _BV(RED_LED_BIT);
+  
+  DDRB  |= _BV(RED_LED_BIT);
+  DDRC  |= _BV(BLUE_LED_BIT) | _BV(GREEN_LED_BIT);
     #else
 	  //JOYSTICKANALOG
 	power_adc_enable(); //disable power saving for ADC
@@ -504,6 +506,9 @@ void Arduboy2Core::bootPins()
 
 void Arduboy2Core::bootOLED()
 {
+
+
+	
 #if defined(GU12864_800B)
   bitSet(RST_PORT,RST_BIT);
   delayByte(10);
@@ -598,12 +603,19 @@ void Arduboy2Core::SPItransfer(uint8_t data)
 #if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
 void Arduboy2Core::i2c_start(uint8_t mode)
 {
+  #if defined(ELBEARBOY)
   I2C_SDA_AS_OUTPUT(); // SDA low before SCL for start condition
   I2C_SDA_LOW();       // disable posible internal pullup, ensure SDA low on enabling output
   Delay_us(10);
   I2C_SCL_AS_OUTPUT();
   I2C_SCL_LOW();
   Delay_us(10);
+  #else
+  I2C_SDA_LOW();       // disable posible internal pullup, ensure SDA low on enabling output
+  I2C_SDA_AS_OUTPUT(); // SDA low before SCL for start condition
+  I2C_SCL_LOW();
+  I2C_SCL_AS_OUTPUT();
+  #endif
   i2c_sendByte(SSD1306_I2C_ADDR << 1);
   i2c_sendByte(mode);
   

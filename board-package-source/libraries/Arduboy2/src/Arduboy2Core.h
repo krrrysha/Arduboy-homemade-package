@@ -8,9 +8,8 @@
 #define ARDUBOY2_CORE_H
 
 #ifdef MCU_MIK32_Amur
-	//define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
+	#define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
 	//#define OLED_SH1106_I2C
-	#define OLED_SSD1306_I2C
 	//#define JOYSTICKANALOG // undef or JOYSTICKANALOG or JOYSTICDISCRETE.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 	//#define JOYSTICDISCRETE
 	#define ELBEARBOY
@@ -18,10 +17,12 @@
 #endif
 
 #ifdef __AVR_ATmega328P__
-	#define OLED_SH1106_I2C
+	//#define OLED_SH1106_I2C
+	#define OLED_SSD1306_I2C
+	//#define JOYSTICDISCRETE // undef or JOYSTICKANALOG or JOYSTICDISCRETE  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
+	//#define JOYSTICKANALOG
 	#define ECONSOLE
 	#warning ECONSOLE!
-	#define JOYSTICKANALOG // undef or JOYSTICKANALOG or JOYSTICDISCRETE  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 #endif
 
 
@@ -203,54 +204,54 @@
 	#endif
 #endif
 #ifndef ELBEARBOY
-#if defined (ECONSOLE)
-	#define RED_LED 13   /**< The pin number for the red color in the RGB LED. */
-	#define GREEN_LED 17 /**< The pin number for the greem color in the RGB LED. */
-	#define BLUE_LED 16   /**< The pin number for the blue color in the RGB LED. */
+	#if defined (ECONSOLE)
+		#define RED_LED 13   /**< The pin number for the red color in the RGB LED. */
+		#define GREEN_LED 17 /**< The pin number for the greem color in the RGB LED. */
+		#define BLUE_LED 16   /**< The pin number for the blue color in the RGB LED. */
 
-	#define RED_LED_PORT PORTB  
-	#define RED_LED_BIT PORTB5
+		#define RED_LED_PORT PORTB  
+		#define RED_LED_BIT PORTB5
 
-	#define GREEN_LED_PORT PORTC
-	#define GREEN_LED_BIT PORTC3
+		#define GREEN_LED_PORT PORTC
+		#define GREEN_LED_BIT PORTC3
 
-	#define BLUE_LED_PORT PORTC
-	#define BLUE_LED_BIT PORTC2
+		#define BLUE_LED_PORT PORTC
+		#define BLUE_LED_BIT PORTC2
 
-#else
-#define RED_LED 10   /**< The pin number for the red color in the RGB LED. */
-#ifdef AB_ALTERNATE_WIRING
-  #define GREEN_LED 3 // Pro Micro alternative green LED pin
-#else
-  #define GREEN_LED 11 /**< The pin number for the green color in the RGB LED. */
-#endif
-#define BLUE_LED 9   /**< The pin number for the blue color in the RGB LED. */
+	#else
+		#define RED_LED 10   /**< The pin number for the red color in the RGB LED. */
+			#ifdef AB_ALTERNATE_WIRING
+			  #define GREEN_LED 3 // Pro Micro alternative green LED pin
+			#else
+			  #define GREEN_LED 11 /**< The pin number for the green color in the RGB LED. */
+			#endif
+		#define BLUE_LED 9   /**< The pin number for the blue color in the RGB LED. */
 
-#define RED_LED_PORT PORTB
-#define RED_LED_BIT PORTB6
+		#define RED_LED_PORT PORTB
+		#define RED_LED_BIT PORTB6
 
-#ifdef AB_ALTERNATE_WIRING
-  #define GREEN_LED_PORT PORTD // Pro Micro alternative green LED port
-  #define GREEN_LED_BIT PORTD0
-#else
-  #define GREEN_LED_PORT PORTB
-  #define GREEN_LED_BIT PORTB7
-#endif
+			#ifdef AB_ALTERNATE_WIRING
+			  #define GREEN_LED_PORT PORTD // Pro Micro alternative green LED port
+			  #define GREEN_LED_BIT PORTD0
+			#else
+			  #define GREEN_LED_PORT PORTB
+			  #define GREEN_LED_BIT PORTB7
+			#endif
 
-#define BLUE_LED_PORT PORTB
-#define BLUE_LED_BIT PORTB5
-#endif
+		#define BLUE_LED_PORT PORTB
+		#define BLUE_LED_BIT PORTB5
+	#endif
 
-#define TX_LED_PORT PORTD 
-#define TX_LED_BIT PORTD5 // D5
+	#define TX_LED_PORT PORTD 
+	#define TX_LED_BIT PORTD5 // D5
 
-#define RX_LED_PORT PORTB
-#define RX_LED_BIT PORTB0 // D8
+	#define RX_LED_PORT PORTB
+	#define RX_LED_BIT PORTB0 // D8
 
-#ifdef LCD_ST7565
-  #define POWER_LED_PORT PORTD
-  #define POWER_LED_BIT PORTD0
-#endif
+	#ifdef LCD_ST7565
+	  #define POWER_LED_PORT PORTD
+	  #define POWER_LED_BIT PORTD0
+	#endif
 #else // ELBEARBOY
 
 	#if defined (JOYSTICDISCRETE) || defined (JOYSTICKANALOG)
@@ -281,11 +282,11 @@
 		#define BLUE_LED_BIT 4
 	#endif
 
-#define TX_LED_PORT PORTD
-#define TX_LED_BIT PORTD5 // D5
+	#define TX_LED_PORT PORTD
+	#define TX_LED_BIT PORTD5 // D5
 
-#define RX_LED_PORT PORTB
-#define RX_LED_BIT PORTB0 //d8
+	#define RX_LED_PORT PORTB
+	#define RX_LED_BIT PORTB0 //d8
 #endif
 // bit values for button states
 // these are determined by the buttonsState() function
@@ -977,7 +978,9 @@ class Arduboy2Core : public Arduboy2NoUSB
     {
       // SDA and SCL both are already low, from writing ACK bit no need to change state
       I2C_SDA_AS_INPUT(); // switch to input so SDA is pulled up externally first for stop condition
+	  #if defined(ELBEARBOY)
 	  Delay_us(10);
+	  #endif
       I2C_SCL_AS_INPUT(); // pull up SCL externally
     }
 
