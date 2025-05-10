@@ -284,7 +284,7 @@ void Arduboy2Core::bootPins()
 		GPIO_1->DIRECTION_IN = 1 << PIN_AXISY; //
 		PAD_CONFIG->PORT_0_PUPD |=  (0b01 << (2 * B_BUTTON_BIT) | 0b01 << (2 * A_BUTTON_BIT));
 	#elif defined (JOYSTICDISCRET)
-		//JOYSTICDISCRETE
+		//JOYSTICKDISCRETE
 
 		  // Задаем направление без "|=", т.к. для установки DIRECTION - только запись "1"
 		  PAD_CONFIG->PORT_0_PUPD |=  (0b01 << (2 * LEFT_BUTTON_BIT) | 0b01 << (2 * RIGHT_BUTTON_BIT) | 0b01 << (2 * UP_BUTTON_BIT) | 0b01 << (2 * DOWN_BUTTON_BIT) );

@@ -10,8 +10,8 @@
 #ifdef MCU_MIK32_Amur
 	#define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
 	//#define OLED_SH1106_I2C
-	//#define JOYSTICKANALOG // undef or JOYSTICKANALOG or JOYSTICDISCRETE.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
-	//#define JOYSTICDISCRETE
+	//#define JOYSTICKANALOG // undef or JOYSTICKANALOG or JOYSTICKDISCRETE.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
+	//#define JOYSTICKDISCRETE
 	#define ELBEARBOY
 	#warning ELBEARBOY!
 #endif
@@ -19,7 +19,7 @@
 #ifdef __AVR_ATmega328P__
 	//#define OLED_SH1106_I2C
 	#define OLED_SSD1306_I2C
-	//#define JOYSTICDISCRETE // undef or JOYSTICKANALOG or JOYSTICDISCRETE  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
+	//#define JOYSTICKDISCRETE // undef or JOYSTICKANALOG or JOYSTICKDISCRETE  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 	//#define JOYSTICKANALOG
 	#define ECONSOLE
 	#warning ECONSOLE!
@@ -254,7 +254,7 @@
 	#endif
 #else // ELBEARBOY
 
-	#if defined (JOYSTICDISCRETE) || defined (JOYSTICKANALOG)
+	#if defined (JOYSTICKDISCRETE) || defined (JOYSTICKANALOG)
 		#define RED_LED 2  // D13 port 1.2
 		#define GREEN_LED 2 // D17 port 0.2
 		#define BLUE_LED 4  // D16 port 0.4
@@ -333,8 +333,8 @@
 		#define B_BUTTON_PORTIN PIND
 		#define B_BUTTON_DDR DDRD
 		#define B_BUTTON_BIT PORTD3
-	#elif defined (JOYSTICDISCRETE) 
-		// JOYSTICDISCRETE KEYS 
+	#elif defined (JOYSTICKDISCRETE) 
+		// JOYSTICKDISCRETE KEYS 
 		#define PIN_LEFT_BUTTON 5
 		#define LEFT_BUTTON_PORT PORTD
 		#define LEFT_BUTTON_PORTIN PIND
@@ -433,7 +433,7 @@
 
 		#define CHAN_AXISX 0 // Ось X port_1_5
 		#define CHAN_AXISY 1 // Ось Y port_1_7
-	#elif defined (JOYSTICDISCRETE) // JOYSTICDISCRETE KEYS 
+	#elif defined (JOYSTICKDISCRETE) // JOYSTICKDISCRETE KEYS 
 		#define B_BUTTON_BIT 8 // D7/8 port_1_8
 		#define B_BUTTON_PORTIN GPIO_1->STATE
 			
