@@ -606,10 +606,10 @@ void Arduboy2Core::i2c_start(uint8_t mode)
   #if defined(ELBEARBOY)
   I2C_SDA_AS_OUTPUT(); // SDA low before SCL for start condition
   I2C_SDA_LOW();       // disable posible internal pullup, ensure SDA low on enabling output
-  Delay_us(10);
+  Delay_us(2);
   I2C_SCL_AS_OUTPUT();
   I2C_SCL_LOW();
-  Delay_us(10);
+  Delay_us(2);
   #else
   I2C_SDA_LOW();       // disable posible internal pullup, ensure SDA low on enabling output
   I2C_SDA_AS_OUTPUT(); // SDA low before SCL for start condition
@@ -663,23 +663,23 @@ void Arduboy2Core::i2c_sendByte(uint8_t byte)
 			{	I2C_SDA_LOW();
 			I2C_SDA_AS_OUTPUT(); // Выставить бит на SDA (лог.0
 			}
-			Delay_us(10);
+			Delay_us(2);
 			I2C_SCL_AS_INPUT();   // Записать его импульсом на SCL       // отпустить SCL (лог.1)
-			Delay_us(10);
+			Delay_us(2);
 			I2C_SCL_LOW();
 			I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)
 			byte<<=1; // сдвигаем на 1 бит влево
 		}
 		I2C_SDA_AS_INPUT(); // отпустить SDA (лог.1), чтобы ведомое устройство смогло сгенерировать ACK. В оригинальном тексте Arduboy2 тут выставляется лог.0. Вероятно, чтобы не дожидаться, пока это сделает ведомый?
-		Delay_us(10);
+		Delay_us(2);
 		//Delay_us(4);
 		I2C_SCL_AS_INPUT(); // отпустить SCL (лог.1), чтобы ведомое устройство передало ACK
-		Delay_us(10);
+		Delay_us(2);
 		//Delay_us(4);
 		I2C_SCL_LOW();
 		I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)  // приём ACK завершён
 		//Delay_us(4);
-		Delay_us(10);
+		Delay_us(2);
   #endif
 }
 #endif

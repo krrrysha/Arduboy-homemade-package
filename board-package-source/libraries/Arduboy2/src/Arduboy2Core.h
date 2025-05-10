@@ -979,7 +979,7 @@ class Arduboy2Core : public Arduboy2NoUSB
       // SDA and SCL both are already low, from writing ACK bit no need to change state
       I2C_SDA_AS_INPUT(); // switch to input so SDA is pulled up externally first for stop condition
 	  #if defined(ELBEARBOY)
-	  Delay_us(10);
+	  Delay_us(2);
 	  #endif
       I2C_SCL_AS_INPUT(); // pull up SCL externally
     }
