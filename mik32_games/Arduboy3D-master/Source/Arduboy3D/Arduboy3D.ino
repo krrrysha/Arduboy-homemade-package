@@ -8,7 +8,8 @@
 Arduboy2Base arduboy;
 Arduboy2 arduboyUnitName;
 ArduboyTones sound(arduboy.audio.enabled);
-Sprites sprites;
+SpritesB sprites;
+//Sprites sprites;
 
 uint8_t Platform::GetInput()
 {
