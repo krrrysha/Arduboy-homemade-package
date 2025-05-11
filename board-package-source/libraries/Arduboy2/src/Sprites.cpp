@@ -420,43 +420,46 @@ void Sprites::drawBitmap(int16_t x, int16_t y,
       break;
 #else
 		case SPRITE_PLUS_MASK:
-		{
-			// Указатель на начало данных битовой карты и маски
-			const uint8_t *bofs = bitmap + ((start_h * w) + xOffset) * 2;
+		
+		const uint8_t *bofs = (uint8_t *)bitmap + ((start_h * w) + xOffset) * 2;
+		
+		for (uint8_t a = 0; a < loop_h; a++) {
+        for (uint8_t iCol = 0; iCol < rendered_width; iCol++) {
+          // NOTE: you might think in the yOffset==0 case that this results
+          // in more effort, but in all my testing the compiler was forcing
+          // 16-bit math to happen here anyways, so this isn't actually
+          // compiling to more code than it otherwise would. If the offset
+          // is 0 the high part of the word will just never be used.
 
-			// Буфер экрана Arduboy
-			uint8_t *buffer = Arduboy2Base::sBuffer + ofs;
+          // load data and bit shift
+          // mask needs to be bit flipped
+          bitmap_data = pgm_read_byte(bofs++) * mul_amt;
+          mask_data = ~(pgm_read_byte(bofs++) * mul_amt);
 
-			// Цикл по строкам спрайта
-			for (int yi = 0; yi < loop_h; yi++) {
-				int sRow = start_h + yi; // Текущая строка спрайта
 
-				// Указатель на текущую строку в буфере экрана
-				uint8_t *buffer_row = buffer + (sRow / 8) * WIDTH + (yOffset % 8);
-
-				// Цикл по столбцам спрайта
-				for (int xi = 0; xi < rendered_width; xi++) {
-					// Загрузка данных битовой карты и маски
-					uint8_t bitmap_data = pgm_read_byte(bofs++); // Данные битовой карты
-					uint8_t mask_data = pgm_read_byte(bofs++);   // Данные маски
-
-					// Применение маски
-					if (mask_data & (1 << (yOffset % 8))) {
-						// Если маска разрешает, рисуем пиксель из битовой карты
-						if (bitmap_data & (1 << (yOffset % 8))) {
-							buffer_row[xi] |= (1 << (sRow % 8)); // Установить пиксель
-						} else {
-							buffer_row[xi] &= ~(1 << (sRow % 8)); // Сбросить пиксель
-						}
-					}
-				}
-
-				// Переход к следующей строке
-				bofs += (w - rendered_width) * 2; // Смещение для следующей строки
-				buffer += WIDTH; // Переход к следующей строке в буфере экрана
-			}
-		}
-		break;
+          if (sRow >= 0) {
+            data = Arduboy2Base::sBuffer[ofs];
+            data &= (uint8_t)(mask_data);
+            data |= (uint8_t)(bitmap_data);
+            Arduboy2Base::sBuffer[ofs] = data;
+          }
+          if (yOffset != 0 && sRow < 7) {
+            const size_t index = static_cast<uint16_t>(ofs + WIDTH);
+            data = Arduboy2Base::sBuffer[index];
+            data &= (uint8_t)(mask_data >> 8);
+            data |= (uint8_t)(bitmap_data >> 8);
+            Arduboy2Base::sBuffer[index] = data;
+          }
+          ofs++;
+          mask_ofs++;
+          //bofs++;
+        }
+        sRow++;
+        bofs += w - rendered_width;
+        mask_ofs += w - rendered_width;
+        ofs += WIDTH - rendered_width;
+      }
+      break;
 #endif
   }
 }
