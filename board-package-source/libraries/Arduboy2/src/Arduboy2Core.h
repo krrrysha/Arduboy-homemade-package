@@ -37,8 +37,13 @@
 #endif
 
 #ifdef JOYSTICKANALOG
-	#define JOYSENSX 200 //Joystick sensitivity. X axis
-	#define JOYSENSY 200 //Joystick sensitivity. Y axis
+	#if !defined(ELBEARBOY) // ECONSOLE:
+		#define JOYSENSX 200 //Joystick sensitivity. X axis
+		#define JOYSENSY 200 //Joystick sensitivity. Y axis
+	#else // ELBEARBOY:
+		#define JOYSENSX 1500 //Joystick sensitivity. X axis
+		#define JOYSENSY 1500 //Joystick sensitivity. Y axis
+	#endif
 #endif
 
 // main hardware compile flags
