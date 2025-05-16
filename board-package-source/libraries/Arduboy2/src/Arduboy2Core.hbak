@@ -41,8 +41,8 @@
 		#define JOYSENSX 200 //Joystick sensitivity. X axis
 		#define JOYSENSY 200 //Joystick sensitivity. Y axis
 	#else // ELBEARBOY:
-		#define JOYSENSX 1200 //Joystick sensitivity. X axis
-		#define JOYSENSY 1200 //Joystick sensitivity. Y axis
+		#define JOYSENSX 1500 //Joystick sensitivity. X axis
+		#define JOYSENSY 1500 //Joystick sensitivity. Y axis
 	#endif
 #endif
 
