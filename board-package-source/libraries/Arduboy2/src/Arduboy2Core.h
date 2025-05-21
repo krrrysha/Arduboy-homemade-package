@@ -17,8 +17,8 @@
 #endif
 
 #ifdef __AVR_ATmega328P__
-	//#define OLED_SH1106_I2C
 	#define OLED_SSD1306_I2C
+	//#define OLED_SH1106_I2C
 	//#define JOYSTICKDISCRETE // undef or JOYSTICKANALOG or JOYSTICKDISCRETE  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 	//#define JOYSTICKANALOG
 	#define ECONSOLE
@@ -160,22 +160,20 @@
 			//port states
 			// INIT I2C as serial: PAD_CONFIG->PORT_1_CFG |= (0b01 << (2 * I2C_SCL));
 			//						PAD_CONFIG->PORT_1_CFG |= (0b01 << (2 * I2C_SDA));
-			#define I2C_SDA_HIGH() I2C_PORT |=  (1 << I2C_SDA)
-			#define I2C_SCL_HIGH() I2C_PORT |=  (1 << I2C_SCL)
-			#define I2C_SDA_LOW()  I2C_PORT &= ~(1 << I2C_SDA)
-			#define I2C_SCL_LOW()  I2C_PORT &= ~(1 << I2C_SCL)
-
+			//#define I2C_SDA_HIGH()  GPIO_1->SET =   (1 << I2C_SDA)
+			//#define I2C_SCL_HIGH()  GPIO_1->SET =   (1 << I2C_SCL)
+			
 			//port directions
 			#define I2C_SDA_AS_INPUT()  GPIO_1->DIRECTION_IN =  (1 << I2C_SDA)	// установка SDA в 1
 			#define I2C_SCL_AS_INPUT()  GPIO_1->DIRECTION_IN =  (1 << I2C_SCL) // установка SCL в 1
 
 			// установка SDA в 0
-			#define I2C_SDA_AS_OUTPUT() GPIO_1->DIRECTION_OUT = (1 << I2C_SDA); 
-			#define I2C_SDA_LOW()   GPIO_1->CLEAR = (1 << I2C_SDA); 
+			#define I2C_SDA_AS_OUTPUT() GPIO_1->DIRECTION_OUT = (1 << I2C_SDA) 
+			#define I2C_SDA_LOW()   GPIO_1->CLEAR = (1 << I2C_SDA) 
 
 			// установка SCL в 0
-			#define I2C_SCL_AS_OUTPUT()  GPIO_1->DIRECTION_OUT = (1 << I2C_SCL); 
-			#define I2C_SCL_LOW()    GPIO_1->CLEAR = (1 << I2C_SCL); 
+			#define I2C_SCL_AS_OUTPUT()  GPIO_1->DIRECTION_OUT = (1 << I2C_SCL) 
+			#define I2C_SCL_LOW()    GPIO_1->CLEAR = (1 << I2C_SCL) 
 		
 			#define SSD1306_I2C_ADDR 0x3c //0x3c:default, 0x3d: alternative)
 			#define SSD1306_I2C_CMD  0x00
@@ -976,16 +974,15 @@ class Arduboy2Core : public Arduboy2NoUSB
 		/* small delay for i2c
 	*/
 		#define __NOP() __asm volatile ("ADDI x0, x0, 0")
-		static void  Delay_us (uint32_t us);
+		#define __10NOP() __asm volatile ("ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n  ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n")
+		#define __5NOP() __asm volatile ("ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n  ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n")
+		//static void  Delay_us (uint32_t us);
 		
     #endif
 	static void inline i2c_stop() __attribute__((always_inline))
     {
       // SDA and SCL both are already low, from writing ACK bit no need to change state
       I2C_SDA_AS_INPUT(); // switch to input so SDA is pulled up externally first for stop condition
-	  #if defined(ELBEARBOY)
-	  Delay_us(2);
-	  #endif
       I2C_SCL_AS_INPUT(); // pull up SCL externally
     }
 

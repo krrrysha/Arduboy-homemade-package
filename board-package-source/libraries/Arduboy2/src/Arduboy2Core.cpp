@@ -604,12 +604,10 @@ void Arduboy2Core::SPItransfer(uint8_t data)
 void Arduboy2Core::i2c_start(uint8_t mode)
 {
   #if defined(ELBEARBOY)
-  I2C_SDA_AS_OUTPUT(); // SDA low before SCL for start condition
   I2C_SDA_LOW();       // disable posible internal pullup, ensure SDA low on enabling output
-  Delay_us(2);
-  I2C_SCL_AS_OUTPUT();
+  I2C_SDA_AS_OUTPUT(); // SDA low before SCL for start condition
   I2C_SCL_LOW();
-  Delay_us(2);
+  I2C_SCL_AS_OUTPUT();
   #else
   I2C_SDA_LOW();       // disable posible internal pullup, ensure SDA low on enabling output
   I2C_SDA_AS_OUTPUT(); // SDA low before SCL for start condition
@@ -654,32 +652,28 @@ void Arduboy2Core::i2c_sendByte(uint8_t byte)
      [sclb] "i" (scl_bit)
   );
   #else
-	uint8_t i;
-	for (i=0;i<8;i++)
+	//I2C_SCL_LOW();
+	//I2C_SDA_LOW();
+	for (uint8_t i=0;i<8;i++)
 		{
 			if (byte & 0x80) 
 			{ I2C_SDA_AS_INPUT();  // лог.1
 			} else 
-			{	I2C_SDA_LOW();
-			I2C_SDA_AS_OUTPUT(); // Выставить бит на SDA (лог.0
+			{	I2C_SDA_AS_OUTPUT();
 			}
-			Delay_us(2);
-			I2C_SCL_AS_INPUT();   // Записать его импульсом на SCL       // отпустить SCL (лог.1)
-			Delay_us(2);
-			I2C_SCL_LOW();
-			I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)
-			byte<<=1; // сдвигаем на 1 бит влево
+			byte<<=1; // сдвигаем на 1 бит влево // 5NOP ok for 1306 & 1309
+			 __5NOP();
+			I2C_SCL_AS_INPUT();   // Записать его импульсом на SCL       // отпустить SCL (лог.1) // 5 NOP ok for sh1106 // 20 NOP ok for ssd1309
+			 __10NOP(); __10NOP();  
+			I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0) // 5 NOP ok for sh1106
+			//__5NOP();
+
 		}
 		I2C_SDA_AS_INPUT(); // отпустить SDA (лог.1), чтобы ведомое устройство смогло сгенерировать ACK. В оригинальном тексте Arduboy2 тут выставляется лог.0. Вероятно, чтобы не дожидаться, пока это сделает ведомый?
-		Delay_us(2);
-		//Delay_us(4);
-		I2C_SCL_AS_INPUT(); // отпустить SCL (лог.1), чтобы ведомое устройство передало ACK
-		Delay_us(2);
-		//Delay_us(4);
-		I2C_SCL_LOW();
-		I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)  // приём ACK завершён
-		//Delay_us(4);
-		Delay_us(2);
+		I2C_SCL_AS_INPUT(); // отпустить SCL (лог.1), чтобы ведомое устройство передало ACK // 20 NOP ok for ssd1309
+			__10NOP(); __10NOP();
+		I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)  // приём ACK завершён // 1 nop for 1309
+		__NOP();
   #endif
 }
 #endif
@@ -1761,16 +1755,17 @@ void Arduboy2Core::delayByte(uint8_t ms)
 
 #ifdef ELBEARBOY
 
+/*
 void inline Arduboy2Core::Delay_us (uint32_t us) //Функция задержки в микросекундах us
 {
-/*
-        uint32_t i;
-      for (i=0;i<us;i++)
-      {
-       i++;
-       i--;
-      }
-*/
+
+//        uint32_t i;
+//      for (i=0;i<us;i++)
+//      {
+//       i++;
+//       i--;
+//      }
+
 //    __NOP();
 //    __NOP();
 //    __NOP();
@@ -1784,6 +1779,7 @@ void inline Arduboy2Core::Delay_us (uint32_t us) //Функция задержк
 	while(us--){__NOP();};
    
 }
+*/
 
 uint32_t Arduboy2Core::read_eeprom_word(uint8_t idx) {
       EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + idx)<<2;
