@@ -5,7 +5,7 @@
 
 // Shortcuts
 #define create_player(x, y)   { \
-    create_coords((double) x + 0.5, (double) y + 0.5), \
+    create_coords((float) x + 0.5, (float) y + 0.5), \
     create_coords(1, 0), \
     create_coords(0, -0.66), \
     0, \
@@ -32,7 +32,7 @@ struct Player {
   Coords pos;
   Coords dir;
   Coords plane;
-  double velocity;
+  float velocity;
   uint8_t health;
   uint8_t keys;  
 };

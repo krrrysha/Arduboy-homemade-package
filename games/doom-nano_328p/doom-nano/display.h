@@ -6,6 +6,15 @@ todo: Moving this to CPP looks like it takes more Flash storage. Figure out why.
 #include <Arduboy2.h>
 extern Arduboy2Base arduboy;
 
+#ifndef min_
+#define min_(a, b) (((a) < (b)) ? (a) : (b))
+#endif
+
+#ifndef max_
+#define max_(a, b) (((a) > (b)) ? (a) : (b))
+#endif
+
+
 // Reads a char from an F() string
 #define F_char(ifsh, ch)    pgm_read_byte(reinterpret_cast<PGM_P>(ifsh) + ch)
 
@@ -21,7 +30,7 @@ void drawByte(uint8_t x, uint8_t y, uint8_t b);
 uint8_t getByte(uint8_t x, uint8_t y);
 void drawPixel(int8_t x, int8_t y, bool color, bool raycasterViewport);
 void drawVLine(uint8_t x, int8_t start_y, int8_t end_y, uint8_t intensity);
-void drawSprite(int8_t x, int8_t y, const uint8_t bitmap[], const uint8_t mask[], int16_t w, int16_t h, uint8_t sprite, double distance);
+void drawSprite(int8_t x, int8_t y, const uint8_t bitmap[], const uint8_t mask[], int16_t w, int16_t h, uint8_t sprite, float distance);
 void drawChar(int8_t x, int8_t y, char ch);
 void drawText(int8_t x, int8_t y, char *txt, uint8_t space = 1);
 void drawText(int8_t x, int8_t y, const __FlashStringHelper txt, uint8_t space = 1);
@@ -30,11 +39,13 @@ void drawText(int8_t x, int8_t y, const __FlashStringHelper txt, uint8_t space =
 //Adafruit_SSD1306<SCREEN_WIDTH, SCREEN_HEIGHT> display;
 
 // FPS control
-double delta = 1;
+float delta = 1;
 uint32_t lastFrameTime = 0;
 
 #ifdef OPTIMIZE_SSD1306
 // Optimizations for SSD1306 handles buffer directly
+uint8_t *display_buf;
+#else
 uint8_t *display_buf;
 #endif
 
@@ -52,6 +63,8 @@ void setupDisplay() {
 
 #ifdef OPTIMIZE_SSD1306
   display_buf = arduboy.getBuffer();
+#else
+  display_buf = arduboy.getBuffer();
 #endif
 
   // initialize z buffer
@@ -62,11 +75,11 @@ void setupDisplay() {
 // Calculates also delta to keep movement consistent in lower framerates
 void fps() {
   while (millis() - lastFrameTime < FRAME_TIME);
-  delta = (double)(millis() - lastFrameTime) / FRAME_TIME;
+  delta = (float)(millis() - lastFrameTime) / FRAME_TIME;
   lastFrameTime = millis();
 }
 
-double getActualFps() {
+float getActualFps() {
   return 1000 / (FRAME_TIME * delta);
 }
 
@@ -81,7 +94,7 @@ boolean getGradientPixel(uint8_t x, uint8_t y, uint8_t i) {
   if (i == 0) return 0;
   if (i >= GRADIENT_COUNT - 1) return 1;
 
-  uint8_t index = max((uint8_t)0, min((uint8_t)(GRADIENT_COUNT - 1), i)) * GRADIENT_WIDTH * GRADIENT_HEIGHT // gradient index
+  uint8_t index = max_(0, min_(GRADIENT_COUNT - 1, i)) * GRADIENT_WIDTH * GRADIENT_HEIGHT // gradient index
                   + y * GRADIENT_WIDTH % (GRADIENT_WIDTH * GRADIENT_HEIGHT)             // y byte offset
                   + x / GRADIENT_HEIGHT % GRADIENT_WIDTH;                               // x byte offset
 
@@ -115,7 +128,8 @@ void drawPixel(int8_t x, int8_t y, bool color, bool raycasterViewport = false) {
     display_buf[x + (y / 8)*SCREEN_WIDTH] &= ~(1 << (y & 7));
   }
 #else
-  display.drawPixel(x, y, color);
+  //display.drawPixel(x, y, color);
+  arduboy.drawPixel(x, y, color);
 #endif
 }
 
@@ -173,10 +187,10 @@ void drawSprite(
   const uint8_t bitmap[], const uint8_t mask[],
   int16_t w, int16_t h,
   uint8_t sprite,
-  double distance
+  float distance
 ) {
-  uint8_t tw = (double) w / distance;
-  uint8_t th = (double) h / distance;
+  uint8_t tw = (float) w / distance;
+  uint8_t th = (float) h / distance;
   uint8_t byte_width = w / 8;
   uint8_t pixel_size = max((uint8_t)1, (uint8_t)(1.0 / distance));
   uint16_t sprite_offset = byte_width * h * sprite;

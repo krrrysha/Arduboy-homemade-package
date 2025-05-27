@@ -9,7 +9,7 @@ inline T sq(T value) {
     return value * value;
 }
 
-Coords create_coords(double x, double y) {
+Coords create_coords(float x, float y) {
   return { x, y };
 }
 

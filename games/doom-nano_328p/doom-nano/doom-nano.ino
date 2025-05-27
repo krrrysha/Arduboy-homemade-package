@@ -13,7 +13,7 @@ Arduboy2Base arduboy;
 
 // Useful macros
 #define swap(a, b)            do { typeof(a) temp = a; a = b; b = temp; } while (0)
-#define sign(a, b)            (double) (a > b ? 1 : (b > a ? -1 : 0))
+#define sign(a, b)            (float) (a > b ? 1 : (b > a ? -1 : 0))
 
 #ifndef min_
 #define min_(a, b) (((a) < (b)) ? (a) : (b))
@@ -43,20 +43,17 @@ uint8_t num_static_entities = 0;
 
 
 void display_drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int8_t w, int8_t h, uint8_t color){
- ////static void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, uint8_t w, uint8_t h, uint8_t color = WHITE);
-	//arduboy.drawBitmap(x,y,bitmap,w,h,color);
   arduboy.drawSlowXYBitmap(x,y,bitmap,w,h,color);
 }
 
 
 void display_clearRect(int16_t x, int16_t y, int16_t w, int16_t h){
-//static void drawRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color = WHITE);
 	arduboy.fillRect(x,y,w,h,0);
 }
 
-void display_display(){ 
-	arduboy.display();
-}
+//void display_display(){ 
+//	arduboy.display();
+//}
 
 void display_invertDisplay(bool invert)
 {
@@ -64,11 +61,9 @@ arduboy.invert(invert);
 }
 
 void setup(void) {
- 
-    //arduboy.boot();
-    arduboy.begin();
-    //arduboy.bootLogo();
-    arduboy.clear();
+  Serial.begin(9600);
+  arduboy.begin();
+  arduboy.clear();
   setupDisplay();
   //input_setup();
   //sound_init();
@@ -149,7 +144,7 @@ void spawnEntity(uint8_t type, uint8_t x, uint8_t y) {
   }
 }
 
-void spawnFireball(double x, double y) {
+void spawnFireball(float x, float y) {
   // Limit the number of spawned entities
   if (num_entities >= MAX_ENTITIES) {
     return;
@@ -205,14 +200,15 @@ void removeStaticEntity(UID uid) {
   }
 }
 
-UID detectCollision(const uint8_t level[], Coords *pos, double relative_x, double relative_y, bool only_walls = false) {
+UID detectCollision(const uint8_t level[], Coords *pos, float relative_x, float relative_y, bool only_walls = false) {
   // Wall collision
   uint8_t round_x = int(pos->x + relative_x);
   uint8_t round_y = int(pos->y + relative_y);
   uint8_t block = getBlockAt(level, round_x, round_y);
 
   if (block == E_WALL) {
-    playSound(hit_wall_snd, HIT_WALL_SND_LEN);
+    //playSound(hit_wall_snd, HIT_WALL_SND_LEN);
+    playTSound(hit_wall_Tsnd);
     return create_uid(block, round_x, round_y);
   }
 
@@ -248,8 +244,9 @@ UID detectCollision(const uint8_t level[], Coords *pos, double relative_x, doubl
 
 // Shoot
 void fire() {
-  playSound(shoot_snd, SHOOT_SND_LEN);
-
+  //playSound(shoot_snd, SHOOT_SND_LEN);
+  playTSound(shoot_Tsnd);
+  
   for (uint8_t i = 0; i < num_entities; i++) {
     // Shoot only ALIVE enemies
     if (uid_get_type(entity[i].uid) != E_ENEMY || entity[i].state == S_DEAD || entity[i].state == S_HIDDEN) {
@@ -258,7 +255,7 @@ void fire() {
 
     Coords transform = translateIntoView(&(entity[i].pos));
     if (abs(transform.x) < 20 && transform.y > 0) {
-      uint8_t damage = (double) min_(GUN_MAX_DAMAGE, GUN_MAX_DAMAGE / (abs(transform.x) * entity[i].distance) / 5);
+      uint8_t damage = (float) min_(GUN_MAX_DAMAGE, GUN_MAX_DAMAGE / (abs(transform.x) * entity[i].distance) / 5);
       if (damage > 0) {
         entity[i].health = max_(0, entity[i].health - damage);
         entity[i].state = S_HIT;
@@ -269,7 +266,7 @@ void fire() {
 }
 
 // Update coords if possible. Return the collided uid, if any
-UID updatePosition(const uint8_t level[], Coords *pos, double relative_x, double relative_y, bool only_walls = false) {
+UID updatePosition(const uint8_t level[], Coords *pos, float relative_x, float relative_y, bool only_walls = false) {
   UID collide_x = detectCollision(level, pos, relative_x, 0, only_walls);
   UID collide_y = detectCollision(level, pos, 0, relative_y, only_walls);
 
@@ -287,7 +284,7 @@ void updateEntities(const uint8_t level[]) {
     entity[i].distance = coords_distance(&(player.pos), &(entity[i].pos));
 
     // Run the timer. Works with actual frames.
-    // Todo: use delta here. But needs double type and more memory
+    // Todo: use delta here. But needs d_o_u_b_l_e type and more memory
     if (entity[i].timer > 0) entity[i].timer--;
 
     // too far away. put it in doze mode
@@ -382,8 +379,8 @@ void updateEntities(const uint8_t level[]) {
             UID collided = updatePosition(
               level,
               &(entity[i].pos),
-              cos((double) entity[i].health / FIREBALL_ANGLES * PI) * FIREBALL_SPEED,
-              sin((double) entity[i].health / FIREBALL_ANGLES * PI) * FIREBALL_SPEED,
+              cos((float) entity[i].health / FIREBALL_ANGLES * PI) * FIREBALL_SPEED,
+              sin((float) entity[i].health / FIREBALL_ANGLES * PI) * FIREBALL_SPEED,
               true
             );
 
@@ -398,7 +395,8 @@ void updateEntities(const uint8_t level[]) {
       case E_MEDIKIT: {
           if (entity[i].distance < ITEM_COLLIDER_DIST) {
             // pickup
-            playSound(medkit_snd, MEDKIT_SND_LEN);
+            //playSound(medkit_snd, MEDKIT_SND_LEN);
+            playTSound(medkit_Tsnd);
             entity[i].state = S_HIDDEN;
             player.health = min_(100, player.health + 50);
             updateHud();
@@ -410,7 +408,8 @@ void updateEntities(const uint8_t level[]) {
       case E_KEY: {
           if (entity[i].distance < ITEM_COLLIDER_DIST) {
             // pickup
-            playSound(get_key_snd, GET_KEY_SND_LEN);
+            //playSound(get_key_snd, GET_KEY_SND_LEN);
+            playTSound(get_key_Tsnd);
             entity[i].state = S_HIDDEN;
             player.keys++;
             updateHud();
@@ -425,23 +424,23 @@ void updateEntities(const uint8_t level[]) {
 }
 
 // The map raycaster. Based on https://lodev.org/cgtutor/raycasting.html
-void renderMap(const uint8_t level[], double view_height) {
+void renderMap(const uint8_t level[], float view_height) {
   UID last_uid;
 
   for (uint8_t x = 0; x < SCREEN_WIDTH; x += RES_DIVIDER) {
-    double camera_x = 2 * (double) x / SCREEN_WIDTH - 1;
-    double ray_x = player.dir.x + player.plane.x * camera_x;
-    double ray_y = player.dir.y + player.plane.y * camera_x;
+    float camera_x = 2 * (float) x / SCREEN_WIDTH - 1;
+    float ray_x = player.dir.x + player.plane.x * camera_x;
+    float ray_y = player.dir.y + player.plane.y * camera_x;
     uint8_t map_x = uint8_t(player.pos.x);
     uint8_t map_y = uint8_t(player.pos.y);
     Coords map_coords = { player.pos.x, player.pos.y };
-    double delta_x = abs(1 / ray_x);
-    double delta_y = abs(1 / ray_y);
+    float delta_x = abs(1 / ray_x);
+    float delta_y = abs(1 / ray_y);
 
     int8_t step_x; 
     int8_t step_y;
-    double side_x;
-    double side_y;
+    float side_x;
+    float side_y;
 
     if (ray_x < 0) {
       step_x = -1;
@@ -463,6 +462,8 @@ void renderMap(const uint8_t level[], double view_height) {
     uint8_t depth = 0;
     bool hit = 0;
     bool side; 
+   
+
     while (!hit && depth < MAX_RENDER_DEPTH) {
       if (side_x < side_y) {
         side_x += delta_x;
@@ -479,10 +480,11 @@ void renderMap(const uint8_t level[], double view_height) {
       if (block == E_WALL) {
         hit = 1;
       } else {
+        
         // Spawning entities here, as soon they are visible for the
         // player. Not the best place, but would be a very performance
         // cost scan for them in another loop
-        if (block == E_ENEMY || (block & 0b00001000) /* all collectable items */) {
+        if (block == E_ENEMY || (block & 0b00001000) ) { // all collectable items 
           // Check that it's close to the player
           if (coords_distance(&(player.pos), &map_coords) < MAX_ENTITY_DISTANCE) {
             UID uid = create_uid(block, map_x, map_y);
@@ -492,13 +494,14 @@ void renderMap(const uint8_t level[], double view_height) {
             }
           }
         }
+        
       }
 
       depth++;
     }
 
     if (hit) {
-      double distance;
+      float distance;
       
       if (side == 0) {
         distance = max_(1, (map_x - player.pos.x + (1 - step_x) / 2) / ray_x);
@@ -511,14 +514,17 @@ void renderMap(const uint8_t level[], double view_height) {
 
       // rendered line height
       uint8_t line_height = RENDER_HEIGHT / distance;
-
+      
+      // RISC-V 38 ms:
       drawVLine(
         x,
         view_height / distance - line_height / 2 + RENDER_HEIGHT / 2,
         view_height / distance + line_height / 2 + RENDER_HEIGHT / 2,
         GRADIENT_COUNT - int(distance / MAX_RENDER_DEPTH * GRADIENT_COUNT) - side * 2
       );
+      
     }
+  
   }
 }
 
@@ -546,18 +552,18 @@ void sortEntities() {
 
 Coords translateIntoView(Coords *pos) {
   //translate sprite position to relative to camera
-  double sprite_x = pos->x - player.pos.x;
-  double sprite_y = pos->y - player.pos.y;
+  float sprite_x = pos->x - player.pos.x;
+  float sprite_y = pos->y - player.pos.y;
 
   //required for correct matrix multiplication
-  double inv_det = 1.0 / (player.plane.x * player.dir.y - player.dir.x * player.plane.y);
-  double transform_x = inv_det * (player.dir.y * sprite_x - player.dir.x * sprite_y);
-  double transform_y = inv_det * (- player.plane.y * sprite_x + player.plane.x * sprite_y); // Z in screen
+  float inv_det = 1.0 / (player.plane.x * player.dir.y - player.dir.x * player.plane.y);
+  float transform_x = inv_det * (player.dir.y * sprite_x - player.dir.x * sprite_y);
+  float transform_y = inv_det * (- player.plane.y * sprite_x + player.plane.x * sprite_y); // Z in screen
 
   return { transform_x, transform_y };
 }
 
-void renderEntities(double view_height) {
+void renderEntities(float view_height) {
   sortEntities();
 
   for (uint8_t i = 0; i < num_entities; i++) {
@@ -662,10 +668,10 @@ void renderEntities(double view_height) {
   }
 }
 
-void renderGun(uint8_t gun_pos, double amount_jogging) {
+void renderGun(uint8_t gun_pos, float amount_jogging) {
   // jogging
-  char x = 48 + sin((double) millis() * JOGGING_SPEED) * 10 * amount_jogging;
-  char y = RENDER_HEIGHT - gun_pos + abs(cos((double) millis() * JOGGING_SPEED)) * 8 * amount_jogging;
+  char x = 48 + sin((float) millis() * JOGGING_SPEED) * 10 * amount_jogging;
+  char y = RENDER_HEIGHT - gun_pos + abs(cos((float) millis() * JOGGING_SPEED)) * 8 * amount_jogging;
 
   if (gun_pos > GUN_SHOT_POS - 2) {
     // Gun fire
@@ -718,8 +724,8 @@ void loopIntro() {
   delay(1000);
   drawText(SCREEN_WIDTH / 2 - 25, SCREEN_HEIGHT * .8, F("PRESS FIRE"));
   //arduboy.clear();
-  //arduboy.diplay();
-  display_display();
+  arduboy.display();
+  //display_display();
   
   // wait for fire
   while (!exit_scene) {
@@ -734,11 +740,11 @@ void loopGamePlay() {
   bool gun_fired = false;
   bool walkSoundToggle = false;
   uint8_t gun_pos = 0;
-  double rot_speed;
-  double old_dir_x;
-  double old_plane_x;
-  double view_height;
-  double jogging;
+  float rot_speed;
+  float old_dir_x;
+  float old_plane_x;
+  float view_height;
+  float jogging;
   uint8_t fade = GRADIENT_COUNT - 1;
 
   initializeLevel(sto_level_1);
@@ -786,15 +792,17 @@ void loopGamePlay() {
         player.plane.y = old_plane_x * sin(rot_speed) + player.plane.y * cos(rot_speed);
       }
 
-      view_height = abs(sin((double) millis() * JOGGING_SPEED)) * 6 * jogging;
+      view_height = abs(sin((float) millis() * JOGGING_SPEED)) * 6 * jogging;
 
       if(view_height > 5.9) {
         if(sound == false) {
           if(walkSoundToggle) {
-            playSound(walk1_snd, WALK1_SND_LEN);
+            //playSound(walk1_snd, WALK1_SND_LEN);
+            playTSound(walk1_Tsnd);
             walkSoundToggle = false;
           } else {
-            playSound(walk2_snd, WALK2_SND_LEN);
+            //playSound(walk2_snd, WALK2_SND_LEN);
+            playTSound(walk2_Tsnd);
             walkSoundToggle = true;
           }
         }
@@ -839,7 +847,12 @@ void loopGamePlay() {
     updateEntities(sto_level_1);
 
     // Render stuff
+    
+    unsigned long ttt;
+    ttt = micros();
     renderMap(sto_level_1, view_height);
+      Serial.print("renderMap took "); Serial.print(micros() - ttt); Serial.println(" µs");
+    
     renderEntities(view_height);
     renderGun(gun_pos, jogging);
 
@@ -867,7 +880,9 @@ void loopGamePlay() {
     // Draw the frame
     //display.invertDisplay(invert_screen);
     display_invertDisplay(invert_screen);
-    display_display();
+    //display_display();
+    arduboy.display();    
+    
     
     // Exit routine
     //#ifdef SNES_CONTROLLER
@@ -881,7 +896,7 @@ void loopGamePlay() {
 }
 
 void loop(void) {
-      //arduboy.clear();
+
   switch (scene) {
     case INTRO: {
         loopIntro();
@@ -891,14 +906,13 @@ void loop(void) {
         loopGamePlay();
         break;
       }
-        //arduboy.display();
   }
 
   // fade out effect
   for (uint8_t i=0; i<GRADIENT_COUNT; i++) {
     fadeScreen(i, 0);
-    display_display();
-    
+    //display_display();
+    arduboy.display();    
     delay(40);
   }
   exit_scene = false;
