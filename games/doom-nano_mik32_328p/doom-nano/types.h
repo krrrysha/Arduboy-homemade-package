@@ -24,11 +24,18 @@ struct Coords {
   float y;
 };
 
+struct Coords_CM {
+  int16_t x;
+  int16_t y;
+};
+
 UID create_uid(EType type, uint8_t x, uint8_t y);
 EType uid_get_type(UID uid);
 
 Coords create_coords(float x, float y);
 uint8_t coords_distance(Coords* a, Coords* b);
+
+uint8_t coords_distance_CM(Coords_CM* a, Coords_CM* b);
 
 #endif
 

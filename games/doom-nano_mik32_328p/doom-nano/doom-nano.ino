@@ -61,7 +61,7 @@ arduboy.invert(invert);
 }
 
 void setup(void) {
-  Serial.begin(9600);
+  //Serial.begin(115200);
   arduboy.begin();
   arduboy.clear();
   setupDisplay();
@@ -423,39 +423,67 @@ void updateEntities(const uint8_t level[]) {
   }
 }
 
-// The map raycaster. Based on https://lodev.org/cgtutor/raycasting.html
 void renderMap(const uint8_t level[], float view_height) {
   UID last_uid;
+  int16_t view_height_cm = (int16_t)(view_height*100);
+  int16_t player_dir_y_CM = (int16_t)(player.dir.y*100);
+  int16_t player_plane_y_CM = (int16_t)(player.plane.y*100);
+  int16_t player_pos_y_CM = (int16_t)(player.pos.y*100);
+
 
   for (uint8_t x = 0; x < SCREEN_WIDTH; x += RES_DIVIDER) {
-    float camera_x = 2 * (float) x / SCREEN_WIDTH - 1;
-    float ray_x = player.dir.x + player.plane.x * camera_x;
-    float ray_y = player.dir.y + player.plane.y * camera_x;
-    uint8_t map_x = uint8_t(player.pos.x);
-    uint8_t map_y = uint8_t(player.pos.y);
-    Coords map_coords = { player.pos.x, player.pos.y };
-    float delta_x = abs(1 / ray_x);
-    float delta_y = abs(1 / ray_y);
+    
+
+
+    int16_t player_pos_x_CM = (int16_t)(player.pos.x*100);
+    int16_t player_plane_x_CM = (int16_t)(player.plane.x*100);
+    int16_t player_dir_x_CM = (int16_t)(player.dir.x*100);
+
+    Coords_CM player_pos_CM = { player_pos_x_CM, player_pos_y_CM };
+
+    //int16_t camera_x = 200 * (int16_t) x / (SCREEN_WIDTH) - 100;
+    int16_t camera_x = (int16_t) ((200 * x) / SCREEN_WIDTH) - 100;
+    int32_t ray_x = player_dir_x_CM + (player_plane_x_CM * camera_x)/100;
+    int32_t ray_y = player_dir_y_CM + (player_plane_y_CM * camera_x)/100;
+    
+   
+    uint8_t map_x = uint8_t(player_pos_x_CM/100);
+    uint8_t map_y = uint8_t(player_pos_y_CM/100);
+    //Coords map_coords = { player_pos_x_CM, player_pos_y_CM };
+    Coords_CM map_coords = { map_x * 100, map_y * 100 };
+    //int32_t delta_x = abs(10000 / ray_x);
+    int32_t delta_x = (ray_x != 0) ? abs(10000 / ray_x) : 1000000;
+    
+
+    //int32_t delta_y = abs(10000 / ray_y);
+    int32_t delta_y = (ray_y != 0) ? abs(10000 / ray_y) : 1000000;
+    
+    
+    //delta_x = min(delta_x, (int32_t) 1000);
+    //delta_y = min(delta_y, (int32_t) 1000);
 
     int8_t step_x; 
+
+    int32_t side_x;
+    
     int8_t step_y;
-    float side_x;
-    float side_y;
+    int32_t side_y;
+
 
     if (ray_x < 0) {
       step_x = -1;
-      side_x = (player.pos.x - map_x) * delta_x;
+      side_x = (player_pos_x_CM - map_x*100) * delta_x/100;
     } else {
       step_x = 1;
-      side_x = (map_x + 1.0 - player.pos.x) * delta_x;
+      side_x = ((map_x + 1)*100 - player_pos_x_CM) * delta_x/100;
     }
 
     if (ray_y < 0) {
       step_y = -1;
-      side_y = (player.pos.y - map_y) * delta_y;
+      side_y = (player_pos_y_CM - map_y*100) * delta_y/100;
     } else {
       step_y = 1;
-      side_y = (map_y + 1.0 - player.pos.y) * delta_y;
+      side_y = ((map_y + 1)*100 - player_pos_y_CM) * delta_y/100;
     }
 
     // Wall detection
@@ -465,6 +493,7 @@ void renderMap(const uint8_t level[], float view_height) {
    
 
     while (!hit && depth < MAX_RENDER_DEPTH) {
+      
       if (side_x < side_y) {
         side_x += delta_x;
         map_x += step_x;
@@ -475,8 +504,12 @@ void renderMap(const uint8_t level[], float view_height) {
         side = 1;
       }
 
-      uint8_t block = getBlockAt(level, map_x, map_y);
+    //if (map_x < 0 || map_x >= LEVEL_WIDTH || map_y < 0 || map_y >= LEVEL_HEIGHT) {
+    //    break; // Прерываем цикл, если вышли за уровень
+    //}
 
+      uint8_t block = getBlockAt(level, map_x, map_y);
+      
       if (block == E_WALL) {
         hit = 1;
       } else {
@@ -486,7 +519,8 @@ void renderMap(const uint8_t level[], float view_height) {
         // cost scan for them in another loop
         if (block == E_ENEMY || (block & 0b00001000) ) { // all collectable items 
           // Check that it's close to the player
-          if (coords_distance(&(player.pos), &map_coords) < MAX_ENTITY_DISTANCE) {
+          //Coords_CM map_coords = { map_x * 100 + 50, map_y * 100 + 50 };
+          if (coords_distance_CM(&(player_pos_CM), &map_coords) < MAX_ENTITY_DISTANCE) {
             UID uid = create_uid(block, map_x, map_y);
             if (last_uid != uid && !isSpawned(uid)) {
               spawnEntity(block, map_x, map_y);
@@ -501,31 +535,40 @@ void renderMap(const uint8_t level[], float view_height) {
     }
 
     if (hit) {
-      float distance;
-      
+      int32_t distance;
+
+
       if (side == 0) {
-        distance = max_(1, (map_x - player.pos.x + (1 - step_x) / 2) / ray_x);
+        //distance = (map_x * 100 - player_pos_x_CM + (100 - step_x * 100 / 2)) * delta_x / 100;
+        distance = (ray_x != 0) ? (int32_t)(map_x * 100 - player_pos_x_CM + (100 - step_x * 100) / 2) * 100/ray_x : 1000000 ;
       } else {
-        distance = max_(1, (map_y - player.pos.y + (1 - step_y) / 2) / ray_y);
+        //distance = (map_y * 100 - player_pos_y_CM + (100 - step_y * 100 / 2)) * delta_y / 100;
+        distance =  (ray_y != 0) ? (int32_t)(map_y * 100 - player_pos_y_CM + (100 - step_y * 100) / 2) * 100 / ray_y : 1000000;
       }
 
       // store zbuffer value for the column
-      zbuffer[x / Z_RES_DIVIDER] = min_(distance * DISTANCE_MULTIPLIER, 255);
+      zbuffer[x / Z_RES_DIVIDER] = min_((distance * DISTANCE_MULTIPLIER)/100, 255);
+
 
       // rendered line height
-      uint8_t line_height = RENDER_HEIGHT / distance;
-      
-      // RISC-V 38 ms:
+      distance = max_((int32_t)100, min_(distance, (int32_t) (MAX_RENDER_DEPTH * 100)));
+      uint8_t line_height = RENDER_HEIGHT*100 / (distance+1);
+
+      int8_t start_y_tst=(view_height_cm / distance)  - line_height / 2 + RENDER_HEIGHT / 2;
+      int8_t end_y_tst=(view_height_cm / distance) + line_height / 2 + RENDER_HEIGHT / 2;
+      int8_t intensity_tst=GRADIENT_COUNT - ((distance * GRADIENT_COUNT)/ (MAX_RENDER_DEPTH*100)) - side * 2;
+
       drawVLine(
         x,
-        view_height / distance - line_height / 2 + RENDER_HEIGHT / 2,
-        view_height / distance + line_height / 2 + RENDER_HEIGHT / 2,
-        GRADIENT_COUNT - int(distance / MAX_RENDER_DEPTH * GRADIENT_COUNT) - side * 2
+        start_y_tst,
+        end_y_tst,
+        intensity_tst
       );
       
     }
   
   }
+  
 }
 
 // Sort entities from far to close
@@ -611,7 +654,8 @@ void renderEntities(float view_height) {
           }
 
           drawSprite(
-            sprite_screen_x - BMP_IMP_WIDTH * .5 / transform.y,
+            //sprite_screen_x - BMP_IMP_WIDTH * .5 / transform.y,
+            sprite_screen_x - BMP_IMP_WIDTH / 2 / transform.y,
             sprite_screen_y - 8 / transform.y,
             bmp_imp_bits,
             bmp_imp_mask,
@@ -849,9 +893,9 @@ void loopGamePlay() {
     // Render stuff
     
     unsigned long ttt;
-    ttt = micros();
+    //ttt = micros();
     renderMap(sto_level_1, view_height);
-      Serial.print("renderMap took "); Serial.print(micros() - ttt); Serial.println(" µs");
+    //Serial.print("renderMap took "); Serial.print(micros() - ttt); Serial.println(" µs");
     
     renderEntities(view_height);
     renderGun(gun_pos, jogging);
@@ -888,10 +932,10 @@ void loopGamePlay() {
     //#ifdef SNES_CONTROLLER
     //if (input_start()) {
     //#else
-    if (input_left() && input_right()) {
-    //#endif
-      jumpTo(INTRO);
-    }
+    //if (input_left() && input_right()) {
+        //#endif
+    //  jumpTo(INTRO);
+    //}
   } while (!exit_scene);
 }
 

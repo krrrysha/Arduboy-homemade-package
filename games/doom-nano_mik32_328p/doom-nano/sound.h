@@ -111,7 +111,7 @@ void sound_init() {
  // snd_ptr = reinterpret_cast<uint16_t>(snd);
  // snd_len = len;
   //sound = true;
-   Serial.println(arduboy.audio.enabled() ? "YES" : "NO");
+   //Serial.println(arduboy.audio.enabled() ? "YES" : "NO");
    asound.tones(Tsnd);
 }
 

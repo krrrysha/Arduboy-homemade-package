@@ -7,4 +7,5 @@ bool input_down();
 bool input_left();
 bool input_right();
 bool input_fire();
+bool input_start();
 #endif

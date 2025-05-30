@@ -189,10 +189,12 @@ void drawSprite(
   uint8_t sprite,
   float distance
 ) {
-  uint8_t tw = (float) w / distance;
-  uint8_t th = (float) h / distance;
+  uint16_t distance_cm=(int16_t)(distance*100); // для distance есть ограничение 0.1<distance<8, т.е. 10<distance_cm<800
+
+  uint8_t tw = (w*100) / distance_cm; 
+  uint8_t th = (h*100) /distance_cm;
   uint8_t byte_width = w / 8;
-  uint8_t pixel_size = max((uint8_t)1, (uint8_t)(1.0 / distance));
+  uint8_t pixel_size = max((uint8_t)1, (uint8_t)(100 / distance_cm));
   uint16_t sprite_offset = byte_width * h * sprite;
 
   bool pixel;
@@ -200,7 +202,7 @@ void drawSprite(
 
   // Don't draw the whole sprite if the anchor is hidden by z buffer
   // Not checked per pixel for performance reasons
-  if (zbuffer[min(max(x, (int8_t)0), (int8_t)(ZBUFFER_SIZE - 1)) / Z_RES_DIVIDER] < distance * DISTANCE_MULTIPLIER) {
+  if (100*zbuffer[min(max(x, (int8_t)0), (int8_t)(ZBUFFER_SIZE - 1)) / Z_RES_DIVIDER] < distance_cm * DISTANCE_MULTIPLIER) {
     return;
   }
 
@@ -210,10 +212,10 @@ void drawSprite(
       continue;
     }
 
-    uint8_t sy = ty * distance; // The y from the sprite
+    uint8_t sy = (ty * distance_cm)/100; // The y from the sprite
 
     for (uint8_t tx = 0; tx < tw; tx += pixel_size) {
-      uint8_t sx = tx * distance; // The x from the sprite
+      uint8_t sx = (tx * distance_cm)/100; // The x from the sprite
       uint16_t byte_offset = sprite_offset + sy * byte_width + sx / 8;
 
       // Don't draw out of screen
