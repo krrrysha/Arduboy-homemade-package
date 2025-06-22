@@ -64,13 +64,13 @@ void Arduboy2Base::beginDoFirst()
 void Arduboy2Base::flashlight()
 {
 
-#if defined(JOYSTICKANALOG) 
+//#if defined(JOYSTICKANALOG) 
 for (uint8_t i=0;i<254;i++)
 {
 	buttonsState();
 	delayShort(10);
 }
-#endif	
+//#endif	
   if (!pressed(UP_BUTTON)) {
     return;
   }
@@ -122,6 +122,7 @@ void Arduboy2Base::systemButtons()
 
 void Arduboy2Base::sysCtrlSound(uint8_t buttons, uint8_t led, uint8_t eeVal)
 {
+  	
   if (pressed(buttons)) {
     setRGBledBlueOff();
     delayByte(200);

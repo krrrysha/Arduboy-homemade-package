@@ -220,32 +220,41 @@ void Arduboy2Core::bootPins()
 {
 #ifdef ARDUBOY_10
 #ifdef ECONSOLE
+  	DDRC &= ~(_BV(RAND_SEED_IN_BIT)); // as input; это можно не добавлять. значение по-умолчанию "0"
+	PORTC &= ~(_BV(RAND_SEED_IN_BIT)); // without pullup; это можно не добавлять. значение по-умолчанию "0"
+	//PORTC |= (_BV(RAND_SEED_IN_BIT)); // 
   #ifndef  JOYSTICKANALOG
 	// Port  INPUT_PULLUP
-  PORTD |= _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) |
+	PORTD |= _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) |
            _BV(B_BUTTON_BIT) |
 		   _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
- DDRD &= ~(_BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) |
+	DDRD &= ~(_BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) |
 	    _BV(B_BUTTON_BIT)|
 		_BV(RIGHT_BUTTON_BIT) |
 	    _BV(DOWN_BUTTON_BIT));
-  PORTD |= _BV(A_BUTTON_BIT);
-  DDRD &= ~(_BV(A_BUTTON_BIT)); 
+	PORTD |= _BV(A_BUTTON_BIT);
+	DDRD &= ~(_BV(A_BUTTON_BIT)); 
   
-  DDRB  |= _BV(RED_LED_BIT);
-  DDRC  |= _BV(BLUE_LED_BIT) | _BV(GREEN_LED_BIT);
-    #else
-	  //JOYSTICKANALOG
+	DDRB  |= _BV(RED_LED_BIT);
+	DDRC  |= _BV(BLUE_LED_BIT) | _BV(GREEN_LED_BIT);
+  #else
+	//JOYSTICKANALOG
 	power_adc_enable(); //disable power saving for ADC
 	DDRC &= ~(_BV(X_AXIS_BIT) | _BV(Y_AXIS_BIT));
 	PORTC |= _BV(X_AXIS_BIT) | _BV(Y_AXIS_BIT);
 	PORTD |= _BV(B_BUTTON_BIT) | _BV(A_BUTTON_BIT);
     DDRD &= ~(_BV(B_BUTTON_BIT) | _BV(A_BUTTON_BIT));
-    ADMUX = 0x42;
+	
+	    // random init
+	power_adc_enable(); //disable power saving for ADC
+
+	ADMUX = REF_BACK_IN_ADMUX;
 	ADCSRA=0b10010011; // ADEN=1, ADSC=0 (stop conversion), ADATE=0, ADIF=1 (conversion complete), ADIE=0 (no interputs), ADPS=011 CK/8
 	ADCSRA |= _BV(ADSC); // start conversion (ADMUX has been pre-set in boot())
-	while (bit_is_set(ADCSRA, ADSC)) { } // wait for conversion complete
-	#endif
+	while ((ADCSRA >> ADSC) & 1); // wait for conversion complete
+		
+		
+  #endif
   // switch off LEDs by default
   PORTC &= ~(_BV(GREEN_LED_BIT)   | _BV(BLUE_LED_BIT) | _BV(RED_LED_BIT));
 #elif defined (ELBEARBOY)
@@ -266,19 +275,21 @@ void Arduboy2Core::bootPins()
 	PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SDA)); // Нагрузочная способность 8 мА
 	PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SCL)); // Нагрузочная способность 8 мА
 	i2c_stop();
-	// инициализация EEPROM
+	// инициализация EEPROM. Пользовательские данные Arduino содержатся с EEPROM_START_ADDR=0x1C00 до EEPROM_END=0x1FFF
 	#define EEPROM_START_word_ADDR 0x700
 	EEPROM_REGS->EECON = 0;
 	// инициализация ADC
-	//Serial.println("==INIT ADC START==");
-	chan_selected = CHAN_RANDOM;
-
-    //Serial.println("! chan_sel:");     Serial.println(chan_selected);
-
+	
+	chan_selected = CHAN_RANDOM; //
+    
+	
 	PAD_CONFIG->PORT_0_CFG |= (0b11 << (2 * PIN_RANDOM)); // аналоговый сигнал. порт A2=0.4
 	GPIO_0->DIRECTION_IN = 1 << PIN_RANDOM; // 
+
+	//PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к +
+	PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к gnd
 	#ifdef  JOYSTICKANALOG
-		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A01.5
+		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A0=1.5
 		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
 		GPIO_1->DIRECTION_IN = 1 << PIN_AXISX; // 
 		GPIO_1->DIRECTION_IN = 1 << PIN_AXISY; //
@@ -324,17 +335,6 @@ void Arduboy2Core::bootPins()
 	ANALOG_REG->ADC_SINGLE=1; // считаем канал 3
 	while (!ANALOG_REG->ADC_VALID) {};
 
-	/*
-	delay(3000);
-	Serial.print(" chan_conv:");     Serial.print(chan_converted);
-    Serial.print(" chan_sel:");     Serial.print(chan_selected);
-	Serial.print(" ADC_VALUE:"); 	Serial.print(ANALOG_REG->ADC_VALUE);
-    Serial.print(" JoystickXZero:");	Serial.print(JoystickXZero);
-	Serial.print(" JoystickYZero:");  Serial.print(JoystickYZero);
-    Serial.println();
-	Serial.println("==INIT ADC COMPLETE==");
-	*/
-	
 
 
 #else
@@ -452,7 +452,7 @@ void Arduboy2Core::bootPins()
   // Port F INPUT or LOW
           ~(_BV(RAND_SEED_IN_BIT));
   
-  // Port F outputs (none)
+  // Port F outputs (none) // в оригинальной версии здесь какая-то дичь. для DDRF выполняется умножением маски на "0"
   DDRF = 0 &
   // Port F inputs
          ~(_BV(LEFT_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) |
@@ -672,6 +672,8 @@ void Arduboy2Core::i2c_sendByte(uint8_t byte)
 		I2C_SDA_AS_INPUT(); // отпустить SDA (лог.1), чтобы ведомое устройство смогло сгенерировать ACK. В оригинальном тексте Arduboy2 тут выставляется лог.0. Вероятно, чтобы не дожидаться, пока это сделает ведомый?
 		I2C_SCL_AS_INPUT(); // отпустить SCL (лог.1), чтобы ведомое устройство передало ACK // 20 NOP ok for ssd1309
 			__10NOP(); __10NOP();
+			__NOP();
+			__NOP();
 		I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)  // приём ACK завершён // 1 nop for 1309
 		__NOP();
   #endif
@@ -1597,18 +1599,21 @@ uint8_t Arduboy2Core::buttonsState()
 		ADCJoystickState &= ~(RIGHT_BUTTON | LEFT_BUTTON);
 		if (JoystickXZero>1024) {JoystickXZero=ADCdata;} // if first run
 		if (ADCdata > JoystickXZero+JOYSENSX) {ADCJoystickState |= RIGHT_BUTTON;} else if (ADCdata < JoystickXZero-JOYSENSX) {ADCJoystickState |= LEFT_BUTTON;} // we determine the direction along the X axis
-		ADMUX = 0x41; // we will measure the signal at the AC1 input; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=1; AMUX= 0x41
+		ADMUX = YAXIS_IN_ADMUX; // we will measure the signal at the AC1 input; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=1;  
+		//ADMUX =  0b01000001;
 		ADCSRA |= (1 << ADSC);  // start conversionе
 	} else if ((ADMUX & 0b00001111) ==1)   // if the conversion at the AC1 input is complete 
 		{ 
 			ADCJoystickState &= ~(UP_BUTTON | DOWN_BUTTON);
 			if (JoystickYZero>1024) {JoystickYZero=ADCdata;} // if first run
 			if (ADCdata > JoystickYZero+JOYSENSY) {ADCJoystickState |= UP_BUTTON;} else if (ADCdata < JoystickYZero-JOYSENSY) {ADCJoystickState |= DOWN_BUTTON;} // we determine the direction along the Y axis
-			ADMUX = 0x40; // we will measure the signal at the AC0 input; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=0; AMUX= 0x40
+			ADMUX =  XAXIS_IN_ADMUX; // we will measure the signal at the AC0 input; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=0;  
+			//ADMUX =  0b01000000;
 			ADCSRA |= (1 << ADSC);  // start conversionе
 		} else 
 		{
-			ADMUX = 0x40; // снимать сигнал будем с входа AC0; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=0; AMUX= 0x40
+			ADMUX =  XAXIS_IN_ADMUX; // снимать сигнал будем с входа AC0; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=0; 
+			//ADMUX =  0b01000000;
 			ADCSRA |= (1 << ADSC); 
 		}
 	} 
@@ -1659,18 +1664,7 @@ uint8_t Arduboy2Core::buttonsState()
 
 			}
 			
-	/*
-    Serial.print(" chan_conv:");
-    Serial.print(chan_converted);
-    Serial.print(" chan_sel:");
-    Serial.print(chan_selected);
- Serial.print(" ADC_VALUE:");
- Serial.print(ANALOG_REG->ADC_VALUE);
-    Serial.print(" JoystickXZero:");
- Serial.print(JoystickXZero);
-Serial.print(" JoystickYZero:");  Serial.print(JoystickYZero);
-     Serial.println();
-     */
+
 		}
 		buttons |= ADCJoystickState;
 	#endif
@@ -1713,29 +1707,55 @@ unsigned long Arduboy2Core::generateRandomSeed()
 {
   unsigned long seed;
 
-#ifndef ELBEARBOY
-  power_adc_enable(); // ADC on
+#ifndef ELBEARBOY // classic or ECONSOLE
+  
+	#ifdef JOYSTICKANALOG
 
-  // do an ADC read from an unconnected input pin
-  ADCSRA |= _BV(ADSC); // start conversion (ADMUX has been pre-set in boot())
-  while (bit_is_set(ADCSRA, ADSC)) { } // wait for conversion complete
+	  // ожидаем окончания счета
+	  while ((ADCSRA >> ADSC) & 1);
 
-  seed = ((unsigned long)ADC << 16) + micros();
 
-  #ifndef JOYSTICKANALOG
-  power_adc_disable(); // disable power saving for ADC
-  #endif
+	  ADMUX = RAND_START_IN_ADMUX;
+	  ADCSRA |= _BV(ADSC); // 
+	  while ((ADCSRA >> ADSC) & 1);   // wait for conversion complete
+
+	  ADMUX = REF_BACK_IN_ADMUX;
+	  ADCSRA |= _BV(ADSC); 
+	  while ((ADCSRA >> ADSC) & 1);  // wait for conversion complete
+		seed = ((unsigned long)ADC << 16) + micros();
+	
+	  
+	#else
+
+	  power_adc_enable(); // ADC on
+
+	  // do an ADC read from an unconnected input pin
+	  ADCSRA |= _BV(ADSC); // start conversion (ADMUX has been pre-set in boot())
+	  while (bit_is_set(ADCSRA, ADSC)) { } // wait for conversion complete
+
+	  seed = ((unsigned long)ADC << 16) + micros();
+
+	  power_adc_disable(); // ADC off
+	  
+	  
+	#endif
 #else
-	chan_selected=CHAN_RANDOM; // канал рандомизации
-	myADC_SEL_CHANNEL(chan_selected); //переключаемся на канал для рандомизации
-    ANALOG_REG->ADC_SINGLE=1;
-	myADC_SEL_CHANNEL(chan_selected); //переключаемся на канал для рандомизации
+	//chan_selected=CHAN_RANDOM; // канал рандомизации
+	
+    myADC_SEL_CHANNEL(CHAN_RANDOM); //переключаемся на канал для рандомизации
+	ANALOG_REG->ADC_SINGLE=1;
+    myADC_SEL_CHANNEL(CHAN_RANDOM); //переключаемся на канал для рандомизации
 	while (!ANALOG_REG->ADC_VALID) {};
     ANALOG_REG->ADC_SINGLE=1; //считаем новый рандом
 	while (!ANALOG_REG->ADC_VALID) {};
+	
 	seed = ((unsigned long) ANALOG_REG->ADC_VALUE << 16) + micros();
+	
+	
+	
 #endif
-  return seed;
+ 
+ return seed;
 }
 
 // delay in ms with 16 bit duration

@@ -9,7 +9,7 @@
 
 #ifdef MCU_MIK32_Amur
 	#define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
-	//#define OLED_SH1106_I2C
+	//define OLED_SH1106_I2C
 	//#define JOYSTICKANALOG // undef or JOYSTICKANALOG or JOYSTICKDISCRETE.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 	//#define JOYSTICKDISCRETE
 	#define ELBEARBOY
@@ -418,11 +418,12 @@
 	#define myADC_SEL_CHANNEL(channel_selection) (ANALOG_REG->ADC_CONFIG = ((ANALOG_REG->ADC_CONFIG & (~ADC_CONFIG_SAH_TIME_M)) & (~ADC_CONFIG_SEL_M)) | ((ANALOG_REG->ADC_CONFIG >> 1) & ADC_CONFIG_SAH_TIME_M) | ((channel_selection) << ADC_CONFIG_SEL_S))
 	
 	#define ADC_EXTREF_OFF      0       /* Встроенный источник опорного напряжения 1,2 В */
-	#define ADC_EXTREF_ON       1       /* Внешний источник опорного напряжения */
-	#define ADC_EXTCLB_CLBREF      0       /* Настраиваемый ОИН */
+	//define ADC_EXTREF_ON       1       /* Внешний источник опорного напряжения */
+	//define ADC_EXTCLB_CLBREF      0       /* Настраиваемый ОИН */
 	#define ADC_EXTCLB_ADCREF      1       /* Внешний вывод */
-	#define PIN_RANDOM 4 // ACD3 port_0_4
-	#define CHAN_RANDOM 3 // ACD3 port_0_4
+	//moved to RANDOM config saction:
+	//define PIN_RANDOM 4 // ADC3 port_0_4
+	//define CHAN_RANDOM 3 // ADC3 port_0_4
 
 	#if defined (JOYSTICKANALOG)
 
@@ -586,23 +587,23 @@
 	#define SPEAKER_2_PORT GPIO_1->STATE
 	#define SPEAKER_2_BIT 1
 #else
-#define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
+	#define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
 
-#define SPEAKER_1_PORT PORTC
-#define SPEAKER_1_DDR DDRC
-#define SPEAKER_1_BIT PORTC6
+	#define SPEAKER_1_PORT PORTC
+	#define SPEAKER_1_DDR DDRC
+	#define SPEAKER_1_BIT PORTC6
 
-#ifdef AB_ALTERNATE_WIRING
-  #define PIN_SPEAKER_2 6      //Pro Micro alternative for 2nd speaker pin
-  #define SPEAKER_2_PORT PORTD
-  #define SPEAKER_2_DDR DDRD
-  #define SPEAKER_2_BIT PORTD7
-#else
-  #define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
-  #define SPEAKER_2_PORT PORTC
-  #define SPEAKER_2_DDR DDRC
-  #define SPEAKER_2_BIT PORTC7
-#endif
+	#ifdef AB_ALTERNATE_WIRING
+	  #define PIN_SPEAKER_2 6      //Pro Micro alternative for 2nd speaker pin
+	  #define SPEAKER_2_PORT PORTD
+	  #define SPEAKER_2_DDR DDRD
+	  #define SPEAKER_2_BIT PORTD7
+	#else
+	  #define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
+	  #define SPEAKER_2_PORT PORTC
+	  #define SPEAKER_2_DDR DDRC
+	  #define SPEAKER_2_BIT PORTC7
+	#endif
 #endif
 // -----------------------
 
@@ -697,23 +698,37 @@
 
 // Unconnected analog input used for noise by initRandomSeed()
 #ifndef SUPPORT_XY_BUTTONS
-	#ifndef ELBEARBOY
-	#define RAND_SEED_IN A4
-	#define RAND_SEED_IN_PORT PORTF
-	#define RAND_SEED_IN_BIT PORTF1
-	// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
-	#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(REFS1) | _BV(MUX0))
-	#else
-	#define RAND_SEED_PIN 4 // A2 port_0_4
-	#define GPIO_RAND_SEED 0
-	#define ADCCHAN_RAND_SEED 0
+	#ifdef ECONSOLE // A2=ADC2=PC2=D16; для SLIMBOY есть ошибка - там PORTF, хотя его нет в Atmega328p
+		#define RAND_SEED_IN A2
+		#define RAND_SEED_IN_PORT PORTC
+		#define RAND_SEED_IN_BIT PORTC2
+		
+		//#define RAND_START_IN_ADMUX ( _BV(MUX3) | _BV(MUX2) | _BV(MUX1) | _BV(MUX0) ) // ADC:b_1111=AC_0v; 0000 1111  REF: 0000->AREF pin ;	REFS1=0, REFS0=0, ADLAR=0, MUX4=0, MUX3=1, MUX2=1, MUX1=1, MUX0=1;
+		//define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(MUX1) ) // ADC:b_0010=AC2; 0100 0010 REF: 0100->Vcc with external capacitor at AREF pin; ; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=1, MUX0=0;
+		#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1)  )
+		#define RAND_START_IN_ADMUX (_BV(REFS1) | _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1)  )
+		#define REF_BACK_IN_ADMUX (_BV(REFS0) | _BV(MUX1) )
+		
+		#define XAXIS_IN_ADMUX (_BV(REFS0) ) // ADC:b_0000=AC0; 0100 0001 REF: 0100-> Vcc with external capacitor at AREF pin;  REFS1=1, REFS0=1, ADLAR=0, MUX4=0, MUX3=1, MUX2=1, MUX1=1, MUX0=0;
+		#define YAXIS_IN_ADMUX (_BV(REFS0) | _BV(MUX0) ) // ADC:b_0001=AC1; 0100 0001 REF: 0100-> Vcc with external capacitor at AREF pin; REFS1=1, REFS0=1, ADLAR=0, MUX4=0, MUX3=1, MUX2=1, MUX1=1, MUX0=0;
+		 
+	#elif defined (ELBEARBOY) // MIK32: A2=ADC2=port_0_4
+		#define PIN_RANDOM 4 // ADC3 port_0_4
+		#define CHAN_RANDOM 3 // ADC3 port_0_4
+		//define CNAN_ADCINIT_NANO 3 // канал инициализации ACE-NANO?
+	#else // ATmega32U4: A4=ADC1=PORTF1
+		#define RAND_SEED_IN A4
+		#define RAND_SEED_IN_PORT PORTF
+		#define RAND_SEED_IN_BIT PORTF1
+		// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
+		#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(REFS1) | _BV(MUX0))
 	#endif
 #else
-#define RAND_SEED_IN A5
-#define RAND_SEED_IN_PORT PORTF
-#define RAND_SEED_IN_BIT PORTF0
-// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
-#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(REFS1))
+	#define RAND_SEED_IN A5
+	#define RAND_SEED_IN_PORT PORTF
+	#define RAND_SEED_IN_BIT PORTF0
+	// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
+	#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(REFS1))
 #endif
 
 // SPI interface
