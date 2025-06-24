@@ -703,16 +703,15 @@
 		#define RAND_SEED_IN_PORT PORTC
 		#define RAND_SEED_IN_BIT PORTC2
 		
-		//#define RAND_START_IN_ADMUX ( _BV(MUX3) | _BV(MUX2) | _BV(MUX1) | _BV(MUX0) ) // ADC:b_1111=AC_0v; 0000 1111  REF: 0000->AREF pin ;	REFS1=0, REFS0=0, ADLAR=0, MUX4=0, MUX3=1, MUX2=1, MUX1=1, MUX0=1;
-		//define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(MUX1) ) // ADC:b_0010=AC2; 0100 0010 REF: 0100->Vcc with external capacitor at AREF pin; ; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=1, MUX0=0;
-		#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1)  )
-		#define RAND_START_IN_ADMUX (_BV(REFS1) | _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1)  )
-		#define REF_BACK_IN_ADMUX (_BV(REFS0) | _BV(MUX1) )
+
+		#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1)  ) // ADC:b_1110=1.1V; "0100 1110"; REF: 0100-> Vcc with external capacitor at AREF pin;  REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=1, MUX2=1, MUX1=1, MUX0=0;
+		#define RAND_START_IN_ADMUX (_BV(REFS1) | _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1)  ) // ADC:b_1110=1.1V; "1100 1110"; REF: 1100-> Internal 1.1V voltage reference with external capacitor at AREF pin;  REFS1=1, REFS0=1, ADLAR=0, MUX4=0, MUX3=1, MUX2=1, MUX1=1, MUX0=0;
+		#define REF_BACK_IN_ADMUX (_BV(REFS0) | _BV(MUX1) ) // ADC:b_0010=AC2; "0100 0010"; REF: 0100-> Vcc with external capacitor at AREF pin;  REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=1, MUX0=0;
 		
-		#define XAXIS_IN_ADMUX (_BV(REFS0) ) // ADC:b_0000=AC0; 0100 0001 REF: 0100-> Vcc with external capacitor at AREF pin;  REFS1=1, REFS0=1, ADLAR=0, MUX4=0, MUX3=1, MUX2=1, MUX1=1, MUX0=0;
-		#define YAXIS_IN_ADMUX (_BV(REFS0) | _BV(MUX0) ) // ADC:b_0001=AC1; 0100 0001 REF: 0100-> Vcc with external capacitor at AREF pin; REFS1=1, REFS0=1, ADLAR=0, MUX4=0, MUX3=1, MUX2=1, MUX1=1, MUX0=0;
+		#define XAXIS_IN_ADMUX (_BV(REFS0) ) // ADC:b_0000=AC0; "0100 0000"; REF: 0100-> Vcc with external capacitor at AREF pin;  REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=0;
+		#define YAXIS_IN_ADMUX (_BV(REFS0) | _BV(MUX0) ) // ADC:b_0001=AC1; "0100 0001"; REF: 0100-> Vcc with external capacitor at AREF pin; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=1;
 		 
-	#elif defined (ELBEARBOY) // MIK32: A2=ADC2=port_0_4
+	#elif defined (ELBEARBOY) // MIK32: A2=ADC3=port_0_4
 		#define PIN_RANDOM 4 // ADC3 port_0_4
 		#define CHAN_RANDOM 3 // ADC3 port_0_4
 		//define CNAN_ADCINIT_NANO 3 // канал инициализации ACE-NANO?

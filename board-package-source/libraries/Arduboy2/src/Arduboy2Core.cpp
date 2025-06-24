@@ -222,7 +222,7 @@ void Arduboy2Core::bootPins()
 #ifdef ECONSOLE
   	DDRC &= ~(_BV(RAND_SEED_IN_BIT)); // as input; это можно не добавлять. значение по-умолчанию "0"
 	PORTC &= ~(_BV(RAND_SEED_IN_BIT)); // without pullup; это можно не добавлять. значение по-умолчанию "0"
-	//PORTC |= (_BV(RAND_SEED_IN_BIT)); // 
+	//PORTC |= (_BV(RAND_SEED_IN_BIT)); // подтяжка изменяет измеряемое значение, но не увеличивает разборс
   #ifndef  JOYSTICKANALOG
 	// Port  INPUT_PULLUP
 	PORTD |= _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) |
@@ -287,7 +287,7 @@ void Arduboy2Core::bootPins()
 	GPIO_0->DIRECTION_IN = 1 << PIN_RANDOM; // 
 
 	//PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к +
-	PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к gnd
+	PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к gnd. Нужна для ACE-NANO, у которой без подтяжки не "шумят" аналоговые каналы A0-A2 
 	#ifdef  JOYSTICKANALOG
 		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A0=1.5
 		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
@@ -1714,19 +1714,20 @@ unsigned long Arduboy2Core::generateRandomSeed()
 	  // ожидаем окончания счета
 	  while ((ADCSRA >> ADSC) & 1);
 
-
+		// измеряем внутренний аналоговый канал 1.1В на основе внутреннего опорного 1.1В
 	  ADMUX = RAND_START_IN_ADMUX;
 	  ADCSRA |= _BV(ADSC); // 
 	  while ((ADCSRA >> ADSC) & 1);   // wait for conversion complete
 
+		// переключаем опорное напряжение на внутренний источник 5В. Канал A2. Считается что переключение опорного напряжения вызывает большие погрешности при первых расчетах
 	  ADMUX = REF_BACK_IN_ADMUX;
 	  ADCSRA |= _BV(ADSC); 
 	  while ((ADCSRA >> ADSC) & 1);  // wait for conversion complete
 		seed = ((unsigned long)ADC << 16) + micros();
 	
 	  
-	#else
-
+	#else // стандартный расчет на основе RAND_SEED_IN_ADMUX
+		
 	  power_adc_enable(); // ADC on
 
 	  // do an ADC read from an unconnected input pin
