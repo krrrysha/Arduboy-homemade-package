@@ -55,7 +55,7 @@ void Arduboy2Audio::saveOnOff()
 #ifndef ELBEARBOY
   EEPROM.update(Arduboy2Base::eepromAudioOnOff, audio_enabled);
 #else
-	Arduboy2Core::update_eeprom_1st_page_word(Arduboy2Base::eepromAudioOnOff, audio_enabled);
+	Arduboy2Core::update_eeprom_1st_page_byte(Arduboy2Base::eepromAudioOnOff, audio_enabled);
 #endif
 }
 
