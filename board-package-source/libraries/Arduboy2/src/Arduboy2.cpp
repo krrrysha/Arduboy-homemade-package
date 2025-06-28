@@ -130,7 +130,7 @@ void Arduboy2Base::sysCtrlSound(uint8_t buttons, uint8_t led, uint8_t eeVal)
 #ifndef ELBEARBOY
     eeprom_update_byte((uint8_t*)eepromAudioOnOff, eeVal);
 #else
-    update_eeprom_1st_page_word(eepromAudioOnOff, eeVal);
+    update_eeprom_1st_page_byte(eepromAudioOnOff, eeVal);
 #endif
     delayShort(500);
     digitalWriteRGB(led, RGB_OFF); // turn off "acknowledge" LED
@@ -1164,8 +1164,8 @@ uint16_t Arduboy2Base::readUnitID()
   return eeprom_read_byte((uint8_t*)eepromUnitID) |
          (((uint16_t)(eeprom_read_byte((uint8_t*)(eepromUnitID + 1)))) << 8);
 #else	
-  return read_eeprom_word(eepromUnitID) |
-         (((uint16_t)(read_eeprom_word((eepromUnitID + 1)))) << 8);
+  return read_eeprom_byte(eepromUnitID) |
+         (((uint16_t)(read_eeprom_byte((eepromUnitID + 1)))) << 8);
 
 #endif	
 }
@@ -1176,8 +1176,8 @@ void Arduboy2Base::writeUnitID(uint16_t id)
   eeprom_update_byte((uint8_t*)eepromUnitID, (uint8_t)(id & 0xff));
   eeprom_update_byte((uint8_t*)eepromUnitID + 1, (uint8_t)(id >> 8));
 #else  
-  update_eeprom_1st_page_word(eepromUnitID, (uint8_t)(id & 0xff));
-  update_eeprom_1st_page_word(eepromUnitID + 1, (uint8_t)(id >> 8));
+  update_eeprom_1st_page_byte(eepromUnitID, (uint8_t)(id & 0xff));
+  update_eeprom_1st_page_byte(eepromUnitID + 1, (uint8_t)(id >> 8));
 #endif
 }
 
@@ -1195,7 +1195,7 @@ uint8_t Arduboy2Base::readUnitName(char* name)
 #ifndef ELBEARBOY
     val = eeprom_read_byte(src);
 #else
-	val = read_eeprom_word(src);
+	val = read_eeprom_byte(src);
 #endif		
     name[dest] = val;
     src++;
@@ -1236,7 +1236,7 @@ bool Arduboy2Base::readShowBootLogoFlag()
 #ifndef ELBEARBOY
   return (eeprom_read_byte((uint8_t*)eepromSysFlags) & sysFlagShowLogoMask);
 #else
-  return (read_eeprom_word(eepromSysFlags) & sysFlagShowLogoMask);
+  return (read_eeprom_byte(eepromSysFlags) & sysFlagShowLogoMask);
 #endif
 }
 
@@ -1247,9 +1247,11 @@ void Arduboy2Base::writeShowBootLogoFlag(bool val)
   bitWrite(flags, sysFlagShowLogoBit, val);
   eeprom_update_byte((uint8_t*)eepromSysFlags, flags);
 #else
-  uint8_t flags = read_eeprom_word(eepromSysFlags);
+  uint8_t flags = read_eeprom_byte(eepromSysFlags);
   bitWrite(flags, sysFlagShowLogoBit, val);
-  update_eeprom_1st_page_word(eepromSysFlags, flags);
+  update_eeprom_1st_page_byte(eepromSysFlags, flags);
+  
+  
 #endif	
 }
 
@@ -1258,7 +1260,7 @@ bool Arduboy2Base::readShowUnitNameFlag()
 #ifndef ELBEARBOY
   return (eeprom_read_byte((uint8_t*)eepromSysFlags) & sysFlagUnameMask);
 #else
-  return (read_eeprom_word(eepromSysFlags) & sysFlagUnameMask);
+  return (read_eeprom_byte(eepromSysFlags) & sysFlagUnameMask);
 #endif	
 }
 
@@ -1269,9 +1271,10 @@ void Arduboy2Base::writeShowUnitNameFlag(bool val)
   bitWrite(flags, sysFlagUnameBit, val);
   eeprom_update_byte((uint8_t*)eepromSysFlags, flags);
 #else
-  uint8_t flags = read_eeprom_word(eepromSysFlags);
+  uint8_t flags = read_eeprom_byte(eepromSysFlags);
   bitWrite(flags, sysFlagUnameBit, val);
-  update_eeprom_1st_page_word(eepromSysFlags, flags);
+  update_eeprom_1st_page_byte(eepromSysFlags, flags);  
+  
 #endif	
 }
 
@@ -1280,7 +1283,7 @@ bool Arduboy2Base::readShowBootLogoLEDsFlag()
 #ifndef ELBEARBOY
   return (eeprom_read_byte((uint8_t*)eepromSysFlags) & sysFlagShowLogoLEDsMask);
 #else
-  return (read_eeprom_word(eepromSysFlags) & sysFlagShowLogoLEDsMask);	
+  return (read_eeprom_byte(eepromSysFlags) & sysFlagShowLogoLEDsMask);
 #endif
 }
 
@@ -1291,9 +1294,9 @@ void Arduboy2Base::writeShowBootLogoLEDsFlag(bool val)
   bitWrite(flags, sysFlagShowLogoLEDsBit, val);
   eeprom_update_byte((uint8_t*)eepromSysFlags, flags);
 #else
-  uint8_t flags = read_eeprom_word(eepromSysFlags);
+  uint8_t flags = read_eeprom_byte(eepromSysFlags);
   bitWrite(flags, sysFlagShowLogoLEDsBit, val);
-  update_eeprom_1st_page_word(eepromSysFlags, flags);
+  update_eeprom_1st_page_byte(eepromSysFlags, flags);  
 #endif
 }
 
@@ -1458,7 +1461,7 @@ void Arduboy2::bootLogoExtra()
       c = eeprom_read_byte(++i);
     }
 #else
-  c = read_eeprom_word(eepromUnitName);
+  c = read_eeprom_byte(eepromUnitName);
   if (c != 0xFF && c != 0x00)
   {
     int i = eepromUnitName;
@@ -1467,7 +1470,7 @@ void Arduboy2::bootLogoExtra()
     do
     {
       write(c);
-      c = read_eeprom_word(++i);
+      c = read_eeprom_byte(++i);
     }
 #endif
     while ((uint16_t)i < eepromUnitName + ARDUBOY_UNIT_NAME_LEN);

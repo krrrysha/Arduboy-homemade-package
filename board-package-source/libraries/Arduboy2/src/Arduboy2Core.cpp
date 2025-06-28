@@ -1801,42 +1801,65 @@ void inline Arduboy2Core::Delay_us (uint32_t us) //Функция задержк
    
 }
 */
-
-uint32_t Arduboy2Core::read_eeprom_word(uint8_t idx) {
-      EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + idx)<<2;
-      //uint32_t a32=EEPROM_REGS->EEDAT;
-      //uint8_t a = (uint8_t)a32;
-  return EEPROM_REGS->EEDAT;
+#define myEEPROM_TIMEOUT 100000 
+uint8_t Arduboy2Core::read_eeprom_byte(uint16_t idx) {
+	if (idx >= 1024) {
+		return 0x00;
+	}
+	// выбираем слово
+    uint8_t word_idx = idx >> 2; // делим на 4
+    EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + word_idx)<<2;
+	// ожидаем готовность
+	uint32_t timeout=myEEPROM_TIMEOUT;
+	while (timeout-- && (EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M));
+	// читаем
+	uint32_t word_data = EEPROM_REGS->EEDAT;
+	// выбираем байт
+	uint8_t byte_offset = idx % 4;
+	// меняем порядок байт в слове
+	uint32_t word_order= ((word_data & 0xFF)<<24) | ((word_data & (0xFF<<8))<<8) | ((word_data & (0xFF<<16))>>8) | ((word_data & (0xFF<<24))>>24);
+	return (word_order >> (byte_offset * 8)) & 0xFF;
 }
-
-void Arduboy2Core::update_eeprom_1st_page_word(uint8_t idx, uint32_t val){
-  if (idx<32) {
-      uint32_t timeout=100000;
-      EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + idx)<<2;
+void Arduboy2Core::update_eeprom_1st_page_byte(uint16_t idx, uint8_t val){
+  if (idx<128) {
+	// выбираем слово
+    uint8_t word_idx = idx >> 2;  // делим на 4
+    EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + word_idx)<<2;
+	// ожидаем готовность
+	uint32_t timeout=myEEPROM_TIMEOUT;
+	while (timeout-- && (EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M));
+	// читаем существующее слово в обратном порядке
+	uint32_t exist_order= EEPROM_REGS->EEDAT;
+	//выбираем байт
+	uint8_t byte_offset = idx % 4;
+	// прямой порядок существующего слова
+	uint32_t exist_val= ((exist_order & 0xFF)<<24) | ((exist_order & (0xFF<<8))<<8) | ((exist_order & (0xFF<<16))>>8) | ((exist_order & (0xFF<<24))>>24);
+	// добавляем наш байт в прямой порядок
+	uint32_t word_data=exist_val & (~(0xFF << (byte_offset*8))) |  ((uint32_t)val << (byte_offset * 8));
+	// делаем обратный порядок измененного слова
+	uint32_t word_order=((word_data & 0xFF)<<24) | ((word_data & (0xFF<<8))<<8) | ((word_data & (0xFF<<16))>>8) | ((word_data & (0xFF<<24))>>24);
+		 
       //uint32_t a32=EEPROM_REGS->EEDAT;
       //uint8_t a = (uint8_t)a32;
-      uint32_t exist_val= EEPROM_REGS->EEDAT;
-      if (exist_val != val) {
+
+      if (exist_order != word_order) {
         //erase
-        EEPROM_REGS->EECON |= EEPROM_EECON_BWE_M;
-        EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + idx)<<2;
-        EEPROM_REGS->EEDAT= exist_val;
+        
+		EEPROM_REGS->EECON |= EEPROM_EECON_BWE_M;
+		// При заполнении буфера записи адрес слова внутри буфера определяется разрядами EEA[6:2]
+        EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + word_idx)<<2;
+        EEPROM_REGS->EEDAT= exist_order;
         EEPROM_REGS->EECON |= EEPROM_EECON_OP(EEPROM_EECON_OP_ER) | EEPROM_EECON_EX_M;
-        while (timeout)
-        {
-          timeout--;
-          if (!(EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M)) { break;}
-        }
+		timeout=myEEPROM_TIMEOUT;		
+		while (timeout-- && (EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M));
         //update
+
         EEPROM_REGS->EECON |= EEPROM_EECON_BWE_M;
-        EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + idx)<<2;
-        EEPROM_REGS->EEDAT= val;
+        EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + word_idx)<<2;
+        EEPROM_REGS->EEDAT= word_order;
         EEPROM_REGS->EECON |= EEPROM_EECON_OP(EEPROM_EECON_OP_PR) | EEPROM_EECON_EX_M;
-        while (timeout)
-        {
-          timeout--;
-          if (!(EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M)) { break;}
-        }
+		timeout=myEEPROM_TIMEOUT;
+		while (timeout-- && (EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M));
       }
   } 
 }

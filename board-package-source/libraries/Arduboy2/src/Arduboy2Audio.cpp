@@ -64,7 +64,7 @@ void Arduboy2Audio::begin()
 #ifndef ELBEARBOY
   if (EEPROM.read(Arduboy2Base::eepromAudioOnOff))
 #else
-  if (Arduboy2Core::read_eeprom_word(Arduboy2Base::eepromAudioOnOff))
+  if (Arduboy2Core::read_eeprom_byte(Arduboy2Base::eepromAudioOnOff))
 #endif
     on();
   else
