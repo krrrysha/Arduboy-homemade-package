@@ -1225,7 +1225,7 @@ void Arduboy2Base::writeUnitName(const char* name)
 #ifndef ELBEARBOY
     eeprom_update_byte(dest, done ? 0x00 : name[src]);
 #else
-	 update_eeprom_1st_page_word(dest, done ? 0x00 : name[src]);
+	 update_eeprom_1st_page_byte(dest, done ? 0x00 : name[src]);
 #endif	
     dest++;
   }
