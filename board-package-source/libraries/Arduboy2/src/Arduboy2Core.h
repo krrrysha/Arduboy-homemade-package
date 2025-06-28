@@ -1525,13 +1525,14 @@ class Arduboy2Core : public Arduboy2NoUSB
 	static	uint8_t chan_converted;
 	static	uint8_t chan_selected;
 	
-	
-	/* read 256 eeprom words (32bit) from number 1792 to 2047
+
+	/* read 256 eerprom bytes from number 1792 to 2047
 	*/
-	static uint32_t read_eeprom_word(uint8_t idx);
-	/* update 32 (one page) eeprom words (32bit) from number 1792 to 1823
+	static uint8_t read_eeprom_byte(uint16_t idx);
+	/* update 32 (one page) eerprom bytes from number 1792 to 1823
 	*/
-	static void update_eeprom_1st_page_word(uint8_t idx, uint32_t val);
+	static void update_eeprom_1st_page_byte(uint16_t idx, uint8_t val);
+
 	
 	#endif
 	#if defined (JOYSTICKANALOG)
