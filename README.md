@@ -262,6 +262,8 @@ BSP для MIK32 от ELRON позволяет использовать прог
 
 (представленные ниже аппаратные платформы, кроме Arduino UNO/NANO, не проверялись на совместимость после внесения изменений)
 
+### (Old readme version)
+
 Project forked from MrBlinky/Arduboy-homemade-package
 This fork is for an Arduino clone based on an Arduino Nano with different button mappings.
 It also uses approaches adopted in the Slimboy project, but unlike it, it uses more modern screen handling procedures (including i2c_sendByte)
