@@ -268,12 +268,20 @@ void Arduboy2Core::bootPins()
 	// SDA and SCL as inputs without pullups
 	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SDA)); // Обнуление вывода 12 порта 1 (в режим GPIO)
 	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SCL)); // Обнуление вывода 13 порта 1 (в режим GPIO)
+
+	// принудительное соединение A7 и PORT_0_9
+	GPIO_1->SET =  (1 << SELA_A_PIN);	// установка SELA_A_PIN в 1
+	GPIO_1->SET =  (1 << SELA_B_PIN);	// установка SELA_B_PIN в 1
+
+
 	//PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SDA)); // Обнуление. Отключается подтяжка при работе в режиме выхода
 	//PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SCL)); // Обнуление. Отключается подтяжка при работе в режиме выхода
 	//PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SDA)); // Обнуление.
 	//PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SCL)); // Обнуление
-	PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SDA)); // Нагрузочная способность 8 мА
-	PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SCL)); // Нагрузочная способность 8 мА
+
+	//PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SDA)); // Нагрузочная способность 8 мА
+	//PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SCL)); // Нагрузочная способность 8 мА
+
 	i2c_stop();
 	// инициализация EEPROM. Пользовательские данные Arduino содержатся с EEPROM_START_ADDR=0x1C00 до EEPROM_END=0x1FFF
 	#define EEPROM_START_word_ADDR 0x700

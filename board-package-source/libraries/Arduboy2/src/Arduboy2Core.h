@@ -156,7 +156,10 @@
 			#define I2C_PORT  GPIO_1->STATE
 			#define I2C_SCL 13 // D19  PORT 1.13
 			#define I2C_SDA 12 // D18  PORT 1.12 
-					
+			
+			#define SELA_A_PIN    15 // ANAMUX: SELA_A PORT 1.15
+			#define SELA_B_PIN    11 // ANAMUX: SELA_B PORT 1.11
+
 			//port states
 			// INIT I2C as serial: PAD_CONFIG->PORT_1_CFG |= (0b01 << (2 * I2C_SCL));
 			//						PAD_CONFIG->PORT_1_CFG |= (0b01 << (2 * I2C_SDA));
