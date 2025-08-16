@@ -2,7 +2,7 @@
 
 This is a programm converted to work using Arduboy libraries and integer calculations (on AVR it is possible without them, but on MIK32 Amur it works slowly with float)
 
- [ Game in Ardens emulator ] ( https://tiberiusbrown.github.io/Ardens/player.html?blah=https://github.com/krrrysha/Arduboy-homemade-package/raw/refs/heads/testing/games/doom-nano_mik32_328p/doom-nano.ino.hex&g=none&z=1&p=0&palette=highcontrast)
+ [ Play in Ardens emulator ] ( https://tiberiusbrown.github.io/Ardens/player.html?blah=https://github.com/krrrysha/Arduboy-homemade-package/raw/refs/heads/testing/games/doom-nano_mik32_328p/doom-nano.ino.hex&g=none&z=1&p=0&palette=highcontrast)
  
 
 
