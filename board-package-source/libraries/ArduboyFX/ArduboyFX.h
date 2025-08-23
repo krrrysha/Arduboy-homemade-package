@@ -4,6 +4,32 @@
 #ifdef MCU_MIK32_Amur
 	#define ELBEARBOY
 	#warning ELBEARBOY!
+// режимы работы
+// 	чтение ответа ограниченной длины:
+// SFC_JEDEC_ID          = 0x9F; // только опкод | 3 байта ответа
+// SFC_READSTATUS1       = 0x05; // только опкод | 1 байт ответа
+//	чтение до получения новой команды:
+// SFC_READ              = 0x03; // команда + 3 байта адреса + dummy?| 1 байт ответа
+// 	опкод без ответа:
+// SFC_WRITE_ENABLE      = 0x06; // только опкод | нет ответа
+// SFC_POWERDOWN         = 0xB9; // только опкод | нет ответа
+// 	опкод + 3 байта адреса. без ответа
+// SFC_WRITE             = 0x02; // команда + 3 байта адреса | нет ответа
+// SFC_ERASE             = 0x20; // команда + 3 байта адреса | нет ответа
+
+#include "spifi.h"
+
+
+//struct my_SPDR
+//    {
+//      volatile uint8_t INPUT;         	// входной байт регистра
+//      volatile uint8_t OUTPUT;         	// выходной байт регистра	  
+//      volatile uint8_t OPCODE;         	// код текущей команды SPDS
+//      volatile uint32_t ADDR;         	// полный адрес 
+//      volatile uint8_t CS_FLASH_DISABLE;         	    // сигнал  chip select, актуален при совместной работе с экраном??
+//     volatile uint8_t SPIF_TRANSFER_COMPLETE;           // передача завершена. Используется только в disable и writeByte (и вероятно в displayPrefetch). Исключено
+ //   };
+
 #endif
 
 // For uint8_t, uint16_t
@@ -39,16 +65,19 @@ constexpr uint16_t FX_SAVE_VECTOR_KEY_POINTER  = 0x0018; /* reserved interrupt v
 constexpr uint16_t FX_SAVE_VECTOR_PAGE_POINTER = 0x001A;
 
 // Serial Flash Commands
-constexpr uint8_t SFC_JEDEC_ID          = 0x9F;
-constexpr uint8_t SFC_READSTATUS1       = 0x05;
-constexpr uint8_t SFC_READSTATUS2       = 0x35;
-constexpr uint8_t SFC_READSTATUS3       = 0x15;
-constexpr uint8_t SFC_READ              = 0x03;
-constexpr uint8_t SFC_WRITE_ENABLE      = 0x06;
-constexpr uint8_t SFC_WRITE             = 0x02;
-constexpr uint8_t SFC_ERASE             = 0x20;
-constexpr uint8_t SFC_RELEASE_POWERDOWN = 0xAB;
-constexpr uint8_t SFC_POWERDOWN         = 0xB9;
+constexpr uint8_t SFC_JEDEC_ID          = 0x9F; // только команда | 3 байта ответа
+constexpr uint8_t SFC_READSTATUS1       = 0x05; // только команда | 1 байт ответа
+
+constexpr uint8_t SFC_READ              = 0x03; // команда + 3 байта адреса + dummy?| 1 байт ответа
+
+constexpr uint8_t SFC_WRITE_ENABLE      = 0x06; // только команда | нет ответа
+constexpr uint8_t SFC_WRITE             = 0x02; // команда + 3 байта адреса | нет ответа
+constexpr uint8_t SFC_ERASE             = 0x20; // команда + 3 байта адреса | нет ответа
+constexpr uint8_t SFC_POWERDOWN         = 0xB9; // только команда | нет ответа
+
+constexpr uint8_t SFC_READSTATUS2       = 0x35; //		не используется
+constexpr uint8_t SFC_READSTATUS3       = 0x15; //		не используется
+constexpr uint8_t SFC_RELEASE_POWERDOWN = 0xAB; //		не используется
 
 // drawbitmap bit flags (used by modes below and internally)
 constexpr uint8_t dbfWhiteBlack   = 0; // bitmap is used as mask
@@ -128,8 +157,13 @@ constexpr uint8_t dcmProportional = (1 << dcfProportional); // draw characters w
 
 // Note above modes may be combined like (dcmMasked | dcmProportional)
 
-
+#ifndef ELBEARBOY
 using uint24_t = __uint24;
+#else
+#undef uint24_t
+typedef uint32_t __uint24;
+using uint24_t = uint32_t;
+#endif
 
 struct JedecID
 {
@@ -178,6 +212,65 @@ struct FrameData
 };
 
 
+#ifdef ELBEARBOY
+		#define SPIFI_FIELDFORM_ALL_PARALLEL SPIFI_CONFIG_CMD_FIELDFORM_ALL_PARALLEL
+		#define SPIFI_FRAMEFORM_OPCODE SPIFI_CONFIG_CMD_FRAMEFORM_OPCODE_NOADDR
+		#define SPIFI_FRAMEFORM_3ADDR SPIFI_CONFIG_CMD_FRAMEFORM_NOOPCODE_3ADDR
+		#define SPIFI_FRAMEFORM_OPCODE_3ADDR SPIFI_CONFIG_CMD_FRAMEFORM_OPCODE_3ADDR
+
+
+		#define     SPIFI_DIRECTION_INPUT   SPIFI_CONFIG_CMD_DOUT_M ^ (1 << SPIFI_CONFIG_CMD_DOUT_S)
+		#define    SPIFI_DIRECTION_OUTPUT   SPIFI_CONFIG_CMD_DOUT_M
+
+
+		#define HAL_SPIFI_TIMEOUT 100000
+
+
+		constexpr uint32_t cmd_erase_4k_qpi =
+			SPIFI_DIRECTION_INPUT |
+			SPIFI_CONFIG_CMD_INTLEN(0) |
+			SPIFI_CONFIG_CMD_FIELDFORM(SPIFI_FIELDFORM_ALL_PARALLEL) |
+			SPIFI_CONFIG_CMD_FRAMEFORM(SPIFI_FRAMEFORM_OPCODE_3ADDR) |
+			SPIFI_CONFIG_CMD_OPCODE(0x20);
+
+		constexpr uint32_t cmd_write_bytes_qpi =
+			SPIFI_DIRECTION_OUTPUT |
+			SPIFI_CONFIG_CMD_INTLEN(0) |
+			SPIFI_CONFIG_CMD_FIELDFORM(SPIFI_FIELDFORM_ALL_PARALLEL) |
+			SPIFI_CONFIG_CMD_FRAMEFORM(SPIFI_FRAMEFORM_OPCODE_3ADDR) |
+			SPIFI_CONFIG_CMD_OPCODE(0x02);
+
+		constexpr uint32_t cmd_chip_read_xip_deinit =
+				SPIFI_DIRECTION_INPUT |
+				SPIFI_CONFIG_CMD_INTLEN(1) |
+				SPIFI_CONFIG_CMD_FIELDFORM(SPIFI_FIELDFORM_ALL_PARALLEL) |
+				SPIFI_CONFIG_CMD_FRAMEFORM(SPIFI_FRAMEFORM_3ADDR) |
+				SPIFI_CONFIG_CMD_OPCODE(0xEB);
+
+		constexpr uint32_t cmd_chip_read_qpi_xip_init =
+				SPIFI_DIRECTION_INPUT |
+				SPIFI_CONFIG_CMD_INTLEN(1) |
+				SPIFI_CONFIG_CMD_FIELDFORM(SPIFI_FIELDFORM_ALL_PARALLEL) |
+				SPIFI_CONFIG_CMD_FRAMEFORM(SPIFI_FRAMEFORM_OPCODE_3ADDR) |
+				SPIFI_CONFIG_CMD_OPCODE(0xEB);
+
+		constexpr uint32_t cmd_write_qpi_enable =
+			SPIFI_DIRECTION_INPUT |
+			SPIFI_CONFIG_CMD_INTLEN(0) |
+			SPIFI_CONFIG_CMD_FIELDFORM(SPIFI_FIELDFORM_ALL_PARALLEL) |
+			SPIFI_CONFIG_CMD_FRAMEFORM(SPIFI_FRAMEFORM_OPCODE) |
+			SPIFI_CONFIG_CMD_OPCODE(0x06);
+
+
+		constexpr uint32_t cmd_read_qpi_sreg1 =
+			SPIFI_DIRECTION_INPUT |
+			SPIFI_CONFIG_CMD_INTLEN(0) |
+			SPIFI_CONFIG_CMD_FIELDFORM(SPIFI_FIELDFORM_ALL_PARALLEL) |
+			SPIFI_CONFIG_CMD_FRAMEFORM(SPIFI_FRAMEFORM_OPCODE) |
+			SPIFI_CONFIG_CMD_OPCODE(SFC_READSTATUS1);    
+#endif
+
+
 class FX
 {
   public:
@@ -205,13 +298,15 @@ class FX
 #endif
     };
 
+
     [[gnu::always_inline]]
     static inline void disable() // deselects external flash memory and ends the last command
     {
 #ifndef ELBEARBOY
       FX_PORT  |=  (1 << FX_BIT);
-#endif
+#endif	  
     };
+
 
     [[gnu::always_inline]]
     static inline void wait() // wait for a pending flash transfer to complete
@@ -219,7 +314,7 @@ class FX
 #ifndef ELBEARBOY 
       while ((SPSR & (1 << SPIF)) == 0);
 #else
-	// возможно здесь потребуется реализовать какое-то ожидание?
+	// возможно здесь потребуется реализовать какое-то ожидание? 
 #endif
     }
 
@@ -233,9 +328,7 @@ class FX
       asm volatile("nop\n");
       wait();
 #else
-	  // ?????????????????????????
-	  asm volatile ("ADDI x0, x0, 0\n");
-	  wait();
+ // не используется
 #endif
     }
 
@@ -246,8 +339,7 @@ class FX
       wait();
       SPDR = data;
 #else
-	 wait();
-	 // ?????????????????????????
+ // не используется
 #endif
     }
 
@@ -280,10 +372,17 @@ class FX
     static void wakeUp(); // Wake up flash memory from power down mode
 
     static void sleep(); // Put flash memory in power down mode for low power
-
+#ifndef ELBEARBOY
     static void writeEnable();// Puts flash memory in write mode, required prior to any write command
+#else
+	__attribute__((section(".ram_text"))) static void writeEnable();
+#endif
 
-    [[gnu::noinline, gnu::naked]]
+    #ifndef ELBEARBOY
+		[[gnu::noinline, gnu::naked]]
+	#else
+		[[gnu::noinline]
+	#endif
     static void seekCommand(uint8_t command, uint24_t address);// Write command and selects flash memory address. Required by any read or write command
 
     /// @brief selects flash address of program data for reading and starts the first read
@@ -325,7 +424,11 @@ class FX
       seekData(address + ((index * sizeof(Type)) + offset));
     }
 
-    [[gnu::noinline, gnu::naked]]
+    #ifndef ELBEARBOY
+		[[gnu::noinline, gnu::naked]]
+	#else
+		[[gnu::noinline]
+	#endif	
     static void seekDataArray(uint24_t address, uint8_t index, uint8_t offset, uint8_t elementSize);
 
     [[gnu::noinline]]
@@ -333,18 +436,31 @@ class FX
 
     [[gnu::always_inline]]
     static inline uint8_t readUnsafe() // read flash data without performing any checks and starts the next read.
-    {
-      uint8_t result = SPDR;
-      SPDR = 0;
-      return result;
-    };
+		{
+      #ifndef ELBEARBOY
+		  uint8_t result = SPDR;
+		  SPDR = 0;
+		  return result;
+	  #else
+		uint8_t result=*(uint8_t*)(my_SPDR_ADDR++); //volatile не используем, считаем, что память не может измениться извне
+		//Serial.print(my_SPDR_ADDR,HEX);Serial.print(":");Serial.println(result,HEX);
+		return result;
+	  #endif		  
+		};
 
+	  
     [[gnu::always_inline]]
     static inline uint8_t readUnsafeEnd()
     {
-      uint8_t result = SPDR;
-      disable();
-      return result;
+      #ifndef ELBEARBOY
+	  uint8_t result = SPDR;
+	  disable();
+      return result;	  
+      #else
+		uint8_t result=*(uint8_t*)(my_SPDR_ADDR); //volatile не используем, считаем, что память не может измениться извне
+		//my_SPDR.CS_FLASH_DISABLE=1
+		return result;
+	  #endif
     };
 
     [[gnu::noinline]]
@@ -356,10 +472,18 @@ class FX
     [[gnu::noinline]]
     static uint8_t readPendingLastUInt8();
 
-    [[gnu::noinline, gnu::naked]]
+    #ifndef ELBEARBOY
+		[[gnu::noinline, gnu::naked]]
+	#else
+		[[gnu::noinline]
+	#endif
     static uint16_t readPendingUInt16(); //read a partly prefetched 16-bit word from the current flash location
 
-    [[gnu::noinline, gnu::naked]]
+    #ifndef ELBEARBOY
+		[[gnu::noinline, gnu::naked]]
+	#else
+		[[gnu::noinline]
+	#endif
     static uint16_t readPendingLastUInt16(); //read a partly prefetched 16-bit word from the current flash location
 
     static uint24_t readPendingUInt24() ; //read a partly prefetched 24-bit word from the current flash location
@@ -452,20 +576,34 @@ class FX
     /// * _[trivially copyable](https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable)_
     /// * a _[standard-layout](https://en.cppreference.com/w/cpp/language/data_members#Standard-layout)_ type
     /// Attempting to read an object that does not meet these restrictions will result in _undefined behaviour_.
-    template<typename Type>
+#ifndef ELBEARBOY 
+ template<typename Type>
+
     static void saveGameState(const Type & object)
     {
       saveGameState(reinterpret_cast<const uint8_t *>(&object), sizeof(object));
     }
 
     [[gnu::noinline]]
-    static void saveGameState(const uint8_t* gameState, size_t size); // Saves GameState in RAM to programes exclusive 4K save data block.
+    static void saveGameState(uint8_t* gameState, size_t size); // Saves GameState in RAM to programes exclusive 4K save data block.
 
     static void eraseSaveBlock(uint16_t page); // erases 4K flash block
 
     static void writeSavePage(uint16_t page, uint8_t* buffer);
 
     static void waitWhileBusy(); // wait for outstanding erase or write to finish
+#else
+ template<typename Type>
+
+    static void saveGameState(Type & object)
+    {
+      saveGameState(reinterpret_cast<uint8_t *>(&object), sizeof(object));
+    }
+	__attribute__((section(".ram_text"))) static void saveGameState(uint8_t* gameState, size_t size);
+	__attribute__((section(".ram_text"))) static void eraseSaveBlock(uint16_t page);
+	__attribute__((section(".ram_text"))) static void writeSavePage(uint16_t page, uint8_t* buffer);
+	__attribute__((section(".ram_text"))) static void waitWhileBusy();
+#endif
 
     [[gnu::noinline]]
     static void drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8_t mode);
@@ -697,5 +835,29 @@ class FX
     static Cursor   cursor;
 
     static FrameControl frameControl;
+
+	#ifdef ELBEARBOY
+
+
+	static uint32_t my_SPDR_ADDR;
+			
+__attribute__((section(".ram_text"))) static bool my_SPIFI_SendCommand_LL(
+		uint32_t cmd,
+		uint32_t address,
+		uint16_t bufferSize,
+		uint8_t *readBuffer,
+		uint8_t *writeBuffer,
+		uint32_t interimData,
+		uint32_t timeout);
+
+	__attribute__((always_inline)) static inline bool my_SPIFI_WaitCommandProcessing(uint32_t timeout);			
+	
+	__attribute__((section(".ram_text"))) static void enableCMD(uint32_t *CLIMITbackup, uint32_t *MCMDbackup);
+
+	__attribute__((section(".ram_text"))) static void disableCMD(uint32_t CLIMITbackup, uint32_t MCMDbackup);	
+			
+	#endif
+
+
 };
 #endif

@@ -2,6 +2,12 @@
 
 #if !defined(ELBEARBOY)
 	#include <wiring.c>
+#else
+	//my_SPDR.INPUT=0;
+	//my_SPDR.OUTPUT=0;
+	//my_SPDR.OPCODE=0;
+	uint32_t FX::my_SPDR_ADDR=0x00000000;	
+	//my_SPDR.CS_FLASH_DISABLE=0;
 #endif
 
 uint16_t FX::programDataPage; // program read only data location in flash memory
@@ -12,8 +18,11 @@ Cursor   FX::cursor = {0,0,0,WIDTH};
 FrameControl FX::frameControl;
 
 
-uint8_t FX::writeByte(uint8_t data)
+
+
+uint8_t FX::writeByte(uint8_t data) 
 {
+#ifndef ELBEARBOY // нет смысла использовать напрямую для ELBEARBOY
   SPDR = data;
   asm volatile("nop\n");
   uint8_t result;
@@ -23,10 +32,13 @@ uint8_t FX::writeByte(uint8_t data)
   }
   while ((SPSR & (1 << SPIF)) == 0);
   return result;
+#else
+  return 0;
+#endif  
 }
 
 
-uint8_t FX::readByte()
+uint8_t FX::readByte() // нет смысла использовать напрямую для ELBEARBOY
 {
   return writeByte(0);
 }
@@ -130,36 +142,45 @@ void FX::begin(uint16_t developmentDataPage, uint16_t developmentSavePage)
   wakeUp();
 }
 
+// на будущую доработку? Потребует перехода в командный режим и чтения
 void FX::readJedecID(JedecID & id)
 {
+#ifndef ELBEARBOY
   enable();
   writeByte(SFC_JEDEC_ID);
   id.manufacturer = readByte();
   id.device = readByte();
   id.size = readByte();
   disable();
+#endif  
 }
 
+// на будущую доработку? Потребует перехода в командный режим и чтения
 void FX::readJedecID(JedecID* id)
 {
+#ifndef ELBEARBOY
   enable();
   writeByte(SFC_JEDEC_ID);
   id -> manufacturer = readByte();
   id -> device = readByte();
   id -> size = readByte();
   disable();
+#endif  
 }
+
 
 bool FX::detect()
 {
-  seekCommand(SFC_READ, 0);
-  SPDR = 0;
+//  seekCommand(SFC_READ, 0); // исключаем команды чтения из вариантов обработки seekCommand (для ELBEARBOY, чтобы не переходить в перифейрийный режим, но для AVR это тоже эквивалент)
+//  SPDR = 0;
+  seekData(0);
   return readPendingLastUInt16() == 0x4152;
 }
 
-
+// на будущую доработку? exitToBootloader пока не реализован в Arduboy2.
 void FX::noFXReboot()
   {
+#ifndef ELBEARBOY
     if (!detect())
     {
       do
@@ -170,35 +191,57 @@ void FX::noFXReboot()
       while (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT)); // wait for DOWN button to enter bootloader
       Arduboy2Core::exitToBootloader();
     }
+#endif	
   }
+
 
 
 void FX::writeCommand(uint8_t command)
 {
+#ifndef ELBEARBOY // пока необходимости нет
   enable();
   writeByte(command);
   disable();
+#endif  
 }
+
 
 void FX::wakeUp()
 {
-  writeCommand(SFC_RELEASE_POWERDOWN);
+#ifndef ELBEARBOY // нет смысла ничего включать/отключать. флеш на ace uno используется всегда. 
+  writeCommand(SFC_POWERDOWN);
+#endif  
 }
 
 
 void FX::sleep()
 {
+#ifndef ELBEARBOY // нет смысла ничего включать/отключать. флеш на ace uno используется всегда. 	
   writeCommand(SFC_POWERDOWN);
+#endif
 }
 
+#ifndef ELBEARBOY
 void FX::writeEnable()
 {
-  writeCommand(SFC_WRITE_ENABLE);
+ writeCommand(SFC_WRITE_ENABLE);
 }
+#else
+__attribute__((section(".ram_text")))void FX::writeEnable()
+{
+   uint8_t byte = 0;
+   do
+    {
+      my_SPIFI_SendCommand_LL(cmd_read_qpi_sreg1, 0, 1, &byte, 0, 0, HAL_SPIFI_TIMEOUT);   
+    }
+     while ((byte & 1));
+}
+#endif 
 
 
 void FX::seekCommand(uint8_t command, uint24_t address)
 {
+#ifndef ELBEARBOY // в первоначальном виде - не используется. Для записи блока сейва, блока страницы и очистки страницы будем использовать аналог?
   enable();
  #ifdef ARDUINO_ARCH_AVR
   register uint8_t cmd asm("r24") = command; //assembly optimizer for AVR platform ~saves 12 bytes
@@ -217,12 +260,14 @@ void FX::seekCommand(uint8_t command, uint24_t address)
     :
   );
  #else
-  writeByte(command);
-  writeByte(address >> 16);
-  writeByte(address >> 8);
-  writeByte(address);
+	  writeByte(command);
+	  writeByte(address >> 16);
+	  writeByte(address >> 8);
+	  writeByte(address);
  #endif
+#endif
 }
+
 
 
 void FX::seekData(uint24_t address)
@@ -244,9 +289,17 @@ void FX::seekData(uint24_t address)
   );
  #else // C++ version for non AVR platforms
   abs_address = address + (uint24_t)programDataPage << 8;
+  //Serial.print("address="); Serial.print(address,HEX); Serial.println(" + "); 
+  //Serial.println(((uint24_t)programDataPage << 8),HEX);
  #endif
-  seekCommand(SFC_READ, abs_address);
-  SPDR = 0;
+  #ifndef ELBEARBOY
+	seekCommand(SFC_READ, abs_address);
+	SPDR = 0;
+  #else
+	//my_SPDR.OPCODE=0x03; // это условно. никто в реальности читать в перифейрином режиме из флеш не собирается
+	// в реальной команде seekCommand на выходе SPDR вероятно будет последний байт адреса
+	my_SPDR_ADDR=abs_address;
+  #endif
 }
 
 
@@ -275,7 +328,21 @@ void FX::seekDataArray(uint24_t address, uint8_t index, uint8_t offset, uint8_t 
     : "r21"
   );
  #else
-  address += elementSize ? index * elementSize + offset : index * 256 + offset;
+
+
+//
+Serial.println();
+Serial.print("address="); Serial.print(address,HEX);
+Serial.print(",index="); Serial.print(index);
+Serial.print(",offset="); Serial.print(offset);
+Serial.print(",elementSize="); Serial.println(elementSize);
+
+address += elementSize ? index * elementSize + offset : index * 256 + offset;
+
+//Serial.print("seekDataArray_addr="); Serial.println(addr,HEX);
+//Serial.print("seekDataArray_addr="); Serial.println(0x80010054,HEX);
+//Serial.print("sizeof_addr="); Serial.println(sizeof(addr));
+
   seekData(address);
  #endif
 }
@@ -299,19 +366,29 @@ void FX::seekSave(uint24_t address)
     :
   );
  #else // C++ version for non AVR platforms
-  abs_address = address + (uint24_t)programSavePage << 8;
+  uint24_t abs_address = address + (uint24_t)programSavePage << 8;
  #endif
-  seekCommand(SFC_READ, abs_address);
-  SPDR = 0;
+  #ifndef ELBEARBOY
+	seekCommand(SFC_READ, abs_address);
+	SPDR = 0;
+  #else
+	//my_SPDR.OPCODE=0x03; // это условно. никто в реальности читать в перифейрином режиме из флеш не собирается
+	// в реальной команде seekCommand на выходе SPDR вероятно будет последний байт адреса
+	my_SPDR_ADDR=abs_address;
+  #endif
 }
 
 
 uint8_t FX::readPendingUInt8()
 {
   wait();
+#ifndef ELBEARBOY
   uint8_t result = SPDR;
   SPDR = 0;
   return result;
+#else
+  return readUnsafe();
+#endif
 }
 
 
@@ -358,7 +435,7 @@ uint16_t FX::readPendingLastUInt16()
   );
   return result;
  #else //C++ implementation for non AVR platforms
-  return ((uint16_t)readPendingUint8() << 8) | (uint16_t)readEnd();
+  return ((uint16_t)readPendingUInt8() << 8) | (uint16_t)readEnd();
  #endif
 }
 
@@ -478,6 +555,7 @@ void FX::readBytes(uint8_t* buffer, size_t length)
 
 void FX::readBytesEnd(uint8_t* buffer, size_t length)
 {
+   Serial.println("readBytesEnd??");
 #ifdef ARDUINO_ARCH_AVR
   asm volatile(
     "1:                 \n"
@@ -499,7 +577,8 @@ void FX::readBytesEnd(uint8_t* buffer, size_t length)
     : "r24"
   );
  #else
-   for (size_t i = 0; i <= length; i++)
+
+	for (size_t i = 0; i <= length; i++)
   {
     if ((i+1) != length)
     buffer[i] = readPendingUInt8();
@@ -593,132 +672,172 @@ uint8_t FX::loadGameState(uint8_t* gameState, size_t size) // ~54 bytes
   return result;
 }
 
-void FX::saveGameState(const uint8_t* gameState, size_t size) // ~152 bytes locates free space in 4K save block and saves the GamesState.
-{                                                       //            if there is not enough free space, the block is erased prior to saving
- register size_t sz asm("r18") = size;
- #ifdef ARDUINO_ARCH_AVR
-  asm volatile(
-    "ldi  r26, 0                \n" //addr = 0
-    "ldi  r27, 0                \n"
-    "1:                         \n"
-    "movw r22, r26              \n" //uint24_t addr
-    "ldi  r24, 0                \n"
-    "call %x2                   \n" //seekSave uses r20, r21, r22, r23, r24
-    "call %x3                   \n" //readPendingLastUInt16 uses r24, r25
-    "movw r22, r26              \n" //save addr
-    "adiw r26, 2                \n" //addr += 2 for size word
-    "add  r26, r18              \n" //addr += size
-    "adc  r27, r19              \n"
-    "cp   r24, r18              \n"
-    "cpc  r25, r19              \n"
-    "breq 1b                    \n" //readPendingLastUInt16 == size
-    "                           \n"
-    "subi r24, 0xFF             \n" //if result of readPendingLastUInt16 != 0xFFFF
-    "sbci r25, 0xFF             \n"
-    "brne 2f                    \n" //erase block
-    "                           \n"
-    "subi r26, lo8(4094+1)      \n"
-    "sbci r27, hi8(4094+1)      \n"// addr < 4094+1 (last two bytes in 4K block always 0xFF)
-    "movw r26, r22              \n"// addr -= size - 2  point to start of free space
-    "brcs 3f                    \n"
-    "2:                         \n" //erase 4K save block at addr
-    "call %x4                   \n" //writeEnable
-    "ldi  r20, 0                \n"
-    "lds  r21, %[page]+0        \n"
-    "lds  r22, %[page]+1        \n"
-    "ldi  r24, %[erase]         \n" //SFC_ERASE
-    "call %x5                   \n" //seekCommand
-    "sbi  %[fxport], %[fxbit]   \n" //disable
-    "call %x6                   \n" //waitWhileBusy
-    "ldi  r26, 0                \n" //addr = 0
-    "ldi  r27, 0                \n"
-    "3:                         \n"
-    "ldi  r23, 0xFC             \n" // int8_t shiftstate = -4
-    "4:                         \n"
-    "call %x4                   \n" //writeEnable
-    "mov  r20, r26              \n" //addr
-    "lds  r21, %[page]+0        \n"
-    "add  r21, r27              \n"
-    "lds  r22, %[page]+1        \n"
-    "adc  r22, r1               \n"
-    "ldi  r24, %[write]         \n" //SFC_WRITE
-    "call %x5                   \n" //seekCommand
-    "5:                         \n"
-    "mov  r24, r19              \n"
-    "sbrc r23, 1                \n" //if (shiftstate & 3 == 0) writebyte(size >> 8)
-    "mov  r24, r18              \n" //if (shiftstate & 3 == 2) writebyte(size & 0xFF)
-    "sbrc r23, 0                \n" //else writeByte(gameState++);
-    "ld   r24, z+               \n" //saveState
-    "call %x7                   \n" //writeByte
-    "asr  r23                   \n" //shiftstate >>= 1
-    "brcc .+6                   \n" //if (shiftstate == -1) size--
-    "subi r18, 1                \n"
-    "sbci r19, 0                \n"
-    "breq 6f                    \n" //size == 0
-    "                           \n"
-    "adiw r26, 1                \n" //addr++
-    "and  r26, r26              \n"
-    "brne 5b                    \n" //while addr & 0xFF != 0 (not end of page)
-    "6:                         \n"
-    "sbi  %[fxport], %[fxbit]   \n" //disable
-    "call %x6                   \n" //waitWhileBusy
-    "cp   r18, r1               \n"
-    "cpc  r19, r1               \n"
-    "brne 4b                    \n" //while size != 0
-    :[state]  "+&z" (gameState),
-     [size]   "+&r" (sz)
-    :         ""    (seekSave),
-              ""    (readPendingLastUInt16),
-              ""    (writeEnable),
-              ""    (seekCommand),
-              ""    (waitWhileBusy),
-              ""    (writeByte),
-     [fxport] "i"   (_SFR_IO_ADDR(FX_PORT)),
-     [fxbit]  "i"   (FX_BIT),
-     [erase]  "i"   (SFC_ERASE),
-     [write]  "i"   (SFC_WRITE),
-     [page]   ""    (&programSavePage)
-    : "r20", "r21", "r22", "r23", "r24", "r25", "r26", "r27"
-  );
- #else
-  uint16_t addr = 0;
-  for(;;) // locate end of previous gameStates
-  {
-    seekSave(addr);
-    if (readPendingLastUInt16() != size) break; //found end of previous gameStates
-    addr += size + 2;
-  }
-  if ((addr + size) > 4094) //is there enough space left? last two bytes of 4K block must always be unused (0xFF)
-  {
-    eraseSaveBlock(0); // erase save block
-    waitWhileBusy();   // wait for erase to complete
-    addr = 0;          // write saveState at the start of block
-  }
+ #ifndef ELBEARBOY
+	void FX::saveGameState(const uint8_t* gameState, size_t size) // ~152 bytes locates free space in 4K save block and saves the GamesState.
+	{                                                       //            if there is not enough free space, the block is erased prior to saving
 
-  while (size)
-  {
-    writeEnable();
-    seekCommand(SFC_WRITE, (uint24_t)(programSavePage << 8) + addr);
-    do
-    {
-      writeByte(*gameState++);
-      if (--size == 0) break;
-    }
-    while ((uint8_t)++addr); // write bytes until end of a page
-    disable();               // start writing the (partial) page
-    waitWhileBusy();         // wait for page write to complete
-  }
- #endif
-}
+	 #ifdef ARDUINO_ARCH_AVR
+	 register size_t sz asm("r18") = size;
+	  asm volatile(
+		"ldi  r26, 0                \n" //addr = 0
+		"ldi  r27, 0                \n"
+		"1:                         \n"
+		"movw r22, r26              \n" //uint24_t addr
+		"ldi  r24, 0                \n"
+		"call %x2                   \n" //seekSave uses r20, r21, r22, r23, r24
+		"call %x3                   \n" //readPendingLastUInt16 uses r24, r25
+		"movw r22, r26              \n" //save addr
+		"adiw r26, 2                \n" //addr += 2 for size word
+		"add  r26, r18              \n" //addr += size
+		"adc  r27, r19              \n"
+		"cp   r24, r18              \n"
+		"cpc  r25, r19              \n"
+		"breq 1b                    \n" //readPendingLastUInt16 == size
+		"                           \n"
+		"subi r24, 0xFF             \n" //if result of readPendingLastUInt16 != 0xFFFF
+		"sbci r25, 0xFF             \n"
+		"brne 2f                    \n" //erase block
+		"                           \n"
+		"subi r26, lo8(4094+1)      \n"
+		"sbci r27, hi8(4094+1)      \n"// addr < 4094+1 (last two bytes in 4K block always 0xFF)
+		"movw r26, r22              \n"// addr -= size - 2  point to start of free space
+		"brcs 3f                    \n"
+		"2:                         \n" //erase 4K save block at addr
+		"call %x4                   \n" //writeEnable
+		"ldi  r20, 0                \n"
+		"lds  r21, %[page]+0        \n"
+		"lds  r22, %[page]+1        \n"
+		"ldi  r24, %[erase]         \n" //SFC_ERASE
+		"call %x5                   \n" //seekCommand
+		"sbi  %[fxport], %[fxbit]   \n" //disable
+		"call %x6                   \n" //waitWhileBusy
+		"ldi  r26, 0                \n" //addr = 0
+		"ldi  r27, 0                \n"
+		"3:                         \n"
+		"ldi  r23, 0xFC             \n" // int8_t shiftstate = -4
+		"4:                         \n"
+		"call %x4                   \n" //writeEnable
+		"mov  r20, r26              \n" //addr
+		"lds  r21, %[page]+0        \n"
+		"add  r21, r27              \n"
+		"lds  r22, %[page]+1        \n"
+		"adc  r22, r1               \n"
+		"ldi  r24, %[write]         \n" //SFC_WRITE
+		"call %x5                   \n" //seekCommand
+		"5:                         \n"
+		"mov  r24, r19              \n"
+		"sbrc r23, 1                \n" //if (shiftstate & 3 == 0) writebyte(size >> 8)
+		"mov  r24, r18              \n" //if (shiftstate & 3 == 2) writebyte(size & 0xFF)
+		"sbrc r23, 0                \n" //else writeByte(gameState++);
+		"ld   r24, z+               \n" //saveState
+		"call %x7                   \n" //writeByte
+		"asr  r23                   \n" //shiftstate >>= 1
+		"brcc .+6                   \n" //if (shiftstate == -1) size--
+		"subi r18, 1                \n"
+		"sbci r19, 0                \n"
+		"breq 6f                    \n" //size == 0
+		"                           \n"
+		"adiw r26, 1                \n" //addr++
+		"and  r26, r26              \n"
+		"brne 5b                    \n" //while addr & 0xFF != 0 (not end of page)
+		"6:                         \n"
+		"sbi  %[fxport], %[fxbit]   \n" //disable
+		"call %x6                   \n" //waitWhileBusy
+		"cp   r18, r1               \n"
+		"cpc  r19, r1               \n"
+		"brne 4b                    \n" //while size != 0
+		:[state]  "+&z" (gameState),
+		 [size]   "+&r" (sz)
+		:         ""    (seekSave),
+				  ""    (readPendingLastUInt16),
+				  ""    (writeEnable),
+				  ""    (seekCommand),
+				  ""    (waitWhileBusy),
+				  ""    (writeByte),
+		 [fxport] "i"   (_SFR_IO_ADDR(FX_PORT)),
+		 [fxbit]  "i"   (FX_BIT),
+		 [erase]  "i"   (SFC_ERASE),
+		 [write]  "i"   (SFC_WRITE),
+		 [page]   ""    (&programSavePage)
+		: "r20", "r21", "r22", "r23", "r24", "r25", "r26", "r27"
+	  );
+	 #else
+	  uint16_t addr = 0;
+	  for(;;) // locate end of previous gameStates
+	  {
+		seekSave(addr);
+		if (readPendingLastUInt16() != size) break; //found end of previous gameStates
+		addr += size + 2;
+	  }
+	  if ((addr + size) > 4094) //is there enough space left? last two bytes of 4K block must always be unused (0xFF)
+	  {
+		eraseSaveBlock(0); // erase save block
+		waitWhileBusy();   // wait for erase to complete
+		addr = 0;          // write saveState at the start of block
+	  }
 
+	  while (size)
+	  {
+		writeEnable();
+		seekCommand(SFC_WRITE, (uint24_t)(programSavePage << 8) + addr);
+		do
+		{
+		  writeByte(*gameState++);
+		  if (--size == 0) break;
+		}
+		while ((uint8_t)++addr); // write bytes until end of a page
+		disable();               // start writing the (partial) page
+		waitWhileBusy();         // wait for page write to complete
+	  }
+	 #endif
+	}
+#else
+    __attribute__((section(".ram_text"))) void FX::saveGameState(uint8_t* gameState, size_t size) // ~152 bytes locates free space in 4K save block and saves the GamesState.
+	{
+	  uint16_t addr = 0;
+	  for(;;) // locate end of previous gameStates
+	  {
+		seekSave(addr);
+		if (readPendingLastUInt16() != size) break; //found end of previous gameStates
+		addr += size + 2;
+	  }
+	  if ((addr + size) > 4094) //is there enough space left? last two bytes of 4K block must always be unused (0xFF)
+	  {
+		eraseSaveBlock(0); // erase save block
+		addr = 0;          // write saveState at the start of block
+	  }	
+	  uint32_t MCMDbackup; 
+	  uint32_t CLIMITbackup;           // 
+	  enableCMD(&CLIMITbackup,&MCMDbackup);
+	  writeEnable();
+	  my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, addr, size, 0, gameState, 0, HAL_SPIFI_TIMEOUT);
+	  waitWhileBusy();
+	  disableCMD(CLIMITbackup,MCMDbackup);
+	}
+#endif
+
+#ifndef ELBEARBOY
 void  FX::eraseSaveBlock(uint16_t page)
 {
   writeEnable();
   seekCommand(SFC_ERASE, (uint24_t)(programSavePage + page) << 8);
   disable();
 }
+#else // возможно ли выравнивание по 256 при стирании?
+__attribute__((section(".ram_text"))) void  FX::eraseSaveBlock(uint16_t page)
+{
+	uint32_t MCMDbackup; 
+	uint32_t CLIMITbackup;           // 
+	enableCMD(&CLIMITbackup,&MCMDbackup);
+	writeEnable();
+	//стирание
+	my_SPIFI_SendCommand_LL(cmd_erase_4k_qpi, ((uint24_t)(programSavePage + page) << 8), 0, 0, 0, 0, HAL_SPIFI_TIMEOUT);
+	waitWhileBusy();
+	disableCMD(CLIMITbackup,MCMDbackup);
+}
+#endif
 
-
+#ifndef ELBEARBOY
 void FX::writeSavePage(uint16_t page, uint8_t* buffer)
 {
   writeEnable();
@@ -731,15 +850,39 @@ void FX::writeSavePage(uint16_t page, uint8_t* buffer)
   while (i++ < 255);
   disable();
 }
+#else
+__attribute__((section(".ram_text"))) void FX::writeSavePage(uint16_t page, uint8_t* buffer)
+{
+	uint32_t MCMDbackup; 
+	uint32_t CLIMITbackup;           // 
+	enableCMD(&CLIMITbackup,&MCMDbackup);
+	writeEnable();
+	my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, ((uint24_t)(programSavePage + page) << 8), 256, 0, buffer, 0, HAL_SPIFI_TIMEOUT);
+	waitWhileBusy();
+	disableCMD(CLIMITbackup,MCMDbackup);
+}
+#endif
 
-void FX::waitWhileBusy()
+#ifndef ELBEARBOY
+void FX::waitWhileBusy() 
 {
   enable();
   writeByte(SFC_READSTATUS1);
   while(readByte() & 1)
     ; // wait while BUSY status bit is set
   disable();
+#else
+__attribute__((section(".ram_text"))) void FX::waitWhileBusy() 
+{
+    uint8_t byte = 0;
+   do
+    {
+      my_SPIFI_SendCommand_LL(cmd_read_qpi_sreg1, 0, 1, &byte, 0, 0, HAL_SPIFI_TIMEOUT);   
+    }
+     while ((byte & 1));
+#endif
 }
+
 
 void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8_t mode)
 {
@@ -765,7 +908,7 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
     else renderwidth = width;
   }
 
-  //determine render height
+  //determine render heightspifiHandle
   int16_t skiptop;     // pixel to be skipped at the top
   int8_t renderheight; // in pixels
   if (y < 0)
@@ -781,7 +924,7 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
     if (y + height > HEIGHT) renderheight = HEIGHT - y;
     else renderheight = height;
   }
-  uint24_t offset = (uint24_t)(frame * (fastDiv8(height+(uint16_t)7)) + skiptop) * width + skipleft;
+  uint24_t offset = (uint24_t)(frame * (fastDiv8((uint16_t)(height+(uint16_t)7))) + skiptop) * width + skipleft;
   if (mode & dbmMasked)
   {
     offset += offset; // double for masked bitmaps
@@ -1168,7 +1311,9 @@ uint24_t FX::drawFrame(uint24_t address) //~94 bytes
 
 void FX::readDataArray(uint24_t address, uint8_t index, uint8_t offset, uint8_t elementSize, uint8_t* buffer, size_t length)
 {
+  //Serial.println ("readDataArray step-1?");
   seekDataArray(address, index, offset, elementSize);
+  //Serial.println ("readDataArray step-2?");
   readBytesEnd(buffer, length);
 }
 
@@ -1203,6 +1348,7 @@ uint32_t FX::readIndexedUInt32(uint24_t address, uint8_t index)
 void FX::displayPrefetch(uint24_t address, uint8_t* target, uint16_t len, bool clear)
 {
   seekData(address);
+#ifndef ELBEARBOY
   asm volatile
   (
     "   ldi     r30, lo8(%[sbuf])               \n" // uint8_t* ptr = Arduboy2::sBuffer;
@@ -1245,20 +1391,64 @@ void FX::displayPrefetch(uint24_t address, uint8_t* target, uint16_t len, bool c
   disableOLED();
   disable();
   SPSR;
+#else
+	/*
+	seekData(address);
+	uint8_t* ptr = Arduboy2::sBuffer;
+	//enableOLED();
+	while (true) 
+	{
+		uint8_t displaydata = *ptr;
+		//uint8_t targetdata = SPDR;
+		uint8_t targetdata=readUnsafe();
+		//SPDR = displaydata;
+		if (clear) displaydata = 0;
+		*ptr++ = displaydata;
+		if (--len >= 0) *target++ = targetdata;
+		//branch ahead and back to 2 to burn 4 cycles
+		if (ptr >= Arduboy2::sBuffer + WIDTH * HEIGHT / 8) break;
+	}
+	disableOLED();
+	disable();
+	SPSR;
+    */
+	 uint8_t* sBuffer = Arduboy2::sBuffer;
+	 for (uint16_t i = 0; i < len; i++) 
+	 {
+
+        target[i] = readUnsafe();
+		if (~clear) 
+		{
+			sBuffer[i] = target[i];
+		}
+		else
+		{
+			sBuffer[i] = 0;
+		}
+     }
+#endif
 }
 
 void FX::display()
 {
+#ifndef ELBEARBOY
   enableOLED();
   Arduboy2Base::display();
   disableOLED();
+#else
+  Arduboy2Base::display();
+#endif
 }
 
 void FX::display(bool clear)
 {
+#ifndef ELBEARBOY	
   enableOLED();
   Arduboy2Base::display(clear);
   disableOLED();
+#else
+  Arduboy2Base::display(clear);
+#endif
 }
 
 void FX::setFont(uint24_t address, uint8_t mode)
@@ -1400,3 +1590,82 @@ void FX::drawNumber(uint32_t n, int8_t digits) //
     while (digits < 0) {++digits; *--str = ' ';}
   drawString(str);
 }
+
+#ifdef ELBEARBOY
+	// двунаправленная команда без полинга 
+	__attribute__((section(".ram_text"))) bool FX::my_SPIFI_SendCommand_LL(
+		uint32_t cmd,
+		uint32_t address,
+		uint16_t bufferSize,
+		uint8_t *readBuffer,
+		uint8_t *writeBuffer,
+		uint32_t interimData,
+		uint32_t timeout)
+	{
+		SPIFI_CONFIG->STAT |= SPIFI_CONFIG_STAT_INTRQ_M;
+		SPIFI_CONFIG->ADDR = address;
+		SPIFI_CONFIG->IDATA = interimData;
+		SPIFI_CONFIG->CMD = cmd | SPIFI_CONFIG_CMD_DATALEN(bufferSize);
+
+		if (cmd & SPIFI_CONFIG_CMD_DOUT_M)
+		{
+			if ((bufferSize > 0) && (writeBuffer == 0))
+			{
+				return HAL_ERROR;
+			}
+			for (int i = 0; i < bufferSize; i++)
+			{
+				SPIFI_CONFIG->DATA8 = writeBuffer[i];
+			}
+		}
+		else
+		{
+			if ((bufferSize > 0) && (readBuffer == 0))
+			{
+				return HAL_ERROR;
+			}
+			for (int i = 0; i < bufferSize; i++)
+			{
+				readBuffer[i] = (uint8_t)SPIFI_CONFIG->DATA8;
+			}
+		}
+		
+		return my_SPIFI_WaitCommandProcessing(timeout);
+	}
+	// Дальний аналог wait() из HAL. wait() - контроль единичного обмена по SPI, а здесь контроль завершения выполнения команды
+	bool FX::my_SPIFI_WaitCommandProcessing(uint32_t timeout)
+	{
+		while (timeout-- > 0)
+		{
+			if ((SPIFI_CONFIG->STAT & SPIFI_CONFIG_STAT_INTRQ_M) != 0)
+			{
+				return 0;
+			}
+		}
+
+		return 1;
+	}
+
+	__attribute__((section(".ram_text"))) void FX::enableCMD(uint32_t *CLIMITbackup, uint32_t *MCMDbackup)
+	{
+		*MCMDbackup = SPIFI_CONFIG->MCMD; 
+		*CLIMITbackup = SPIFI_CONFIG->CLIMIT;     
+		SPIFI_CONFIG->STAT |= SPIFI_CONFIG_STAT_RESET_M;    // reset MCMD mode for writing new CLIMIT
+		// Переключение флеш-памяти в нормальный режим с командами, передав ей "0" в промежуточном байте 
+		uint8_t byte = 0;
+		my_SPIFI_SendCommand_LL(cmd_chip_read_xip_deinit, 0, 1, &byte, 0, 0, HAL_SPIFI_TIMEOUT);   
+	}
+
+	__attribute__((section(".ram_text"))) void FX::disableCMD(uint32_t CLIMITbackup, uint32_t MCMDbackup)
+	{
+		// Переключение флеш-памяти в режим без последующих команд чтения, передав ей "0x20" в промежуточном байте
+		uint8_t byte = 0;
+		my_SPIFI_SendCommand_LL(cmd_chip_read_qpi_xip_init, 0, 1, &byte, 0, 0x20, HAL_SPIFI_TIMEOUT);
+		// считаем что HAL_SPIFI_MspInit() выполнена загрузчиком. далее стандартная инициализация MemoryMode
+		SPIFI_CONFIG->STAT |= SPIFI_CONFIG_STAT_RESET_M;    // аналог disableCMD();
+		SPIFI_CONFIG->CLIMIT = CLIMITbackup;                   // 
+		SPIFI_CONFIG->CTRL |= SPIFI_CONFIG_CTRL_CACHE_EN_M;
+		//while (SPIFI_CONFIG->STAT & (SPIFI_CONFIG_STAT_CMD_M | SPIFI_CONFIG_STAT_MCINIT_M)); // дальний аналог wait() по ТО, почему-то его не используют в HAL
+		SPIFI_CONFIG->MCMD = MCMDbackup; 
+	}
+#endif	
