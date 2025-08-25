@@ -356,19 +356,8 @@ void FX::seekDataArray(uint24_t address, uint8_t index, uint8_t offset, uint8_t 
  #else
 
 
-//
-Serial.println();
-Serial.print("address="); Serial.print(address,HEX);
-Serial.print(",index="); Serial.print(index);
-Serial.print(",offset="); Serial.print(offset);
-Serial.print(",elementSize="); Serial.println(elementSize);
 
 address += elementSize ? index * elementSize + offset : index * 256 + offset;
-
-//Serial.print("seekDataArray_addr="); Serial.println(addr,HEX);
-//Serial.print("seekDataArray_addr="); Serial.println(0x80010054,HEX);
-//Serial.print("sizeof_addr="); Serial.println(sizeof(addr));
-
   seekData(address);
  #endif
 }
