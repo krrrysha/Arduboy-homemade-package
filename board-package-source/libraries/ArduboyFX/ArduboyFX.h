@@ -64,6 +64,21 @@ constexpr uint16_t FX_DATA_VECTOR_PAGE_POINTER = 0x0016;
 constexpr uint16_t FX_SAVE_VECTOR_KEY_POINTER  = 0x0018; /* reserved interrupt vector 6  area */
 constexpr uint16_t FX_SAVE_VECTOR_PAGE_POINTER = 0x001A;
 
+constexpr uint32_t SampeDataKeyPointer[2]={0x4658424F, 0x59444154}; //FXBOYDAT 
+
+typedef struct {
+    const uint32_t VectrorKeyPointer[2]={0x00000000, 0x00000000}; // когда адрес задан, содержит маскированный ключ: инвертированные FXBOYDAT 
+    uint16_t VectrorPagePointer; // 
+} FxData;
+
+
+constexpr uint32_t SampeSaveKeyPointer[2]= {0x4658424F, 0x59534156}; //FXBOYSAV
+
+typedef struct {
+    const uint32_t VectrorKeyPointer[2]={0x00000000, 0x00000000}; //  когда адрес задан, содержит маскированный ключ: инвертированные FXBOYSAV 
+    uint16_t VectrorPagePointer; // 
+} FxSave;
+
 // Serial Flash Commands
 constexpr uint8_t SFC_JEDEC_ID          = 0x9F; // только команда | 3 байта ответа
 constexpr uint8_t SFC_READSTATUS1       = 0x05; // только команда | 1 байт ответа

@@ -51,8 +51,8 @@ void FX::begin()
 }
 
 
-void FX::begin(uint16_t developmentDataPage)
-{
+void FX::begin(uint16_t developmentDataPage) // ?????????? нужен 32х разрядный адрес 
+{ 
   disableOLED();
  #ifdef ARDUINO_ARCH_AVR
   const uint8_t* vector = (const uint8_t*)FX_DATA_VECTOR_KEY_POINTER;
@@ -74,20 +74,29 @@ void FX::begin(uint16_t developmentDataPage)
     : "r18", "r19", "r20", "r21"
    );
  #else
-  if (pgm_read_word(FX_DATA_VECTOR_KEY_POINTER) == FX_VECTOR_KEY_VALUE)
-  {
-    programDataPage = (pgm_read_byte(FX_DATA_VECTOR_PAGE_POINTER) << 8) | pgm_read_byte(FX_DATA_VECTOR_PAGE_POINTER + 1);
-  }
-  else
-  {
-    programDataPage = developmentDataPage;
-  }
+	 #ifndef ELBEARBOY
+		  if (pgm_read_word(FX_DATA_VECTOR_KEY_POINTER) == FX_VECTOR_KEY_VALUE)
+		  {
+			programDataPage = (pgm_read_byte(FX_DATA_VECTOR_PAGE_POINTER) << 8) | pgm_read_byte(FX_DATA_VECTOR_PAGE_POINTER + 1);
+		  }
+		  else
+		  {
+			programDataPage = developmentDataPage;
+		  }
+	 #else
+		  if ( ( FxData.VectrorKeyPointer[1] == (~SampeDataKeyPointer[1]) ) && ( FxData.VectrorKeyPointer[2] == (~SampeDataKeyPointer[2]) )
+		  {
+		   programDataPage = *(uint16_t*)(FxData.VectrorPagePointer);
+		  } else  {
+			programDataPage = developmentDataPage; // ?????????? нужен 32х разрядный адрес 
+		  }			
+	 #endif
  #endif
   wakeUp();
 }
 
 
-void FX::begin(uint16_t developmentDataPage, uint16_t developmentSavePage)
+void FX::begin(uint16_t developmentDataPage, uint16_t developmentSavePage) // ?????????? нужен 32х разрядный адрес 
 {
   disableOLED();
  #ifdef ARDUINO_ARCH_AVR
@@ -122,22 +131,38 @@ void FX::begin(uint16_t developmentDataPage, uint16_t developmentSavePage)
     : "r18", "r19", "r20", "r21"
    );
  #else
-  if (pgm_read_word(FX_DATA_VECTOR_KEY_POINTER) == FX_VECTOR_KEY_VALUE)
-  {
-    programDataPage = (pgm_read_byte(FX_DATA_VECTOR_PAGE_POINTER) << 8) | pgm_read_byte(FX_DATA_VECTOR_PAGE_POINTER + 1);
-  }
-  else
-  {
-    programDataPage = developmentDataPage;
-  }
-  if (pgm_read_word(FX_SAVE_VECTOR_KEY_POINTER) == FX_VECTOR_KEY_VALUE)
-  {
-    programSavePage = (pgm_read_byte(FX_SAVE_VECTOR_PAGE_POINTER) << 8) | pgm_read_byte(FX_SAVE_VECTOR_PAGE_POINTER + 1);
-  }
-  else
-  {
-    programSavePage = developmentSavePage;
-  }
+	  #ifndef ELBEARBOY
+		  if (pgm_read_word(FX_DATA_VECTOR_KEY_POINTER) == FX_VECTOR_KEY_VALUE)
+		  {
+			programDataPage = (pgm_read_byte(FX_DATA_VECTOR_PAGE_POINTER) << 8) | pgm_read_byte(FX_DATA_VECTOR_PAGE_POINTER + 1);
+		  }
+		  else
+		  {
+			programDataPage = developmentDataPage;
+		  }
+		  if (pgm_read_word(FX_SAVE_VECTOR_KEY_POINTER) == FX_VECTOR_KEY_VALUE)
+		  {
+			programSavePage = (pgm_read_byte(FX_SAVE_VECTOR_PAGE_POINTER) << 8) | pgm_read_byte(FX_SAVE_VECTOR_PAGE_POINTER + 1);
+		  }
+		  else
+		  {
+			programSavePage = developmentSavePage;
+		  }
+	 #else
+		  if ( ( FxData.VectrorKeyPointer[1] == (~SampeDataKeyPointer[1]) ) && ( FxData.VectrorKeyPointer[2] == (~SampeDataKeyPointer[2]) )
+		  {
+		   programDataPage = *(uint16_t*)(FxData.VectrorPagePointer);
+		  } else  {
+			programDataPage = developmentDataPage; // ?????????? нужен 32х разрядный адрес 
+		  }
+		  
+		  if ( ( FxSave.VectrorKeyPointer[1] == (~SampeSaveKeyPointer[1]) ) && ( FxSave.VectrorKeyPointer[2] == (~SampeSaveKeyPointer[2]) )
+		  {
+		   programSavePage = *(uint16_t*)(FxSave.VectrorPagePointer);
+		  } else  {
+			programSavePage =   (uint16_t)developmentSavePage; // ?????????? нужен 32х разрядный адрес 
+		  }		
+	 #endif
  #endif
   wakeUp();
 }
@@ -288,18 +313,19 @@ void FX::seekData(uint24_t address)
     :
   );
  #else // C++ version for non AVR platforms
-  abs_address = address + (uint24_t)programDataPage << 8;
-  //Serial.print("address="); Serial.print(address,HEX); Serial.println(" + "); 
-  //Serial.println(((uint24_t)programDataPage << 8),HEX);
- #endif
   #ifndef ELBEARBOY
+	abs_address = address + (uint24_t)programDataPage << 8;
 	seekCommand(SFC_READ, abs_address);
 	SPDR = 0;
   #else
+  abs_address = SPIFI_BASE_ADDRESS+address + (uint24_t)programDataPage << 8;
+  //Serial.print("address="); Serial.print(address,HEX); Serial.println(" + "); 
+  //Serial.println(((uint24_t)programDataPage << 8),HEX);
 	//my_SPDR.OPCODE=0x03; // это условно. никто в реальности читать в перифейрином режиме из флеш не собирается
 	// в реальной команде seekCommand на выходе SPDR вероятно будет последний байт адреса
 	my_SPDR_ADDR=abs_address;
   #endif
+ #endif
 }
 
 
@@ -366,16 +392,19 @@ void FX::seekSave(uint24_t address)
     :
   );
  #else // C++ version for non AVR platforms
-  uint24_t abs_address = address + (uint24_t)programSavePage << 8;
- #endif
+
   #ifndef ELBEARBOY
+	uint24_t abs_address = address + (uint24_t)programSavePage << 8;
 	seekCommand(SFC_READ, abs_address);
 	SPDR = 0;
   #else
 	//my_SPDR.OPCODE=0x03; // это условно. никто в реальности читать в перифейрином режиме из флеш не собирается
 	// в реальной команде seekCommand на выходе SPDR вероятно будет последний байт адреса
-	my_SPDR_ADDR=abs_address;
+	uint24_t abs_address = SPIFI_BASE_ADDRESS+ address + (uint24_t)programSavePage << 8;
+	my_SPDR_ADDR= abs_address;
   #endif
+ #endif
+
 }
 
 
@@ -810,7 +839,7 @@ uint8_t FX::loadGameState(uint8_t* gameState, size_t size) // ~54 bytes
 	  uint32_t CLIMITbackup;           // 
 	  enableCMD(&CLIMITbackup,&MCMDbackup);
 	  writeEnable();
-	  my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, addr, size, 0, gameState, 0, HAL_SPIFI_TIMEOUT);
+	  my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, (uint24_t)(programSavePage << 8) + addr + SPIFI_BASE_ADDRESS, size, 0, gameState, 0, HAL_SPIFI_TIMEOUT);
 	  waitWhileBusy();
 	  disableCMD(CLIMITbackup,MCMDbackup);
 	}
@@ -831,7 +860,7 @@ __attribute__((section(".ram_text"))) void  FX::eraseSaveBlock(uint16_t page)
 	enableCMD(&CLIMITbackup,&MCMDbackup);
 	writeEnable();
 	//стирание
-	my_SPIFI_SendCommand_LL(cmd_erase_4k_qpi, ((uint24_t)(programSavePage + page) << 8), 0, 0, 0, 0, HAL_SPIFI_TIMEOUT);
+	my_SPIFI_SendCommand_LL(cmd_erase_4k_qpi, ((uint24_t)(programSavePage + page) << 8) + SPIFI_BASE_ADDRESS, 0, 0, 0, 0, HAL_SPIFI_TIMEOUT);
 	waitWhileBusy();
 	disableCMD(CLIMITbackup,MCMDbackup);
 }
@@ -857,7 +886,7 @@ __attribute__((section(".ram_text"))) void FX::writeSavePage(uint16_t page, uint
 	uint32_t CLIMITbackup;           // 
 	enableCMD(&CLIMITbackup,&MCMDbackup);
 	writeEnable();
-	my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, ((uint24_t)(programSavePage + page) << 8), 256, 0, buffer, 0, HAL_SPIFI_TIMEOUT);
+	my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, ((uint24_t)(programSavePage + page) << 8)+ SPIFI_BASE_ADDRESS, 256, 0, buffer, 0, HAL_SPIFI_TIMEOUT);
 	waitWhileBusy();
 	disableCMD(CLIMITbackup,MCMDbackup);
 }
