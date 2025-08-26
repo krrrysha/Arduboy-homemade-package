@@ -64,20 +64,17 @@ constexpr uint16_t FX_DATA_VECTOR_PAGE_POINTER = 0x0016;
 constexpr uint16_t FX_SAVE_VECTOR_KEY_POINTER  = 0x0018; /* reserved interrupt vector 6  area */
 constexpr uint16_t FX_SAVE_VECTOR_PAGE_POINTER = 0x001A;
 
-constexpr uint32_t SampeDataKeyPointer[2]={0x4658424F, 0x59444154}; //FXBOYDAT 
+constexpr uint32_t SampeDataKeyPointer[2]={0x4658424F, 0x59444154}; //FXBOYDAT  // когда адрес задан, содержит маскированный ключ: инвертированные FXBOYDAT 
 
 typedef struct {
-    const uint32_t VectrorKeyPointer[2]={0x00000000, 0x00000000}; // когда адрес задан, содержит маскированный ключ: инвертированные FXBOYDAT 
+    const uint32_t VectrorKeyPointer[2]={0x00000000, 0x00000000}; 
     uint16_t VectrorPagePointer; // 
-} FxData;
+} FxArea;
 
 
-constexpr uint32_t SampeSaveKeyPointer[2]= {0x4658424F, 0x59534156}; //FXBOYSAV
 
-typedef struct {
-    const uint32_t VectrorKeyPointer[2]={0x00000000, 0x00000000}; //  когда адрес задан, содержит маскированный ключ: инвертированные FXBOYSAV 
-    uint16_t VectrorPagePointer; // 
-} FxSave;
+constexpr uint32_t SampeSaveKeyPointer[2]= {0x4658424F, 0x59534156}; //FXBOYSAV //  когда адрес задан, содержит маскированный ключ: инвертированные FXBOYSAV 
+
 
 // Serial Flash Commands
 constexpr uint8_t SFC_JEDEC_ID          = 0x9F; // только команда | 3 байта ответа
@@ -172,13 +169,17 @@ constexpr uint8_t dcmProportional = (1 << dcfProportional); // draw characters w
 
 // Note above modes may be combined like (dcmMasked | dcmProportional)
 
+
 #ifndef ELBEARBOY
 using uint24_t = __uint24;
 #else
-#undef uint24_t
-typedef uint32_t __uint24;
-using uint24_t = uint32_t;
+	#include <stdint.h>
+//#undef uint24_t
+//typedef uint32_t __uint24;
+//using uint24_t = uint32_t;
+typedef uint32_t uint24_t;
 #endif
+
 
 struct JedecID
 {
@@ -330,6 +331,9 @@ class FX
       while ((SPSR & (1 << SPIF)) == 0);
 #else
 	// возможно здесь потребуется реализовать какое-то ожидание? 
+	//__10NOP();
+	//while ((SPIFI_CONFIG->STAT & SPIFI_CONFIG_STAT_INTRQ_M) != 0);
+	//while (SPIFI_CONFIG->STAT & (SPIFI_CONFIG_STAT_CMD_M | SPIFI_CONFIG_STAT_MCINIT_M));
 #endif
     }
 
@@ -396,7 +400,7 @@ class FX
     #ifndef ELBEARBOY
 		[[gnu::noinline, gnu::naked]]
 	#else
-		[[gnu::noinline]
+		[[gnu::noinline]]
 	#endif
     static void seekCommand(uint8_t command, uint24_t address);// Write command and selects flash memory address. Required by any read or write command
 
@@ -442,7 +446,7 @@ class FX
     #ifndef ELBEARBOY
 		[[gnu::noinline, gnu::naked]]
 	#else
-		[[gnu::noinline]
+		[[gnu::noinline]]
 	#endif	
     static void seekDataArray(uint24_t address, uint8_t index, uint8_t offset, uint8_t elementSize);
 
@@ -457,8 +461,8 @@ class FX
 		  SPDR = 0;
 		  return result;
 	  #else
-		uint8_t result=*(uint8_t*)(my_SPDR_ADDR++); //volatile не используем, считаем, что память не может измениться извне
-		//Serial.print(my_SPDR_ADDR,HEX);Serial.print(":");Serial.println(result,HEX);
+		uint8_t result=*(uint8_t*)(SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR++); //volatile не используем, считаем, что память не может измениться извне
+		//Serial.print((SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR),HEX);Serial.print(":");Serial.println(result,HEX);
 		return result;
 	  #endif		  
 		};
@@ -472,7 +476,7 @@ class FX
 	  disable();
       return result;	  
       #else
-		uint8_t result=*(uint8_t*)(my_SPDR_ADDR); //volatile не используем, считаем, что память не может измениться извне
+		uint8_t result=*(uint8_t*)(SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR); //volatile не используем, считаем, что память не может измениться извне
 		//my_SPDR.CS_FLASH_DISABLE=1
 		return result;
 	  #endif
@@ -490,14 +494,14 @@ class FX
     #ifndef ELBEARBOY
 		[[gnu::noinline, gnu::naked]]
 	#else
-		[[gnu::noinline]
+		[[gnu::noinline]]
 	#endif
     static uint16_t readPendingUInt16(); //read a partly prefetched 16-bit word from the current flash location
 
     #ifndef ELBEARBOY
 		[[gnu::noinline, gnu::naked]]
 	#else
-		[[gnu::noinline]
+		[[gnu::noinline]]
 	#endif
     static uint16_t readPendingLastUInt16(); //read a partly prefetched 16-bit word from the current flash location
 

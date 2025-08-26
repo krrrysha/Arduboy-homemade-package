@@ -8,6 +8,8 @@
 	//my_SPDR.OPCODE=0;
 	uint32_t FX::my_SPDR_ADDR=0x00000000;	
 	//my_SPDR.CS_FLASH_DISABLE=0;
+	FxArea FxData;
+	FxArea FxSave;
 #endif
 
 uint16_t FX::programDataPage; // program read only data location in flash memory
@@ -84,7 +86,7 @@ void FX::begin(uint16_t developmentDataPage) // ?????????? нужен 32х ра�
 			programDataPage = developmentDataPage;
 		  }
 	 #else
-		  if ( ( FxData.VectrorKeyPointer[1] == (~SampeDataKeyPointer[1]) ) && ( FxData.VectrorKeyPointer[2] == (~SampeDataKeyPointer[2]) )
+		  if ( ( FxData.VectrorKeyPointer[1] == (~SampeDataKeyPointer[1]) ) && ( FxData.VectrorKeyPointer[2] == (~SampeDataKeyPointer[2]) ) )
 		  {
 		   programDataPage = *(uint16_t*)(FxData.VectrorPagePointer);
 		  } else  {
@@ -149,14 +151,14 @@ void FX::begin(uint16_t developmentDataPage, uint16_t developmentSavePage) // ??
 			programSavePage = developmentSavePage;
 		  }
 	 #else
-		  if ( ( FxData.VectrorKeyPointer[1] == (~SampeDataKeyPointer[1]) ) && ( FxData.VectrorKeyPointer[2] == (~SampeDataKeyPointer[2]) )
+		  if ( ( FxData.VectrorKeyPointer[1] == (~SampeDataKeyPointer[1]) ) && ( FxData.VectrorKeyPointer[2] == (~SampeDataKeyPointer[2]) ) )
 		  {
 		   programDataPage = *(uint16_t*)(FxData.VectrorPagePointer);
 		  } else  {
 			programDataPage = developmentDataPage; // ?????????? нужен 32х разрядный адрес 
 		  }
 		  
-		  if ( ( FxSave.VectrorKeyPointer[1] == (~SampeSaveKeyPointer[1]) ) && ( FxSave.VectrorKeyPointer[2] == (~SampeSaveKeyPointer[2]) )
+		  if ( ( FxSave.VectrorKeyPointer[1] == (~SampeSaveKeyPointer[1]) ) && ( FxSave.VectrorKeyPointer[2] == (~SampeSaveKeyPointer[2]) ) )
 		  {
 		   programSavePage = *(uint16_t*)(FxSave.VectrorPagePointer);
 		  } else  {
@@ -318,8 +320,12 @@ void FX::seekData(uint24_t address)
 	seekCommand(SFC_READ, abs_address);
 	SPDR = 0;
   #else
-  abs_address = SPIFI_BASE_ADDRESS+address + (uint24_t)programDataPage << 8;
-  //Serial.print("address="); Serial.print(address,HEX); Serial.println(" + "); 
+  abs_address = address + (uint24_t)programDataPage << 8;
+  
+  //Serial.print("address:"); Serial.println(address, HEX); Serial.println(" + ");
+  //Serial.print("programDataPage << 8:"); Serial.println(((uint24_t)programDataPage << 8),HEX);  
+  //Serial.print("="); Serial.println(abs_address, HEX); 
+
   //Serial.println(((uint24_t)programDataPage << 8),HEX);
 	//my_SPDR.OPCODE=0x03; // это условно. никто в реальности читать в перифейрином режиме из флеш не собирается
 	// в реальной команде seekCommand на выходе SPDR вероятно будет последний байт адреса
@@ -356,8 +362,19 @@ void FX::seekDataArray(uint24_t address, uint8_t index, uint8_t offset, uint8_t 
  #else
 
 
+//
+//Serial.println();
+//Serial.print("address="); Serial.print(address,HEX);
+//Serial.print(",index="); Serial.print(index);
+//Serial.print(",offset="); Serial.print(offset);
+//Serial.print(",elementSize="); Serial.println(elementSize);
 
 address += elementSize ? index * elementSize + offset : index * 256 + offset;
+
+//Serial.print("seekDataArray_addr="); Serial.println(addr,HEX);
+//Serial.print("seekDataArray_addr="); Serial.println(0x80010054,HEX);
+//Serial.print("sizeof_addr="); Serial.println(sizeof(addr));
+
   seekData(address);
  #endif
 }
@@ -389,7 +406,7 @@ void FX::seekSave(uint24_t address)
   #else
 	//my_SPDR.OPCODE=0x03; // это условно. никто в реальности читать в перифейрином режиме из флеш не собирается
 	// в реальной команде seekCommand на выходе SPDR вероятно будет последний байт адреса
-	uint24_t abs_address = SPIFI_BASE_ADDRESS+ address + (uint24_t)programSavePage << 8;
+	uint24_t abs_address = address + (uint24_t)programSavePage << 8;
 	my_SPDR_ADDR= abs_address;
   #endif
  #endif
@@ -573,7 +590,7 @@ void FX::readBytes(uint8_t* buffer, size_t length)
 
 void FX::readBytesEnd(uint8_t* buffer, size_t length)
 {
-   Serial.println("readBytesEnd??");
+   
 #ifdef ARDUINO_ARCH_AVR
   asm volatile(
     "1:                 \n"
@@ -904,10 +921,15 @@ __attribute__((section(".ram_text"))) void FX::waitWhileBusy()
 
 void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8_t mode)
 {
+  
+  Serial.println("in drawBitmap:");
   // read bitmap dimensions from flash
   seekData(address);
   int16_t width  = readPendingUInt16();
   int16_t height = readPendingLastUInt16();
+  
+  Serial.print("width="); Serial.print(width); Serial.print("height="); Serial.println(height); 
+  
   // return if the bitmap is completely off screen
   if (x + width <= 0 || x >= WIDTH || y + height <= 0 || y >= HEIGHT) return;
 
@@ -1113,6 +1135,7 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
    );
 #else
   uint8_t lastmask = bitShiftRightMaskUInt8(8 - height); // mask for bottom most pixels
+  Serial.println(" do:");
   do
   {
     seekData(address);
@@ -1122,9 +1145,17 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
     uint8_t rowmask = 0xFF;
     if (renderheight < 8) rowmask = lastmask;
     wait();
-    for (uint8_t c = 0; c < renderwidth; c++)
+    
+	Serial.print(" renderwidth="); Serial.println(renderwidth);
+	
+	for (uint8_t c = 0; c < renderwidth; c++)
     {
-      uint8_t bitmapbyte = readUnsafe();
+   
+  
+	  uint8_t bitmapbyte = readUnsafe();
+
+	  
+
       if (mode & (1 << dbfReverseBlack)) bitmapbyte ^= rowmask;
       uint8_t maskbyte = rowmask;
       if (mode & (1 << dbfWhiteBlack)) maskbyte = bitmapbyte;
@@ -1137,7 +1168,8 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
         if ((mode & dbfWhiteBlack) == 0) maskbyte = tmp;
       }
       uint16_t mask = multiplyUInt8(maskbyte, yshift);
-      if (displayrow >= 0)
+    	  Serial.print(" displayoffset="); Serial.println(displayoffset);
+     if (displayrow >= 0)
       {
         uint8_t pixels = bitmap;
         uint8_t display = Arduboy2Base::sBuffer[displayoffset];
@@ -1146,6 +1178,7 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
         pixels ^= display;
         Arduboy2Base::sBuffer[displayoffset] = pixels;
       }
+
       if (mode & (1 << dbfExtraRow))
       {
         uint8_t display = Arduboy2Base::sBuffer[displayoffset + WIDTH];
@@ -1156,12 +1189,19 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
         Arduboy2Base::sBuffer[displayoffset + WIDTH] = pixels;
       }
       displayoffset++;
+
     }
-    displayoffset += WIDTH - renderwidth;
+
+	
+	displayoffset += WIDTH - renderwidth;
     displayrow ++;
     renderheight -= 8;
     readEnd();
+	
+	Serial.print((SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR),HEX);Serial.print(":");Serial.println((*(uint8_t*)(SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR)),HEX);
+	
   } while (renderheight > 0);
+  Serial.println("out drawBitmap:");
 #endif
 }
 
