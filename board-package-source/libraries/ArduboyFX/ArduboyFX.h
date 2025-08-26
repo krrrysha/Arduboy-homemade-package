@@ -461,8 +461,8 @@ class FX
 		  SPDR = 0;
 		  return result;
 	  #else
-		uint8_t result=*(uint8_t*)(SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR++); //volatile не используем, считаем, что память не может измениться извне
-		//Serial.print((SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR),HEX);Serial.print(":");Serial.println(result,HEX);
+		uint8_t result=*(uint8_t*)(SPIFI_BASE_ADDRESS + my_SPDR_ADDR++); //volatile не используем, считаем, что память не может измениться извне
+		//if (my_SPDR_ADDR == 0x10000) {Serial.print((SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR),HEX);Serial.print(":");Serial.println(result,HEX);}
 		return result;
 	  #endif		  
 		};
@@ -476,7 +476,7 @@ class FX
 	  disable();
       return result;	  
       #else
-		uint8_t result=*(uint8_t*)(SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR); //volatile не используем, считаем, что память не может измениться извне
+		uint8_t result=*(uint8_t*)(SPIFI_BASE_ADDRESS + my_SPDR_ADDR); //volatile не используем, считаем, что память не может измениться извне
 		//my_SPDR.CS_FLASH_DISABLE=1
 		return result;
 	  #endif
@@ -596,15 +596,14 @@ class FX
     /// * a _[standard-layout](https://en.cppreference.com/w/cpp/language/data_members#Standard-layout)_ type
     /// Attempting to read an object that does not meet these restrictions will result in _undefined behaviour_.
 #ifndef ELBEARBOY 
- template<typename Type>
-
+    template<typename Type>
     static void saveGameState(const Type & object)
     {
       saveGameState(reinterpret_cast<const uint8_t *>(&object), sizeof(object));
     }
 
     [[gnu::noinline]]
-    static void saveGameState(uint8_t* gameState, size_t size); // Saves GameState in RAM to programes exclusive 4K save data block.
+    static void saveGameState(const uint8_t* gameState, size_t size); // Saves GameState in RAM to programes exclusive 4K save data block.
 
     static void eraseSaveBlock(uint16_t page); // erases 4K flash block
 

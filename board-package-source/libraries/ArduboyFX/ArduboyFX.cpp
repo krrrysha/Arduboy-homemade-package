@@ -320,16 +320,16 @@ void FX::seekData(uint24_t address)
 	seekCommand(SFC_READ, abs_address);
 	SPDR = 0;
   #else
-  abs_address = address + (uint24_t)programDataPage << 8;
+  abs_address = address + (((uint24_t)programDataPage) << 8);
   
   //Serial.print("address:"); Serial.println(address, HEX); Serial.println(" + ");
   //Serial.print("programDataPage << 8:"); Serial.println(((uint24_t)programDataPage << 8),HEX);  
-  //Serial.print("="); Serial.println(abs_address, HEX); 
+  //Serial.print("????  address:");Serial.print(address, HEX); Serial.print("+((uint24_t)programDataPage << 8):");Serial.print(((uint24_t)programDataPage << 8), HEX); Serial.print(" abs_address"); Serial.println(( abs_address  ), HEX); 
 
   //Serial.println(((uint24_t)programDataPage << 8),HEX);
 	//my_SPDR.OPCODE=0x03; // это условно. никто в реальности читать в перифейрином режиме из флеш не собирается
 	// в реальной команде seekCommand на выходе SPDR вероятно будет последний байт адреса
-	my_SPDR_ADDR=abs_address;
+	my_SPDR_ADDR=(uint32_t)abs_address;
   #endif
  #endif
 }
@@ -363,17 +363,19 @@ void FX::seekDataArray(uint24_t address, uint8_t index, uint8_t offset, uint8_t 
 
 
 //
-//Serial.println();
-//Serial.print("address="); Serial.print(address,HEX);
-//Serial.print(",index="); Serial.print(index);
-//Serial.print(",offset="); Serial.print(offset);
-//Serial.print(",elementSize="); Serial.println(elementSize);
 
 address += elementSize ? index * elementSize + offset : index * 256 + offset;
 
 //Serial.print("seekDataArray_addr="); Serial.println(addr,HEX);
 //Serial.print("seekDataArray_addr="); Serial.println(0x80010054,HEX);
 //Serial.print("sizeof_addr="); Serial.println(sizeof(addr));
+
+//Serial.println();
+//Serial.print("address="); Serial.print(address,HEX);
+//Serial.print(",index="); Serial.print(index);
+//Serial.print(",offset="); Serial.print(offset);
+//Serial.print(",elementSize="); Serial.println(elementSize);
+
 
   seekData(address);
  #endif
@@ -406,8 +408,8 @@ void FX::seekSave(uint24_t address)
   #else
 	//my_SPDR.OPCODE=0x03; // это условно. никто в реальности читать в перифейрином режиме из флеш не собирается
 	// в реальной команде seekCommand на выходе SPDR вероятно будет последний байт адреса
-	uint24_t abs_address = address + (uint24_t)programSavePage << 8;
-	my_SPDR_ADDR= abs_address;
+	uint24_t abs_address = address + (((uint24_t)programSavePage) << 8);
+	my_SPDR_ADDR= (uint32_t)abs_address;
   #endif
  #endif
 
@@ -449,7 +451,11 @@ uint16_t FX::readPendingUInt16()
   );
   return result;
  #else //C++ implementation for non AVR platforms
-  return ((uint16_t)readPendingUInt8() << 8) | (uint16_t)readPendingUInt8();
+	#ifndef ELBEARBOY
+		return ((uint16_t)readPendingUInt8() << 8) | (uint16_t)readPendingUInt8();
+	#else
+		return (((uint16_t)readPendingUInt8()) << 8) | (uint16_t)readPendingUInt8();
+	#endif
  #endif
 }
 
@@ -470,7 +476,11 @@ uint16_t FX::readPendingLastUInt16()
   );
   return result;
  #else //C++ implementation for non AVR platforms
-  return ((uint16_t)readPendingUInt8() << 8) | (uint16_t)readEnd();
+	#ifndef ELBEARBOY
+		return ((uint16_t)readPendingUInt8() << 8) | (uint16_t)readEnd();
+	#else
+		return (((uint16_t)readPendingUInt8()) << 8) | (uint16_t)readEnd();
+	#endif
  #endif
 }
 
@@ -493,7 +503,11 @@ uint24_t FX::readPendingUInt24()
   );
   return result;
  #else //C++ implementation for non AVR platforms
-  return ((uint24_t)readPendingUInt16() << 8) | readPendingUInt8();
+	#ifndef ELBEARBOY
+		return ((uint24_t)readPendingUInt16() << 8) | readPendingUInt8();
+	#else
+		return (((uint24_t)readPendingUInt16()) << 8) | readPendingUInt8();
+	#endif	
  #endif
 }
 
@@ -516,7 +530,11 @@ uint24_t FX::readPendingLastUInt24()
   );
   return result;
  #else //C++ implementation for non AVR platforms
-  return ((uint24_t)readPendingUInt16() << 8) | readEnd();
+   #ifndef ELBEARBOY
+	return ((uint24_t)readPendingUInt16() << 8) | readEnd();
+   #else
+    return (((uint24_t)readPendingUInt16()) << 8) | readEnd();
+   #endif	   
  #endif
 }
 
@@ -845,7 +863,7 @@ uint8_t FX::loadGameState(uint8_t* gameState, size_t size) // ~54 bytes
 	  uint32_t CLIMITbackup;           // 
 	  enableCMD(&CLIMITbackup,&MCMDbackup);
 	  writeEnable();
-	  my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, (uint24_t)(programSavePage << 8) + addr + SPIFI_BASE_ADDRESS, size, 0, gameState, 0, HAL_SPIFI_TIMEOUT);
+	  my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, (((uint24_t)programSavePage) << 8) + addr + SPIFI_BASE_ADDRESS, size, 0, gameState, 0, HAL_SPIFI_TIMEOUT);
 	  waitWhileBusy();
 	  disableCMD(CLIMITbackup,MCMDbackup);
 	}
@@ -866,7 +884,7 @@ __attribute__((section(".ram_text"))) void  FX::eraseSaveBlock(uint16_t page)
 	enableCMD(&CLIMITbackup,&MCMDbackup);
 	writeEnable();
 	//стирание
-	my_SPIFI_SendCommand_LL(cmd_erase_4k_qpi, ((uint24_t)(programSavePage + page) << 8) + SPIFI_BASE_ADDRESS, 0, 0, 0, 0, HAL_SPIFI_TIMEOUT);
+	my_SPIFI_SendCommand_LL(cmd_erase_4k_qpi, (((uint24_t)(programSavePage + page)) << 8) + SPIFI_BASE_ADDRESS, 0, 0, 0, 0, HAL_SPIFI_TIMEOUT);
 	waitWhileBusy();
 	disableCMD(CLIMITbackup,MCMDbackup);
 }
@@ -892,7 +910,7 @@ __attribute__((section(".ram_text"))) void FX::writeSavePage(uint16_t page, uint
 	uint32_t CLIMITbackup;           // 
 	enableCMD(&CLIMITbackup,&MCMDbackup);
 	writeEnable();
-	my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, ((uint24_t)(programSavePage + page) << 8)+ SPIFI_BASE_ADDRESS, 256, 0, buffer, 0, HAL_SPIFI_TIMEOUT);
+	my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, (((uint24_t)(programSavePage + page)) << 8)+ SPIFI_BASE_ADDRESS, 256, 0, buffer, 0, HAL_SPIFI_TIMEOUT);
 	waitWhileBusy();
 	disableCMD(CLIMITbackup,MCMDbackup);
 }
@@ -922,13 +940,13 @@ __attribute__((section(".ram_text"))) void FX::waitWhileBusy()
 void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8_t mode)
 {
   
-  Serial.println("in drawBitmap:");
+  //Serial.println("in drawBitmap:");
   // read bitmap dimensions from flash
   seekData(address);
   int16_t width  = readPendingUInt16();
   int16_t height = readPendingLastUInt16();
   
-  Serial.print("width="); Serial.print(width); Serial.print("height="); Serial.println(height); 
+  //Serial.print("width="); Serial.print(width); Serial.print(" height="); Serial.println(height); 
   
   // return if the bitmap is completely off screen
   if (x + width <= 0 || x >= WIDTH || y + height <= 0 || y >= HEIGHT) return;
@@ -964,7 +982,12 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
     if (y + height > HEIGHT) renderheight = HEIGHT - y;
     else renderheight = height;
   }
-  uint24_t offset = (uint24_t)(frame * (fastDiv8((uint16_t)(height+(uint16_t)7))) + skiptop) * width + skipleft;
+  
+  
+    uint24_t offset = (uint24_t)(frame * (fastDiv8((uint16_t)(height+(uint16_t)7))) + skiptop) * width + skipleft;
+	//Serial.print("           frame="); Serial.print(frame); Serial.print(" height="); Serial.print(height); Serial.print(" skiptop="); Serial.print(skiptop);  Serial.print(" width="); Serial.print(width); Serial.print(" skipleft="); Serial.print(skipleft); Serial.print(" offset=0x"); Serial.println(offset,HEX);
+	
+	
   if (mode & dbmMasked)
   {
     offset += offset; // double for masked bitmaps
@@ -1135,7 +1158,7 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
    );
 #else
   uint8_t lastmask = bitShiftRightMaskUInt8(8 - height); // mask for bottom most pixels
-  Serial.println(" do:");
+   //Serial.print(" do: address======"); Serial.println(address);
   do
   {
     seekData(address);
@@ -1146,12 +1169,12 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
     if (renderheight < 8) rowmask = lastmask;
     wait();
     
-	Serial.print(" renderwidth="); Serial.println(renderwidth);
+	//Serial.print(" renderwidth="); Serial.println(renderwidth);
 	
 	for (uint8_t c = 0; c < renderwidth; c++)
     {
    
-  
+      //Serial.print((SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR),HEX);Serial.print(":");Serial.println((*(uint8_t*)(SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR)),HEX);
 	  uint8_t bitmapbyte = readUnsafe();
 
 	  
@@ -1168,7 +1191,7 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
         if ((mode & dbfWhiteBlack) == 0) maskbyte = tmp;
       }
       uint16_t mask = multiplyUInt8(maskbyte, yshift);
-    	  Serial.print(" displayoffset="); Serial.println(displayoffset);
+    	  //Serial.print(" displayoffset="); Serial.println(displayoffset);
      if (displayrow >= 0)
       {
         uint8_t pixels = bitmap;
@@ -1198,10 +1221,10 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
     renderheight -= 8;
     readEnd();
 	
-	Serial.print((SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR),HEX);Serial.print(":");Serial.println((*(uint8_t*)(SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR)),HEX);
+	//Serial.print((SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR),HEX);Serial.print(":");Serial.println((*(uint8_t*)(SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR)),HEX);
 	
   } while (renderheight > 0);
-  Serial.println("out drawBitmap:");
+  //Serial.println("out drawBitmap:");
 #endif
 }
 
