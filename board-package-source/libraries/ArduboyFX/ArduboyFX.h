@@ -89,7 +89,7 @@ constexpr uint8_t SFC_POWERDOWN         = 0xB9; // только команда |
 
 constexpr uint8_t SFC_READSTATUS2       = 0x35; //		не используется
 constexpr uint8_t SFC_READSTATUS3       = 0x15; //		не используется
-constexpr uint8_t SFC_RELEASE_POWERDOWN = 0xAB; //		не используется
+constexpr uint8_t SFC_RELEASE_POWERDOWN = 0xAB; //		
 
 // drawbitmap bit flags (used by modes below and internally)
 constexpr uint8_t dbfWhiteBlack   = 0; // bitmap is used as mask
@@ -171,12 +171,16 @@ constexpr uint8_t dcmProportional = (1 << dcfProportional); // draw characters w
 
 
 #ifndef ELBEARBOY
-using uint24_t = __uint24;
+using uint24_t = __uint24; 
 #else
 	#include <stdint.h>
 //#undef uint24_t
 //typedef uint32_t __uint24;
 //using uint24_t = uint32_t;
+
+// может быть несовместимо для функций в которых передается размер типа данных: seekArrayElement, seekArrayElementMember, readObject, readDataObject, readSaveObject, loadGameState, 
+//saveGameState, readIndexedUInt24, readIndexedUInt32,drawNumber
+
 typedef uint32_t uint24_t;
 #endif
 
@@ -414,7 +418,7 @@ class FX
     /// @tparam Type The type of the element to be read.
     /// @param address The base address of the array.
     /// @param index The index of the array element.
-    template<typename Type>
+    template<typename Type> 
     static void seekArrayElement(uint24_t address, uint8_t index)
     {
       // Note: By the laws of the language this should never happen.
@@ -433,7 +437,7 @@ class FX
     /// It is intended that the value of `offset` be acquired using the
     /// `offsetof` macro from `stddef.h`, as this is the safest way
     /// to obtain the offset of an object member.
-    template<typename Type>
+    template<typename Type> 
     static void seekArrayElementMember(uint24_t address, uint8_t index, size_t offset)
     {
       // Note: By the laws of the language this should never happen.
@@ -462,7 +466,6 @@ class FX
 		  return result;
 	  #else
 		uint8_t result=*(uint8_t*)(SPIFI_BASE_ADDRESS + my_SPDR_ADDR++); //volatile не используем, считаем, что память не может измениться извне
-		//if (my_SPDR_ADDR == 0x10000) {Serial.print((SPIFI_BASE_ADDRESS + (uint32_t)my_SPDR_ADDR),HEX);Serial.print(":");Serial.println(result,HEX);}
 		return result;
 	  #endif		  
 		};
@@ -545,7 +548,7 @@ class FX
     /// * _[trivially copyable](https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable)_
     /// * a _[standard-layout](https://en.cppreference.com/w/cpp/language/data_members#Standard-layout)_ type
     /// Attempting to read an object that does not meet these restrictions will result in _undefined behaviour_.
-    template<typename Type>
+    template<typename Type> 
     static void readDataObject(uint24_t address, Type & object)
     {
       readDataBytes(address, reinterpret_cast<uint8_t *>(&object), sizeof(object));
@@ -562,7 +565,7 @@ class FX
     /// * _[trivially copyable](https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable)_
     /// * a _[standard-layout](https://en.cppreference.com/w/cpp/language/data_members#Standard-layout)_ type
     /// Attempting to read an object that does not meet these restrictions will result in _undefined behaviour_.
-    template<typename Type>
+    template<typename Type> 
     static void readSaveObject(uint24_t address, Type & object)
     {
       readSaveBytes(address, reinterpret_cast<uint8_t *>(&object), sizeof(object));
@@ -578,7 +581,7 @@ class FX
     /// * _[trivially copyable](https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable)_
     /// * a _[standard-layout](https://en.cppreference.com/w/cpp/language/data_members#Standard-layout)_ type
     /// Attempting to read an object that does not meet these restrictions will result in _undefined behaviour_.
-    template<typename Type>
+    template<typename Type> 
     static uint8_t loadGameState(Type & object)
     {
       return loadGameState((uint8_t*)(&object), sizeof(object));
@@ -611,7 +614,7 @@ class FX
 
     static void waitWhileBusy(); // wait for outstanding erase or write to finish
 #else
- template<typename Type>
+ template<typename Type> 
 
     static void saveGameState(Type & object)
     {
