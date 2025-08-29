@@ -1,0 +1,88 @@
+#include <Arduboy2.h>       
+#include <ArduboyFX.h>      
+#include "ArduboyTonesFX.h"
+
+#include "Engine.h"
+#include "Generated/fxdata.h"
+#include "ArduboyPlatform.h"
+#include "Generated/Data_Audio.h"
+
+#undef pgm_read_ptr(addr)
+
+Arduboy2Base arduboy;
+
+int y_lut[64] = {
+    0,   0,   0,   0,   0,   0,   0,   0,
+    128, 128, 128, 128, 128, 128, 128, 128,
+    256, 256, 256, 256, 256, 256, 256, 256,
+    384, 384, 384, 384, 384, 384, 384, 384,
+    512, 512, 512, 512, 512, 512, 512, 512,
+    640, 640, 640, 640, 640, 640, 640, 640,
+    768, 768, 768, 768, 768, 768, 768, 768,
+    896, 896, 896, 896, 896, 896, 896, 896
+};
+
+uint16_t audioBuffer[32];
+ArduboyTonesFX sound(arduboy.audio.enabled, audioBuffer, 32);
+
+unsigned long lastTimingSample;
+
+void ArduboyPlatform::playSound(uint8_t id)
+{
+	sound.tonesFromFX((uint24_t)((uint32_t) Data_audio + (uint32_t)(pgm_read_word(&Data_AudioPatterns[id]))));
+}
+
+void setup() {
+  arduboy.boot();
+  //arduboy.flashlight();
+  //arduboy.systemButtons();
+  //arduboy.bootLogo();
+  arduboy.setFrameRate(TARGET_FRAMERATE);
+  arduboy.audio.begin();
+  arduboy.audio.on();
+
+  FX::begin(FX_DATA_PAGE, FX_SAVE_PAGE);    
+  engine.init();
+  Serial.begin(9600);
+  Serial.println("SetupEnd");
+}
+
+void loop() {
+  static int16_t tickAccum = 0;
+  unsigned long timingSample = millis();
+  tickAccum += (timingSample - lastTimingSample);
+  lastTimingSample = timingSample;
+//Serial.println("1");
+  if (!arduboy.nextFrame()) return; 
+//Serial.println("2");
+  sound.fillBufferFromFX();
+  Platform.update();
+//Serial.println("3");
+  constexpr int16_t frameDuration = 1000 / TARGET_FRAMERATE;
+  while(tickAccum > frameDuration)
+  {
+    engine.update();
+	tickAccum -= frameDuration;
+  }
+//Serial.println("4");	
+  engine.draw();
+//Serial.println("5");
+  if(engine.gameState == GameState_Playing && engine.renderer.damageIndicator < 0)
+  {
+    uint8_t brightness = -engine.renderer.damageIndicator * 5;
+    arduboy.setRGBled(brightness, brightness, brightness);
+  }
+  else if(engine.gameState == GameState_Playing && engine.renderer.damageIndicator > 0)
+  {
+    uint8_t brightness = engine.renderer.damageIndicator * 51;
+    arduboy.setRGBled(brightness, 0, 0);
+  }
+  else
+  {
+    arduboy.setRGBled(0, 0, 0);
+  }  
+//Serial.println("6"); 
+  FX::display();
+  //FX::display(CLEAR_BUFFER); // Using CLEAR_BUFFER will clear the display buffer after it is displayed
+//Serial.println("7");  
+}
