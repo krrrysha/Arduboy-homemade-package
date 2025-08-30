@@ -18,7 +18,7 @@
 // SFC_ERASE             = 0x20; // команда + 3 байта адреса | нет ответа
 
 #include "spifi.h"
-
+#include <mik32_hal_irq.h>
 
 //struct my_SPDR
 //    {
