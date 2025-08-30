@@ -832,6 +832,8 @@ void FX::saveGameState(const uint8_t* gameState, size_t size) // ~152 bytes loca
 		if (readPendingLastUInt16() != size) break; //found end of previous gameStates
 		addr += size + 2;
 	  }
+	  
+	  
 	  if ((addr + size) > 4094) //is there enough space left? last two bytes of 4K block must always be unused (0xFF)
 	  {
 		
@@ -843,21 +845,44 @@ void FX::saveGameState(const uint8_t* gameState, size_t size) // ~152 bytes loca
 	  uint32_t MCMDbackup; 
 	  uint32_t CLIMITbackup;           // 
 
-	  enableCMD(&CLIMITbackup,&MCMDbackup);
+
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK ; // отключаем прерывания по уровню (вывод звука)
+	enableCMD(&CLIMITbackup,&MCMDbackup);
 	  static uint8_t swaped_size[2];
 	  swaped_size[0] = (size>>8) & 0xFF;
 	  swaped_size[1] = size & 0xFF;
-	  
+  
 	  // запись размера
+	  uint32_t  full_start_addr =(((uint24_t)programSavePage) << 8) + addr + SPIFI_BASE_ADDRESS;
+
+
 	  writeEnable(); 
-	  my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, (((uint24_t)programSavePage) << 8) + addr + SPIFI_BASE_ADDRESS, 2, 0, swaped_size, 0, HAL_SPIFI_TIMEOUT); 
+	  my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, full_start_addr++, 1, 0, &swaped_size[0], 0, HAL_SPIFI_TIMEOUT); 
+	  waitWhileBusy();
+	  writeEnable(); 
+	  my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, full_start_addr++, 1, 0, &swaped_size[1], 0, HAL_SPIFI_TIMEOUT); 
 	  waitWhileBusy();
 	  // запись кадра 
-	  writeEnable();
-	  my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, (((uint24_t)programSavePage) << 8) + addr + SPIFI_BASE_ADDRESS+2, size, 0, gameState, 0, HAL_SPIFI_TIMEOUT); 
-	  waitWhileBusy();
-	  disableCMD(CLIMITbackup,MCMDbackup);
-	}
+	uint16_t offset = 0;
+		while (offset < size) {
+			uint16_t current_page_size = min(size - offset, 256 - (full_start_addr & 0xFF));
+			writeEnable();
+			my_SPIFI_SendCommand_LL(
+				cmd_write_bytes_qpi,
+				full_start_addr,
+				current_page_size,
+				0,
+				gameState + offset,
+				0,
+				HAL_SPIFI_TIMEOUT
+			);
+			full_start_addr += current_page_size;
+			offset += current_page_size;
+			waitWhileBusy();
+		}
+   disableCMD(CLIMITbackup,MCMDbackup);	
+   EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK ; // возвращаяем прерывания по уровню для вывода звука
+   }	
 #endif
 
 #ifndef ELBEARBOY
