@@ -897,12 +897,14 @@ __attribute__((section(".ram_text"))) void  FX::eraseSaveBlock(uint16_t page)
 {
 	uint32_t MCMDbackup; 
 	uint32_t CLIMITbackup;           // 
+	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK ; // отключаем прерывания по уровню (вывод звука)
 	enableCMD(&CLIMITbackup,&MCMDbackup);
 	writeEnable();
 	//стирание
 	my_SPIFI_SendCommand_LL(cmd_erase_4k_qpi, (((uint24_t)(programSavePage + page)) << 8) + SPIFI_BASE_ADDRESS, 0, 0, 0, 0, HAL_SPIFI_TIMEOUT);
 	waitWhileBusy();
 	disableCMD(CLIMITbackup,MCMDbackup);
+	EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK ; // отключаем прерывания по уровню (вывод звука)
 }
 #endif
 
