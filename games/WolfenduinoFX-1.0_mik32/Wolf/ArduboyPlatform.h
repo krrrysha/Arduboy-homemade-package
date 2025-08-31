@@ -14,7 +14,7 @@ inline uint8_t* GetScreenBuffer() { return arduboy.sBuffer; }
 [[gnu::always_inline]]
 inline void drawPixel(uint8_t x, uint8_t y, uint8_t color)
 {
- /*
+#ifndef ELBEARBOY
   uint16_t row_offset;
   uint8_t bit;
 
@@ -47,7 +47,6 @@ inline void drawPixel(uint8_t x, uint8_t y, uint8_t color)
   uint8_t data = arduboy.sBuffer[row_offset] | bit;
   if (!(color & _BV(0))) data ^= bit;
   arduboy.sBuffer[row_offset] = data;
-  */
 	//arduboy.drawPixel(x, y, colour);
 	
 	//if(colour)
@@ -59,7 +58,7 @@ inline void drawPixel(uint8_t x, uint8_t y, uint8_t color)
 	//	_displayBuffer[y_lut[y] + x] |= (0x01 << (y & 7));
 	//}
 
-
+#else  
 	if(!color)
 	{
   arduboy.sBuffer[y_lut[y] + x] &= ~(0x01 << (y & 7));
@@ -68,7 +67,7 @@ inline void drawPixel(uint8_t x, uint8_t y, uint8_t color)
 	{
   arduboy.sBuffer[y_lut[y] + x] |= (0x01 << (y & 7));
 	}
-
+#endif
 }
 
 [[gnu::always_inline]]
@@ -115,7 +114,7 @@ inline void diskRead(uint24_t address, uint8_t* buffer, int length)
 
 inline void writeSaveFile(uint8_t* buffer, int length)
 {
-	FX::saveGameState(buffer, length);
+  FX::saveGameState(buffer, length);
 }
 
 inline bool readSaveFile(uint8_t* buffer, int length)

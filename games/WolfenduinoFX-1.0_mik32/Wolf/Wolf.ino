@@ -7,10 +7,12 @@
 #include "ArduboyPlatform.h"
 #include "Generated/Data_Audio.h"
 
-#undef pgm_read_ptr(addr)
+
 
 Arduboy2Base arduboy;
 
+#ifdef ELBEARBOY
+#undef pgm_read_ptr(addr)
 int y_lut[64] = {
     0,   0,   0,   0,   0,   0,   0,   0,
     128, 128, 128, 128, 128, 128, 128, 128,
@@ -21,6 +23,7 @@ int y_lut[64] = {
     768, 768, 768, 768, 768, 768, 768, 768,
     896, 896, 896, 896, 896, 896, 896, 896
 };
+#endif
 
 uint16_t audioBuffer[32];
 ArduboyTonesFX sound(arduboy.audio.enabled, audioBuffer, 32);
@@ -43,8 +46,6 @@ void setup() {
 
   FX::begin(FX_DATA_PAGE, FX_SAVE_PAGE);    
   engine.init();
-  Serial.begin(9600);
-  Serial.println("SetupEnd");
 }
 
 void loop() {

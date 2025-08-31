@@ -5,6 +5,11 @@
 #include "Save.h"
 #include "Generated/fxdata.h"
 
+#ifdef ELBEARBOY
+	#undef pgm_read_ptr(addr)
+	#define pgm_read_ptr(addr) (*(const void**)(addr))
+#endif
+
 #define MENU_ENTRY_END 0
 #define MENU_STR(x) (const void*)(x)
 #define MENU_CALLBACK(x) (const void*)(x)
@@ -314,8 +319,7 @@ void Menu::draw()
 	int y = startY;
 	int item = 0;
 
-#undef pgm_read_ptr(addr)
-#define pgm_read_ptr(addr) (*(const void**)(addr))
+
 
 	while(1)
 	{
