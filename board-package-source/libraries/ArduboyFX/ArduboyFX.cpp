@@ -53,7 +53,7 @@ void FX::begin()
 }
 
 
-void FX::begin(uint16_t developmentDataPage) // ?????????? нужен 32х разрядный адрес 
+void FX::begin(uint16_t developmentDataPage) // 
 {
   disableOLED();
  #ifdef ARDUINO_ARCH_AVR
@@ -90,7 +90,7 @@ void FX::begin(uint16_t developmentDataPage) // ?????????? нужен 32х ра�
 		  {
 		   programDataPage = *(uint16_t*)(FxData.VectrorPagePointer);
 		  } else  {
-			programDataPage = developmentDataPage; // ?????????? нужен 32х разрядный адрес 
+			programDataPage = developmentDataPage; 
 		  }			
 	 #endif
  #endif
@@ -98,7 +98,7 @@ void FX::begin(uint16_t developmentDataPage) // ?????????? нужен 32х ра�
 }
 
 
-void FX::begin(uint16_t developmentDataPage, uint16_t developmentSavePage) // ?????????? нужен 32х разрядный адрес 
+void FX::begin(uint16_t developmentDataPage, uint16_t developmentSavePage) // 
 {
   disableOLED();
  #ifdef ARDUINO_ARCH_AVR
@@ -155,14 +155,14 @@ void FX::begin(uint16_t developmentDataPage, uint16_t developmentSavePage) // ??
 		  {
 		   programDataPage = *(uint16_t*)(FxData.VectrorPagePointer);
 		  } else  {
-			programDataPage = developmentDataPage; // ?????????? нужен 32х разрядный адрес 
+			programDataPage = developmentDataPage; // 
 		  }
 		  
 		  if ( ( FxSave.VectrorKeyPointer[1] == (~SampeSaveKeyPointer[1]) ) && ( FxSave.VectrorKeyPointer[2] == (~SampeSaveKeyPointer[2]) ) )
 		  {
 		   programSavePage = *(uint16_t*)(FxSave.VectrorPagePointer);
 		  } else  {
-			programSavePage =   (uint16_t)developmentSavePage; // ?????????? нужен 32х разрядный адрес 
+			programSavePage =   (uint16_t)developmentSavePage; // 
 		  }		
 	 #endif
  #endif
@@ -846,7 +846,7 @@ void FX::saveGameState(const uint8_t* gameState, size_t size) // ~152 bytes loca
 	  uint32_t CLIMITbackup;           // 
 
 
-		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK ; // отключаем прерывания по уровню (вывод звука)
+		//EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK ; // отключаем прерывания по уровню (вывод звука)
 	enableCMD(&CLIMITbackup,&MCMDbackup);
 	  static uint8_t swaped_size[2];
 	  swaped_size[0] = (size>>8) & 0xFF;
@@ -881,7 +881,7 @@ void FX::saveGameState(const uint8_t* gameState, size_t size) // ~152 bytes loca
 			waitWhileBusy();
 		}
    disableCMD(CLIMITbackup,MCMDbackup);	
-   EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK ; // возвращаяем прерывания по уровню для вывода звука
+   //EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK ; // возвращаяем прерывания по уровню для вывода звука
    }	
 #endif
 

@@ -436,7 +436,7 @@ uint16_t ArduboyTones::getNext()
 	ISR(TIMER3_COMPA_vect)
 	#endif
 #else // ELBEARBOY
-	extern "C" void ISR()
+	extern "C" __attribute__((section(".ram_text"))) void ISR()
 #endif	
 {
   long toggleCount = durationToggleCount;
