@@ -18,6 +18,8 @@ unsigned int Arduboy2Core::JoystickYZero = 5000; // first run indicator. number 
 
 #ifndef ELBEARBOY
 	#include <avr/wdt.h>
+#else	
+	#include <wdt.h>
 #endif
 
 #ifndef OLED_CONTRAST
@@ -287,7 +289,7 @@ void Arduboy2Core::bootPins()
 	GPIO_0->DIRECTION_IN = 1 << PIN_RANDOM; // 
 
 	//PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к +
-	PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к gnd. Нужна для ACE-NANO, у которой без подтяжки не "шумят" аналоговые каналы A0-A2 
+	PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к PW. Нужна для ACE-NANO, у которой без подтяжки не "шумят" аналоговые каналы A0-A2 
 	#ifdef  JOYSTICKANALOG
 		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A0=1.5
 		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
@@ -1888,6 +1890,15 @@ void Arduboy2Core::exitToBootloader()
   WDTCSR = _BV(WDE);
   while (true) { }
  #endif
+#else
+	//Serial.println("WDT");
+	PM->CLK_APB_P_SET |= PM_CLOCK_APB_P_WDT_M; //PM_CLOCK_WDT_M;
+	PM->WDT_CLK_MUX = 0x01 & PM_WDT_CLK_MUX_M;  // 0x01 1 – внутренний HSI32M;
+	//WDT->KEY=0x71;
+	WDT->KEY = WDT_KEY_UNLOCK; // разблокировка  сторожевого таймера  0x1E
+	WDT->CON = WDT_CON_PRESCALE_4096_M | WDT_CON_PRELOAD(0x000); // Делитель входной частоты на 4096   Начальное значение таймера при запуске или перезапуске (таймер считает в сторону увеличения значений)
+	WDT->KEY = WDT_KEY_UNLOCK; // разблокировка  сторожевого таймера 0x1E
+	WDT->KEY = WDT_KEY_START; // запуск сторожевого таймера 0x71
 #endif
 }
 
