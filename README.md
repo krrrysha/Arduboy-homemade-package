@@ -211,12 +211,12 @@ BSP для MIK32 от ELRON позволяет использовать прог
 | Arduboy Function               |                              |                           |                                 |                              |                           |                                 |
 | OLED SDA                       | 18 PORTC4                    | 18 PORTC4                 | 18 PORTC4                       | D18  port_1_12               | D18  port_1_12            | D18  port_1_12                  |
 | OLED SCL                       | 19 PORTC5                    | 19 PORTC5                 | 19 PORTC5                       | D19  port_1_13               | D19  port_1_13            | D19  port_1_13                  |
-| BUTTON UP                      | 3 PORTD3                     | _                         | 2 PORTD2                        | D3/0 port_0_0                |                           | D2/10 port_0_10                 |
-| BUTTON RIGHT                   | 6 PORTD6                     | _                         | 3 PORTD3                        | D6/0 port_0_2                |                           | D3/0 port_0_0                   |
-| BUTTON LEFT                    | 2 PORTD2                     | _                         | 5 PORTD5                        | D2/10 port_0_10              |                           | D5/1 port_0_1                   |
-| BUTTON DOWN                    | 5 PORTD5                     | _                         | 4 PORTD4                        | D5/1 port_0_1                |                           | D4/8 port_0_8                   |
-| BUTTON A (left)                | 4 PORTD4                     | 4 PORTD4                  | 8 PORTB0                        | D4/8 port_0_8                | D4/8 port_0_8             | D8/9 port_1_9                   |
-| BUTTON B (right)               | 7 PORTD7                     | 3 PORTD3                  | 7 PORTD7                        | D7/8 port_1_8                | D3/0 port_0_0             | D7/8 port_1_8                   |
+| BUTTON UP                      | 3 PORTD3                     | _                         | 2 PORTD2  (_A_)                 | D3/0 port_0_0                |                           | D2/10 port_0_10 (_A_)           |
+| BUTTON RIGHT                   | 6 PORTD6                     | _                         | 3 PORTD3  (_B_)                 | D6/0 port_0_2                |                           | D3/0 port_0_0   (_B_)           |
+| BUTTON LEFT                    | 2 PORTD2                     | _                         | 5 PORTD5  (_D_)                 | D2/10 port_0_10              |                           | D5/1 port_0_1   (_D_)           |
+| BUTTON DOWN                    | 5 PORTD5                     | _                         | 4 PORTD4  (_C_)                 | D5/1 port_0_1                |                           | D4/8 port_0_8   (_C_)           |
+| BUTTON A (left)                | 4 PORTD4                     | 4 PORTD4 (_C_)            | 8 PORTB0  (_KEY_)               | D4/8 port_0_8                | D4/8 port_0_8  (_C_)      | D8/9 port_1_9   (_KEY_)         |
+| BUTTON B (right)               | 7 PORTD7                     | 3 PORTD3 (_B_)            | 7 PORTD7  (_F_)                 | D7/8 port_1_8                | D3/0 port_0_0  (_B_)      | D7/8 port_1_8   (_F_)           |
 | SPEAKER PIN 1                  | 9 PORTB1                     | 9 PORTB1                  | 9 PORTB1                        | D9/3 port_0_3                | D9/3 port_0_3             | D9/3 port_0_3                   |
 | X Axis, non standart           | -                            | 14                        | -                               |                              | 14 port_1_5               |                                 |
 | Y Asix, , non standart         | -                            | 15                        | -                               |                              | 15 port_1_7               |                                 |
@@ -237,8 +237,8 @@ BSP для MIK32 от ELRON позволяет использовать прог
 | CART_CS (org)                  | -                            | -                         | -                               |                              |                           |                                 |
 | CART_CS (new)                  | -                            | -                         | -                               |                              |                           |                                 |
 | SPI MISO                       | -                            | -                         | -                               |                              |                           |                                 |
-| BUTTON C (left), non standart  | 11^^                         | 5^^                       | 5^^                             | 11^^                         | 5^^                       | 5^^                             |
-| BUTTON D (right), non standart | 12^^                         | 2^^                       | 2^^                             | 12^^                         | 2^^                       | 2^^                             |
+| BUTTON C (left), non standart  | 11^^                         | 6^^  (_E_)                | 6^^ (_E_)                       | 11^^                         | 6^^  (_E_)                | 6^^ (_E_)                       |
+| BUTTON D (right), non standart | 12^^                         | 7^^  (_F_)                |                                 | 12^^                         | 7^^  (_F_)                |                                 |
 
 Примечания:
 
