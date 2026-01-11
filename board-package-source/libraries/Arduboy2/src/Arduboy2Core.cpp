@@ -131,12 +131,17 @@ const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
   0x8D, 0x14,
  #endif
 
+
+  #ifndef FLIPED
   // Set Segment Re-map (A0) | (b0001)
   // default is (b0000)
   0xA1,
-
   // Set COM Output Scan Direction
-  0xC8,
+	0xC8,
+  #else
+  	0xA0,
+	0xC0,
+  #endif
 
   // Set COM Pins v
   // 0xDA, 0x12,
@@ -290,13 +295,15 @@ void Arduboy2Core::bootPins()
 
 	//PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к +
 	PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к PW. Нужна для ACE-NANO, у которой без подтяжки не "шумят" аналоговые каналы A0-A2 
-	#ifdef  JOYSTICKANALOG
+	#if defined (JOYSTICKANALOG)
 		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A0=1.5
 		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
 		GPIO_1->DIRECTION_IN = 1 << PIN_AXISX; // 
 		GPIO_1->DIRECTION_IN = 1 << PIN_AXISY; //
 		PAD_CONFIG->PORT_0_PUPD |=  (0b01 << (2 * B_BUTTON_BIT) | 0b01 << (2 * A_BUTTON_BIT));
-	#elif defined (JOYSTICDISCRET)
+		
+		GPIO_1->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(RED_LED_BIT) | _BV(BLUE_LED_BIT);
+	#elif defined (JOYSTICKDISCRETE)
 		//JOYSTICKDISCRETE
 
 		  // Задаем направление без "|=", т.к. для установки DIRECTION - только запись "1"
@@ -304,6 +311,9 @@ void Arduboy2Core::bootPins()
 		  PAD_CONFIG->PORT_1_PUPD |=  (0b01 << (2 * B_BUTTON_BIT) | 0b01 << (2 * A_BUTTON_BIT));
 		  GPIO_0->DIRECTION_IN = _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
 		  GPIO_1->DIRECTION_IN = _BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT);
+		  
+	  	  GPIO_1->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(RED_LED_BIT) | _BV(BLUE_LED_BIT);
+		  
 	#else // ECOSOLE KEYS
 		  //PAD_CONFIG->PORT_0_PUPD &= ~ (0b11 << (2 * LEFT_BUTTON_BIT) | 0b11 << (2 * RIGHT_BUTTON_BIT) | 0b11 << (2 * UP_BUTTON_BIT) | 0b11 << (2 * DOWN_BUTTON_BIT) | 0b11 << (2 * A_BUTTON_BIT));
 		  //PAD_CONFIG->PORT_1_PUPD &= ~ (0b11 << (2 * B_BUTTON_BIT));
@@ -311,9 +321,11 @@ void Arduboy2Core::bootPins()
 		  PAD_CONFIG->PORT_1_PUPD |=  (0b01 << (2 * B_BUTTON_BIT));
 		  GPIO_0->DIRECTION_IN = _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT) | _BV(A_BUTTON_BIT);
 		  GPIO_1->DIRECTION_IN =  _BV(B_BUTTON_BIT);
+
+		  GPIO_0->DIRECTION_OUT = _BV(BLUE_LED_BIT);
+		  GPIO_1->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(RED_LED_BIT);	
 	#endif	
-	GPIO_0->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(BLUE_LED_BIT);
-	GPIO_1->DIRECTION_OUT = _BV(RED_LED_BIT);	
+
 	
 	ANALOG_REG->ADC_CONFIG = 0x3c00; // последовательность для инициализации ADC MIK32 из HAL
 	//HAL_ADC_Enable(&hadc);
@@ -1546,6 +1558,10 @@ void Arduboy2Core::digitalWriteRGB(uint8_t red, uint8_t green, uint8_t blue)
 	   (void)blue;  // parameter unused
 	 #endif
 	#endif
+#else
+	  bitWrite(RED_LED_PORT, RED_LED_BIT, red);
+	  bitWrite(GREEN_LED_PORT, GREEN_LED_BIT, green);
+	  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue);
 #endif
 }
 

@@ -4,14 +4,18 @@
  * The Arduboy2Core class for Arduboy hardware initilization and control.
  */
 
+
+// 13,10,12 - RGB?  24,25 -  2wire LCD || D0,D1, D8 свободен. Кстати, а зачем для 2wire - новые провода. Можно и контакты I2C использовать!
+
 #ifndef ARDUBOY2_CORE_H
 #define ARDUBOY2_CORE_H
 
 #ifdef MCU_MIK32_Amur
 	#define OLED_SSD1306_I2C // define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
+	#define FLIPED
 	//#define OLED_SH1106_I2C
 	//#define JOYSTICKANALOG // undef or JOYSTICKANALOG or JOYSTICKDISCRETE.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
-	//#define JOYSTICKDISCRETE
+	#define JOYSTICKDISCRETE
 	#define ELBEARBOY
 	#warning ELBEARBOY!
 #endif
@@ -259,17 +263,17 @@
 
 	#if defined (JOYSTICKDISCRETE) || defined (JOYSTICKANALOG)
 		#define RED_LED 2  // D13 port 1.2
-		#define GREEN_LED 2 // D17 port 0.2
-		#define BLUE_LED 4  // D16 port 0.4
+		#define GREEN_LED 3 // D10 port 1.3
+		#define BLUE_LED 0  // D12 port 1.0
 
 		#define RED_LED_PORT GPIO_1->STATE
 		#define RED_LED_BIT  2 //
 
-		#define GREEN_LED_PORT GPIO_0->STATE
-		#define GREEN_LED_BIT 2
+		#define GREEN_LED_PORT GPIO_1->STATE
+		#define GREEN_LED_BIT 3
 
-		#define BLUE_LED_PORT GPIO_0->STATE
-		#define BLUE_LED_BIT 4
+		#define BLUE_LED_PORT GPIO_1->STATE
+		#define BLUE_LED_BIT 0
 	#else // ECONSOLE KEYS
 		#define RED_LED 2  // D13 port 1.2
 		#define GREEN_LED 9 // D8/9 port_1_9
@@ -440,7 +444,7 @@
 	#elif defined (JOYSTICKDISCRETE) // JOYSTICKDISCRETE KEYS 
 		#define B_BUTTON_BIT 8 // D7/8 port_1_8
 		#define B_BUTTON_PORTIN GPIO_1->STATE
-			
+
 		#define A_BUTTON_BIT 9 // D8/9 port_1_9
 		#define A_BUTTON_PORTIN GPIO_1->STATE
 
@@ -455,7 +459,7 @@
 
 		#define DOWN_BUTTON_BIT 8 // D4/8 port_0_8
 		#define DOWN_BUTTON_PORTIN GPIO_0->STATE
-	
+
 	#else // ECOSOLE KEYS
 		
 		#define B_BUTTON_BIT 8 // D7/8 port_1_8
@@ -753,11 +757,19 @@
 #define OLED_ALL_PIXELS_ON 0xA5 // all pixels on
 #define OLED_PIXELS_FROM_RAM 0xA4 // pixels mapped to display RAM contents
 
-#define OLED_VERTICAL_FLIPPED 0xC0 // reversed COM scan direction
-#define OLED_VERTICAL_NORMAL 0xC8 // normal COM scan direction
+#ifndef FLIPED
+	#define OLED_VERTICAL_FLIPPED 0xC0 // reversed COM scan direction
+	#define OLED_VERTICAL_NORMAL 0xC8 // normal COM scan direction
+	#define OLED_HORIZ_FLIPPED 0xA0 // reversed segment re-map
+	#define OLED_HORIZ_NORMAL 0xA1 // normal segment re-map	
+#else
+	#define OLED_VERTICAL_FLIPPED 0xC8 // reversed COM scan direction
+	#define OLED_VERTICAL_NORMAL 0xC0 // normal COM scan direction
+	#define OLED_HORIZ_FLIPPED 0xA1 // reversed segment re-map
+#define OLED_HORIZ_NORMAL 0xA0 // normal segment re-map
+#endif	
 
-#define OLED_HORIZ_FLIPPED 0xA0 // reversed segment re-map
-#define OLED_HORIZ_NORMAL 0xA1 // normal segment re-map
+
 
 #define OLED_SET_PAGE_ADDRESS      0xB0
 #if defined(OLED_SH1106) || defined(OLED_SH1106_I2C)
