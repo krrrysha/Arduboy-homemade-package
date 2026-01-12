@@ -6,6 +6,7 @@
 #include "globals.h"
 #include "bitmaps.h"
 
+
 Arduboy2 arduboy;
 Sprites sprites;
 
@@ -17,6 +18,7 @@ void setup()
   arduboy.setRGBled(0,0,0);
   arduboy.setFrameRate(FRAMERATE);
   arduboy.audio.on; 
+  Serial.begin(9600);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,21 +111,63 @@ void loop()
   if (hardwareChange)
   {
     arduboy.setRGBled(pgm_read_byte(rgbValues + rgbLed.red), pgm_read_byte(rgbValues + rgbLed.green), pgm_read_byte(rgbValues + rgbLed.blue));
-    rxled_on ? RXLED1 : RXLED0;
-    txled_on ? TXLED1 : TXLED0;
-    SPEAKER_1_PORT &= ~_BV(SPEAKER_1_BIT);    
-    SPEAKER_2_PORT |= _BV(SPEAKER_2_BIT);
-    for (int i = 0; i < 50; i++) 
-    {
-      speaker1_on ? SPEAKER_1_PORT ^= _BV(SPEAKER_1_BIT) : SPEAKER_1_PORT &= ~_BV(SPEAKER_1_BIT);
-      #ifndef AB_DEVKIT
-      speaker2_on ? SPEAKER_2_PORT ^= _BV(SPEAKER_2_BIT) : SPEAKER_2_PORT |= _BV(SPEAKER_2_BIT);
-      #endif
-      delayMicroseconds(300);
-    }
-    SPEAKER_1_PORT &= ~_BV(SPEAKER_1_BIT);    
-    SPEAKER_2_PORT &= ~_BV(SPEAKER_2_BIT);    
-    hardwareChange = false;
+    
+
+    #ifndef ELBEARBOY
+        rxled_on ? RXLED1 : RXLED0;
+        txled_on ? TXLED1 : TXLED0;
+        SPEAKER_1_PORT &= ~_BV(SPEAKER_1_BIT);    
+        SPEAKER_2_PORT |= _BV(SPEAKER_2_BIT);
+        for (int i = 0; i < 50; i++) 
+        {
+        speaker1_on ? SPEAKER_1_PORT ^= _BV(SPEAKER_1_BIT) : SPEAKER_1_PORT &= ~_BV(SPEAKER_1_BIT);
+        #ifndef AB_DEVKIT
+        speaker2_on ? SPEAKER_2_PORT ^= _BV(SPEAKER_2_BIT) : SPEAKER_2_PORT |= _BV(SPEAKER_2_BIT);
+        #endif
+        delayMicroseconds(300);
+        }
+        SPEAKER_1_PORT &= ~_BV(SPEAKER_1_BIT);    
+        SPEAKER_2_PORT &= ~_BV(SPEAKER_2_BIT);    
+        hardwareChange = false;
+  #else
+
+	//PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPEAKER_1_BIT)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
+	//PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * SPEAKER_2_BIT)); // Нужно проверять, что там на порту!!!. установка вывода 1 порта 1 (в режим 0xb00).  Timer Disconnect!
+
+        GPIO_0->DIRECTION_OUT = (1 << SPEAKER_1_BIT);
+        GPIO_1->DIRECTION_OUT = (1 << SPEAKER_2_BIT);
+        GPIO_0->CLEAR = (1 << SPEAKER_1_BIT) ;
+        GPIO_1->SET =   (1 << SPEAKER_2_BIT);
+
+        //GPIO_1->DIRECTION_IN =  (1 << SPEAKER_2_BIT)
+
+        for (int i = 0; i < 50; i++) 
+        {
+                if (speaker1_on) 
+                {
+
+                        //if ((i % 2) == 0) GPIO_0->SET = (1 << SPEAKER_1_BIT); else GPIO_0->CLEAR = (1 << SPEAKER_1_BIT);
+                        if ((GPIO_0->STATE & (1 << SPEAKER_1_BIT))) {GPIO_0->CLEAR = 1 << SPEAKER_1_BIT;} else 
+                                {
+                                GPIO_0->SET = 1 << SPEAKER_1_BIT;
+                                //Serial.print("set trying,");
+                                 // Serial.print("GPIO_0->STATE & (1 << SPEAKER_1_BIT))="); Serial.println((GPIO_0->STATE & (1 << SPEAKER_1_BIT)), BIN);
+                                }
+                }
+                else  GPIO_0->CLEAR = (1 << SPEAKER_1_BIT);
+                
+                if (speaker2_on) 
+                {
+                //if ((i % 2) == 0) GPIO_1->CLEAR = (1 << SPEAKER_2_BIT); else GPIO_1->SET = (1 << SPEAKER_2_BIT);
+                if ((GPIO_1->STATE & (1 << SPEAKER_2_BIT))) {GPIO_1->CLEAR = 1 << SPEAKER_2_BIT;} else {GPIO_1->SET = 1 << SPEAKER_2_BIT;}
+                }
+                else GPIO_1->SET =   (1 << SPEAKER_2_BIT);
+                delayMicroseconds(300);
+        }
+        GPIO_0->CLEAR = (1 << SPEAKER_1_BIT) ;
+        GPIO_1->CLEAR = (1 << SPEAKER_2_BIT) ;
+        hardwareChange = false;
+#endif
   }
 }
 

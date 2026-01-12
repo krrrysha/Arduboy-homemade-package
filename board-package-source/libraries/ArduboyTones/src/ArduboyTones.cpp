@@ -353,8 +353,8 @@ void ArduboyTones::nextTone()
 	}
 	else { bitClear(TONE_PIN2_PORT, TONE_PIN2);} // set pin 2 low for normal volume
   	#else // ELBEARBOY
-		if (GPIO_0->STATE & (1 << TONE_PIN)) {GPIO_0->CLEAR = 1 << TONE_PIN2;}
-		else {GPIO_0->SET = 1 << TONE_PIN2;}
+		if (GPIO_0->STATE & (1 << TONE_PIN)) {GPIO_1->CLEAR = 1 << TONE_PIN2;} // здесь производится инверсия PIN2 относительно PIN1
+		else {GPIO_1->SET = 1 << TONE_PIN2;}
 	}
 	else {GPIO_1->CLEAR = 1 << TONE_PIN2;} // set pin 2 low for normal volume		
 	#endif
@@ -398,9 +398,11 @@ void ArduboyTones::nextTone()
 	// выполняем на случай, если audio.on/off переключит в неправильный режим
 	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
 	GPIO_0->DIRECTION_OUT = 1 << TONE_PIN; //
+	GPIO_0->CLEAR = 1 << TONE_PIN;
 	#ifdef TONES_VOLUME_CONTROL
 	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 1 порта 1 (в режим 0xb00).  Timer Disconnect!
 	GPIO_1->DIRECTION_OUT = 1 << TONE_PIN2; //
+	GPIO_1->CLEAR = 1 << TONE_PIN2;
 	#endif
 	
 	
@@ -457,8 +459,10 @@ uint16_t ArduboyTones::getNext()
 		if (GPIO_0->STATE & (1 << TONE_PIN)) {GPIO_0->CLEAR = 1 << TONE_PIN;}
 		else {GPIO_0->SET = 1 << TONE_PIN;}
 		#ifdef TONES_VOLUME_CONTROL
-			if (GPIO_1->STATE & (1 << TONE_PIN2)) {GPIO_1->CLEAR = 1 << TONE_PIN2;}
-			else {GPIO_1->SET = 1 << TONE_PIN2;}
+			  if (toneHighVol) {
+				if (GPIO_1->STATE & (1 << TONE_PIN2)) {GPIO_1->CLEAR = 1 << TONE_PIN2;}
+				else {GPIO_1->SET = 1 << TONE_PIN2;}
+			  }
 		#endif
 	#endif
     }

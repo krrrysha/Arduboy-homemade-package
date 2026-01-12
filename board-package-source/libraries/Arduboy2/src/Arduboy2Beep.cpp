@@ -25,6 +25,8 @@ void BeepPin1::begin()
 	#endif
 #else // ELBEARBOY
 	// Timer32_1_ch4, D9= PORT 0.3 
+	if (~(GPIO_0->DIRECTION_IN & (1 << BEEPER_1_BIT))) {PAD_CONFIG->PORT_0_CFG |= (0b10 << (2 * BEEPER_1_BIT));} // установка вывода 3 порта 0 (в режим 0xb10). Timer Connect!
+
 	PM->CLK_APB_P_SET = PM_CLOCK_APB_P_TIMER32_1_M | PM_CLOCK_APB_P_GPIO_0_M;
 	PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M;
 	TIMER32_1->CHANNELS[3].CNTRL &=  TIMER32_CH_CNTRL_DISABLE_M;
@@ -115,6 +117,8 @@ void BeepPin2::begin()
 	#endif
 #else // ELBEARBOY
 	// // Timer32_2_ch2, D11= PORT 1.1 
+	if (~(GPIO_1->DIRECTION_IN & (1 << BEEPER_2_BIT))) {PAD_CONFIG->PORT_1_CFG |= (0b10 << (2 * BEEPER_2_BIT));} // установка вывода 1 порта 1 (в режим 0xb10). Timer Connect!
+	
 	PM->CLK_APB_P_SET = PM_CLOCK_APB_P_TIMER32_2_M | PM_CLOCK_APB_P_GPIO_1_M;
 	PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M;
 	TIMER32_2->CHANNELS[1].CNTRL &=  TIMER32_CH_CNTRL_DISABLE_M;
