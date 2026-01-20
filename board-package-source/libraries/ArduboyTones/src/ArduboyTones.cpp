@@ -398,11 +398,9 @@ void ArduboyTones::nextTone()
 	// выполняем на случай, если audio.on/off переключит в неправильный режим
 	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
 	GPIO_0->DIRECTION_OUT = 1 << TONE_PIN; //
-	GPIO_0->CLEAR = 1 << TONE_PIN;
 	#ifdef TONES_VOLUME_CONTROL
 	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 1 порта 1 (в режим 0xb00).  Timer Disconnect!
 	GPIO_1->DIRECTION_OUT = 1 << TONE_PIN2; //
-	GPIO_1->CLEAR = 1 << TONE_PIN2;
 	#endif
 	
 	
