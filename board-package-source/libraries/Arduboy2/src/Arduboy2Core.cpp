@@ -263,7 +263,7 @@ void Arduboy2Core::bootPins()
 		
   #endif
   // switch off LEDs by default
-  PORTC &= ~(_BV(GREEN_LED_BIT)   | _BV(BLUE_LED_BIT) | _BV(RED_LED_BIT));
+  PORTC &= ~(_BV(GREEN_LED_BIT)   | _BV(BLUE_LED_BIT) | _BV(RED_LED_BIT)); // если бы светодиоды там были, их надо было бы выключить....
 #elif defined (ELBEARBOY)
 	
 	//включаем тактирование GPIO_0, GPIO_1, ADC
@@ -302,7 +302,10 @@ void Arduboy2Core::bootPins()
 		GPIO_1->DIRECTION_IN = 1 << PIN_AXISY; //
 		PAD_CONFIG->PORT_0_PUPD |=  (0b01 << (2 * B_BUTTON_BIT) | 0b01 << (2 * A_BUTTON_BIT));
 		
-		GPIO_1->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(RED_LED_BIT) | _BV(BLUE_LED_BIT);
+	  	 //
+		 GPIO_1->DIRECTION_OUT = (1 << RED_LED_BIT) | (1 << BLUE_LED_BIT) | (1 << GREEN_LED_BIT);
+		 GPIO_1->CLEAR = (1 << RED_LED_BIT) | (1 << BLUE_LED_BIT) | (1 << GREEN_LED_BIT); //RGB LED off
+
 	#elif defined (JOYSTICKDISCRETE)
 		//JOYSTICKDISCRETE
 
@@ -312,7 +315,8 @@ void Arduboy2Core::bootPins()
 		  GPIO_0->DIRECTION_IN = _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
 		  GPIO_1->DIRECTION_IN = _BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT);
 		  
-	  	  GPIO_1->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(RED_LED_BIT) | _BV(BLUE_LED_BIT);
+	  	 GPIO_1->DIRECTION_OUT = (1 << RED_LED_BIT) | (1 << BLUE_LED_BIT) | (1 << GREEN_LED_BIT);
+		 GPIO_1->CLEAR = (1 << RED_LED_BIT) | (1 << BLUE_LED_BIT) | (1 << GREEN_LED_BIT); //RGB LED off
 		  
 	#else // ECOSOLE KEYS
 		  //PAD_CONFIG->PORT_0_PUPD &= ~ (0b11 << (2 * LEFT_BUTTON_BIT) | 0b11 << (2 * RIGHT_BUTTON_BIT) | 0b11 << (2 * UP_BUTTON_BIT) | 0b11 << (2 * DOWN_BUTTON_BIT) | 0b11 << (2 * A_BUTTON_BIT));
@@ -321,9 +325,10 @@ void Arduboy2Core::bootPins()
 		  PAD_CONFIG->PORT_1_PUPD |=  (0b01 << (2 * B_BUTTON_BIT));
 		  GPIO_0->DIRECTION_IN = _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT) | _BV(A_BUTTON_BIT);
 		  GPIO_1->DIRECTION_IN =  _BV(B_BUTTON_BIT);
-
-		  GPIO_0->DIRECTION_OUT = _BV(BLUE_LED_BIT);
-		  GPIO_1->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(RED_LED_BIT);	
+		
+		// задаются как выходы. Но не задействованы на плате
+		//GPIO_0->DIRECTION_OUT = _BV(BLUE_LED_BIT);
+		//GPIO_1->DIRECTION_OUT = _BV(GREEN_LED_BIT) | _BV(RED_LED_BIT);	
 	#endif	
 
 	
@@ -1430,7 +1435,8 @@ void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
 #endif
 
 
-#if defined(ECONSOLE) || defined(ELBEARBOY)
+#ifndef ELBEARBOY
+	#if defined(ECONSOLE) 
   // only blue on DevKit, which is not PWM capable
   (void)red;    // parameter unused
   (void)green;  // parameter unused
@@ -1470,6 +1476,40 @@ void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
   (void)red;    // parameter unused
   (void)green;  // parameter unused
   bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue ? RGB_ON : RGB_OFF);
+#endif
+#else
+
+	PM->CLK_APB_P_SET = PM_CLOCK_APB_P_TIMER32_2_M | PM_CLOCK_APB_P_GPIO_1_M;
+	PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M;
+
+	PAD_CONFIG->PORT_1_CFG |= (0b10 << (2 * RED_LED)) | (0b10 << (2 * GREEN_LED)) | (0b10 << (2 * BLUE_LED)) ; // установка вывода в режим 0xb10. Timer Connect!
+
+	TIMER32_2->CHANNELS[0].CNTRL &=  TIMER32_CH_CNTRL_DISABLE_M;
+	TIMER32_2->CHANNELS[2].CNTRL &=  TIMER32_CH_CNTRL_DISABLE_M;
+	TIMER32_2->CHANNELS[3].CNTRL &=  TIMER32_CH_CNTRL_DISABLE_M;
+	
+	TIMER32_2->CHANNELS[0].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
+	TIMER32_2->CHANNELS[2].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
+	TIMER32_2->CHANNELS[3].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
+	
+	TIMER32_2->PRESCALER =  0; //Divide by 1 clock prescale
+	TIMER32_2->INT_MASK =  0;
+	TIMER32_2->INT_CLEAR =   0xFFFFFFFF;
+	
+	TIMER32_2->CHANNELS[0].OCR = 0;
+	TIMER32_2->CHANNELS[2].OCR = 0;
+	TIMER32_2->CHANNELS[3].OCR = 0;
+	
+	TIMER32_2->CHANNELS[0].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
+	TIMER32_2->CHANNELS[2].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
+	TIMER32_2->CHANNELS[3].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
+
+	TIMER32_2->ENABLE = TIMER32_ENABLE_TIM_CLR_M | ~(TIMER32_ENABLE_TIM_EN_M); // без  этого таймер временно "зависает" при быстрой смене TOP/OCR
+	TIMER32_2->TOP = (255); // максимальное значение 255
+	TIMER32_2->CHANNELS[2].OCR = 255- red; // D13 - PORT_1_2 - Timer32_2_ch3 R
+	TIMER32_2->CHANNELS[0].OCR = 255- green; // D12 - PORT_1_0 - Timer32_2_ch1 G
+	TIMER32_2->CHANNELS[3].OCR = 255- blue; // D10 - PORT_1_3 - Timer32_2_ch4 B
+	TIMER32_2->ENABLE = TIMER32_ENABLE_TIM_CLR_M | TIMER32_ENABLE_TIM_EN_M;
 #endif
 }
 
@@ -1514,6 +1554,19 @@ void Arduboy2Core::setRGBled(uint8_t color, uint8_t val)
 		bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val ? RGB_ON : RGB_OFF);
 	  }
 	#endif
+#else
+	  if (color == RED_LED)
+	  {
+		TIMER32_2->CHANNELS[2].OCR = 255- val;
+	  }
+	  else if (color == GREEN_LED)
+	  {
+		TIMER32_2->CHANNELS[0].OCR = 255- val;
+	  }
+	  else if (color == BLUE_LED)
+	  {
+		TIMER32_2->CHANNELS[3].OCR = 255- val;
+	  }
 #endif
 }
 
@@ -1525,6 +1578,10 @@ void Arduboy2Core::freeRGBled()
 		  TCCR0A = _BV(WGM01) | _BV(WGM00);
 		  TCCR1A = _BV(WGM10);
 	#endif  
+#else
+	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * RED_LED)); // установка вывода в режим 0xb00.  Timer Disconnect!
+    PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * GREEN_LED)); // установка вывода в режим 0xb00.  Timer Disconnect!
+	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * BLUE_LED)); // установка вывода в режим 0xb00.  Timer Disconnect!
 #endif
 }
 
@@ -1559,9 +1616,9 @@ void Arduboy2Core::digitalWriteRGB(uint8_t red, uint8_t green, uint8_t blue)
 	 #endif
 	#endif
 #else
-	  bitWrite(RED_LED_PORT, RED_LED_BIT, red);
-	  bitWrite(GREEN_LED_PORT, GREEN_LED_BIT, green);
-	  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue);
+	  if (red) {GPIO_1->SET = (1 << RED_LED_BIT);} else {GPIO_1->CLEAR = (1 << RED_LED_BIT); }
+	  if (green) {GPIO_1->SET = (1 << GREEN_LED_BIT);} else {GPIO_1->CLEAR = (1 << GREEN_LED_BIT); }
+	  if (blue) {GPIO_1->SET = (1 << BLUE_LED_BIT);} else {GPIO_1->CLEAR = (1 << BLUE_LED_BIT); }
 #endif
 }
 
@@ -1588,6 +1645,19 @@ void Arduboy2Core::digitalWriteRGB(uint8_t color, uint8_t val)
 		bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val);
 	  }
 	#endif
+#else
+	  if (color == RED_LED)
+	  {
+		if (val) {GPIO_1->SET = (1 << RED_LED_BIT);} else {GPIO_1->CLEAR = (1 << RED_LED_BIT); }
+	  }
+	  else if (color == GREEN_LED)
+	  {
+		if (val) {GPIO_1->SET = (1 << GREEN_LED_BIT);} else {GPIO_1->CLEAR = (1 << GREEN_LED_BIT); }
+	  }
+	  else if (color == BLUE_LED)
+	  {
+		if (val) {GPIO_1->SET = (1 << BLUE_LED_BIT);} else {GPIO_1->CLEAR = (1 << BLUE_LED_BIT); }
+	  }
 #endif
 }
 

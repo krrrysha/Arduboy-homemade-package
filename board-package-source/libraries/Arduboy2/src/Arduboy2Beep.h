@@ -13,10 +13,11 @@
 #endif						 
 
 #ifdef MCU_MIK32_Amur
+#include "mik32_hal_timer16.h"
 	#define ELBEARBOY
 	#warning ELBEARBOY!
 	#define BEEPER_1_BIT 3 // Добавлены отдельне от SPEAKER_PIN, т.к. оригинальная библиотека не зависит от других
-	#define BEEPER_2_BIT 1	
+	#define BEEPER_2_BIT 7	
 #endif	
 /** \brief
  * Play simple square wave tones using speaker pin 1.

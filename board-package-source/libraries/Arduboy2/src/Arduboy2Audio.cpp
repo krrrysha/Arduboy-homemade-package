@@ -19,12 +19,18 @@ void Arduboy2Audio::on()
   bitSet(SPEAKER_1_DDR, SPEAKER_1_BIT);
 #endif
 #else
-	//PAD_CONFIG->PORT_0_CFG |= (0b10 << (2 * SPEAKER_1_BIT)); // установка вывода 3 порта 0 (в режим 0xb10). Timer Connect!
-	//PAD_CONFIG->PORT_1_CFG |= (0b10 << (2 * SPEAKER_2_BIT)); // установка вывода 1 порта 1 (в режим 0xb10). Timer Connect!
+
+	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPEAKER_1_BIT)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
+	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPEAKER_2_BIT)); // установка вывода 7 порта 0 (в режим 0xb00).  Timer Disconnect!
+	////PAD_CONFIG->PORT_0_CFG |= (0b10 << (2 * SPEAKER_1_BIT)); // установка вывода 3 порта 0 (в режим 0xb10). Timer Connect!
+	////PAD_CONFIG->PORT_1_CFG |= (0b10 << (2 * SPEAKER_2_BIT)); // установка вывода 1 порта 1 (в режим 0xb10). Timer Connect!
 	GPIO_0->DIRECTION_OUT = (1 << SPEAKER_1_BIT);
-	GPIO_1->DIRECTION_OUT = (1 << SPEAKER_2_BIT);
+	//GPIO_1->DIRECTION_OUT = (1 << SPEAKER_2_BIT);
+	GPIO_0->DIRECTION_OUT = (1 << SPEAKER_2_BIT);
 	GPIO_0->CLEAR = (1 << SPEAKER_1_BIT);
-    GPIO_1->CLEAR = (1 << SPEAKER_2_BIT);
+    //GPIO_1->CLEAR = (1 << SPEAKER_2_BIT);
+	GPIO_0->CLEAR = (1 << SPEAKER_2_BIT);
+	
 #endif	
   audio_enabled = true;
 }
@@ -42,9 +48,11 @@ void Arduboy2Audio::off()
 #endif
 #else
 	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPEAKER_1_BIT)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
-	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * SPEAKER_2_BIT)); // установка вывода 1 порта 1 (в режим 0xb00).  Timer Disconnect!
+	//PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * SPEAKER_2_BIT)); // установка вывода 1 порта 1 (в режим 0xb00).  Timer Disconnect!
+	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPEAKER_2_BIT)); // установка вывода 7 порта 0 (в режим 0xb00).  Timer Disconnect!
 	GPIO_0->DIRECTION_IN = (1 << SPEAKER_1_BIT);
-	GPIO_1->DIRECTION_IN = (1 << SPEAKER_2_BIT);
+	//GPIO_1->DIRECTION_IN = (1 << SPEAKER_2_BIT);
+	GPIO_0->DIRECTION_IN = (1 << SPEAKER_2_BIT);
 #endif
 }
 
@@ -72,7 +80,8 @@ void Arduboy2Audio::begin()
 #else
   if (Arduboy2Core::read_eeprom_byte(Arduboy2Base::eepromAudioOnOff))
 #endif
-    on();
+
+  on();
   else
     off();
 }

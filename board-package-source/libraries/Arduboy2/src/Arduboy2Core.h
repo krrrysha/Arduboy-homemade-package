@@ -4,8 +4,13 @@
  * The Arduboy2Core class for Arduboy hardware initilization and control.
  */
 
+// Текущий вариант
+// 13,10,12 - RGB? 
+//// Необходимо вручную перевести dip-переключателем A3 в D17 -speaker 2
+// D13 - PORT_1_2 - Timer32_2_ch3 R
+// D12 - PORT_1_0 - Timer32_2_ch1 G
+// D10 - PORT_1_3 - Timer32_2_ch4 B
 
-// 13,10,12 - RGB?  24,25 -  2wire LCD || D0,D1, D8 свободен. Кстати, а зачем для 2wire - новые провода. Можно и контакты I2C использовать!
 
 #ifndef ARDUBOY2_CORE_H
 #define ARDUBOY2_CORE_H
@@ -263,17 +268,17 @@
 
 	#if defined (JOYSTICKDISCRETE) || defined (JOYSTICKANALOG)
 		#define RED_LED 2  // D13 port 1.2
-		#define GREEN_LED 3 // D10 port 1.3
-		#define BLUE_LED 0  // D12 port 1.0
+		#define GREEN_LED 0  // D12 port 1.0
+		#define BLUE_LED 3  // D10 port 1.3
 
 		#define RED_LED_PORT GPIO_1->STATE
 		#define RED_LED_BIT  2 //
 
 		#define GREEN_LED_PORT GPIO_1->STATE
-		#define GREEN_LED_BIT 3
+		#define GREEN_LED_BIT 0
 
 		#define BLUE_LED_PORT GPIO_1->STATE
-		#define BLUE_LED_BIT 0
+		#define BLUE_LED_BIT 3
 	#else // ECONSOLE KEYS
 		#define RED_LED 2  // D13 port 1.2
 		#define GREEN_LED 9 // D8/9 port_1_9
@@ -587,9 +592,15 @@
 	#define SPEAKER_1_PORT GPIO_0->STATE
 	#define SPEAKER_1_BIT 3
 
-	#define PIN_SPEAKER_2 1 //D11/1 port_1_1
-	#define SPEAKER_2_PORT GPIO_1->STATE
-	#define SPEAKER_2_BIT 1
+	//#define PIN_SPEAKER_2 1 //D11/1 port_1_1
+	//#define SPEAKER_2_PORT GPIO_1->STATE
+	//#define SPEAKER_2_BIT 1
+
+	#define PIN_SPEAKER_2 7 //PORT_0_7 A3,D17
+	#define SPEAKER_2_PORT GPIO_0->STATE
+	#define SPEAKER_2_BIT 7
+
+	
 #else
 	#define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
 
@@ -1250,56 +1261,80 @@ class Arduboy2Core : public Arduboy2NoUSB
 
     static void inline setRGBledRedOn()__attribute__((always_inline))
     {
-     #ifndef LCD_ST7565
-      bitClear(RED_LED_PORT, RED_LED_BIT); // Red on
-     #else
-      bitSet(RED_LED_PORT, RED_LED_BIT); // Red on
-     #endif
+     #ifndef ELBEARBOY
+		 #ifndef LCD_ST7565
+		  bitClear(RED_LED_PORT, RED_LED_BIT); // Red on
+		 #else
+		  bitSet(RED_LED_PORT, RED_LED_BIT); // Red on
+		 #endif
+	 #else
+		GPIO_1->SET = (1 << RED_LED_BIT); 
+	 #endif
     }
 
     static void inline setRGBledRedOff()__attribute__((always_inline))
     {
-     #ifndef LCD_ST7565
-      bitSet(RED_LED_PORT, RED_LED_BIT); // Red off
-     #else
-      bitClear(RED_LED_PORT, RED_LED_BIT); // Red off
-     #endif
+     #ifndef ELBEARBOY
+		 #ifndef LCD_ST7565
+		  bitSet(RED_LED_PORT, RED_LED_BIT); // Red off
+		 #else
+		  bitClear(RED_LED_PORT, RED_LED_BIT); // Red off
+		 #endif
+	 #else
+		GPIO_1->CLEAR = (1 << RED_LED_BIT); 
+	 #endif
     }
 
     static void inline setRGBledGreenOn()__attribute__((always_inline))
     {
-     #ifndef LCD_ST7565
-      bitClear(GREEN_LED_PORT, GREEN_LED_BIT); // Green on
-     #else
-      bitSet(GREEN_LED_PORT, GREEN_LED_BIT); // Green on
-     #endif
+    #ifndef ELBEARBOY
+		 #ifndef LCD_ST7565
+		  bitClear(GREEN_LED_PORT, GREEN_LED_BIT); // Green on
+		 #else
+		  bitSet(GREEN_LED_PORT, GREEN_LED_BIT); // Green on
+		 #endif
+	#else
+		GPIO_1->SET = (1 << GREEN_LED_BIT); 
+	 #endif	 
     }
 
     static void inline setRGBledGreenOff()__attribute__((always_inline))
     {
-     #ifndef LCD_ST7565
-      bitSet(GREEN_LED_PORT, GREEN_LED_BIT); // Green off
-     #else
-      bitClear(GREEN_LED_PORT, GREEN_LED_BIT); // Green off
-     #endif
+    #ifndef ELBEARBOY
+		 #ifndef LCD_ST7565
+		  bitSet(GREEN_LED_PORT, GREEN_LED_BIT); // Green off
+		 #else
+		  bitClear(GREEN_LED_PORT, GREEN_LED_BIT); // Green off
+		 #endif
+	 #else
+		GPIO_1->CLEAR = (1 << GREEN_LED_BIT); 
+	 #endif		 
     }
 
     static void inline setRGBledBlueOn()__attribute__((always_inline))
     {
-     #ifndef LCD_ST7565
-      bitClear(BLUE_LED_PORT, BLUE_LED_BIT); // Blue on
-     #else
-      bitSet(BLUE_LED_PORT, BLUE_LED_BIT); // Blue on
-     #endif
+    #ifndef ELBEARBOY
+		 #ifndef LCD_ST7565
+		  bitClear(BLUE_LED_PORT, BLUE_LED_BIT); // Blue on
+		 #else
+		  bitSet(BLUE_LED_PORT, BLUE_LED_BIT); // Blue on
+		 #endif
+	 #else
+		GPIO_1->SET = (1 << BLUE_LED_BIT); 
+	 #endif		 
     }
 
     static void inline setRGBledBlueOff()__attribute__((always_inline))
     {
-     #ifndef LCD_ST7565
-      bitSet(BLUE_LED_PORT, BLUE_LED_BIT); // Blue off
-     #else
-      bitClear(BLUE_LED_PORT, BLUE_LED_BIT); // Blue off
-     #endif
+	#ifndef ELBEARBOY	 
+		 #ifndef LCD_ST7565
+		  bitSet(BLUE_LED_PORT, BLUE_LED_BIT); // Blue off
+		 #else
+		  bitClear(BLUE_LED_PORT, BLUE_LED_BIT); // Blue off
+		 #endif
+	 #else
+		GPIO_1->CLEAR = (1 << BLUE_LED_BIT); 
+	 #endif		 
     }
 
     /** \brief
