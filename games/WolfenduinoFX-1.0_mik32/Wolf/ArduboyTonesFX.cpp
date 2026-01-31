@@ -107,12 +107,18 @@ ArduboyTonesFX::ArduboyTonesFX(boolean (*outEn)())
 
 	
 	#ifdef TONES_2_SPEAKER_PINS
+/*
 		// // Timer32_2_ch2, D11= PORT 1.1 
 		PM->CLK_APB_P_SET |=  PM_CLOCK_APB_P_GPIO_1_M;
 		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
 		GPIO_1->DIRECTION_OUT = 1 << TONE_PIN2; //
 		GPIO_1->CLEAR = 1 << TONE_PIN2;
-
+*/
+		// D17=PORT_0_7 
+		PM->CLK_APB_P_SET |=  PM_CLOCK_APB_P_GPIO_0_M;
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
+		GPIO_0->DIRECTION_OUT = 1 << TONE_PIN2; //
+		GPIO_0->CLEAR = 1 << TONE_PIN2;
 	#endif
 #endif
 }
@@ -160,12 +166,18 @@ ArduboyTonesFX::ArduboyTonesFX(boolean (*outEn)(), uint16_t *tonesArray, uint8_t
 
 	
 	#ifdef TONES_2_SPEAKER_PINS
+		/*
 		// // Timer32_2_ch2, D11= PORT 1.1 
 		PM->CLK_APB_P_SET |=  PM_CLOCK_APB_P_GPIO_1_M;
 		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
 		GPIO_1->DIRECTION_OUT = 1 << TONE_PIN2; //
 		GPIO_1->CLEAR = 1 << TONE_PIN2;
-
+		*/
+		// D17=PORT_0_7 
+		PM->CLK_APB_P_SET |=  PM_CLOCK_APB_P_GPIO_0_M;
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
+		GPIO_0->DIRECTION_OUT = 1 << TONE_PIN2; //
+		GPIO_0->CLEAR = 1 << TONE_PIN2;											
 	#endif
 #endif
 }
@@ -361,7 +373,8 @@ void ArduboyTonesFX::noTone()
   	GPIO_0->CLEAR = 1 << TONE_PIN;
 	#ifdef TONES_VOLUME_CONTROL
 	  //bitClear(TONE_PIN2_PORT, TONE_PIN2); // set pin 2 low
-	   GPIO_1->CLEAR = 1 << TONE_PIN2;
+	   //GPIO_1->CLEAR = 1 << TONE_PIN2;
+	   GPIO_0->CLEAR = 1 << TONE_PIN2;
 	#endif
 #endif
   tonesPlaying = false;
@@ -479,10 +492,10 @@ void ArduboyTonesFX::nextTone()
 	}
 	else { bitClear(TONE_PIN2_PORT, TONE_PIN2);} // set pin 2 low for normal volume
   	#else // ELBEARBOY
-		if (GPIO_0->STATE & (1 << TONE_PIN)) {GPIO_0->CLEAR = 1 << TONE_PIN2;}
+		if (GPIO_0->STATE & (1 << TONE_PIN)) {GPIO_0->CLEAR = 1 << TONE_PIN2;} // здесь производится инверсия PIN2 относительно PIN1
 		else {GPIO_0->SET = 1 << TONE_PIN2;}
 	}
-	else {GPIO_1->CLEAR = 1 << TONE_PIN2;} // set pin 2 low for normal volume		
+	else {GPIO_0->CLEAR = 1 << TONE_PIN2;} // set pin 2 low for normal volume		
 	#endif
 #endif
 
@@ -525,8 +538,10 @@ void ArduboyTonesFX::nextTone()
 	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
 	GPIO_0->DIRECTION_OUT = 1 << TONE_PIN; //
 	#ifdef TONES_VOLUME_CONTROL
-	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 1 порта 1 (в режим 0xb00).  Timer Disconnect!
-	GPIO_1->DIRECTION_OUT = 1 << TONE_PIN2; //
+	//PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 1 порта 1 (в режим 0xb00).  Timer Disconnect!
+	//GPIO_1->DIRECTION_OUT = 1 << TONE_PIN2; //
+	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 1 порта 1 (в режим 0xb00).  Timer Disconnect!
+	GPIO_0->DIRECTION_OUT = 1 << TONE_PIN2; //
 	#endif
 	
 	
@@ -594,8 +609,12 @@ uint16_t ArduboyTonesFX::getNext()
 		if (GPIO_0->STATE & (1 << TONE_PIN)) {GPIO_0->CLEAR = 1 << TONE_PIN;}
 		else {GPIO_0->SET = 1 << TONE_PIN;}
 		#ifdef TONES_VOLUME_CONTROL
-			if (GPIO_1->STATE & (1 << TONE_PIN2)) {GPIO_1->CLEAR = 1 << TONE_PIN2;}
-			else {GPIO_1->SET = 1 << TONE_PIN2;}
+			  if (toneHighVol) {
+//			if (GPIO_1->STATE & (1 << TONE_PIN2)) {GPIO_1->CLEAR = 1 << TONE_PIN2;}
+//			else {GPIO_1->SET = 1 << TONE_PIN2;}
+			if (GPIO_0->STATE & (1 << TONE_PIN2)) {GPIO_0->CLEAR = 1 << TONE_PIN2;}
+			else {GPIO_0->SET = 1 << TONE_PIN2;}
+			  }
 		#endif
 	#endif
     }
