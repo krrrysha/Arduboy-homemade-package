@@ -97,9 +97,23 @@ vec2 levelExit = vec2(0, 0);
 vec2 startPos;
 byte mapTimer = 10;
 
+
+struct GameSaveData {
+    byte gameIDStart;           // Соответствует OFFSET_MYBL_START (1 байт)
+    byte svlevel;                  // Соответствует OFFSET_LEVEL (1 байта)
+    byte svcoins;                  // Соответствует OFFSET_COINS (1 байта)
+	  byte svcoinshs;                  // Соответствует OFFSET_COINSHS (1 байта)
+	  unsigned long svscore;        // Соответствует OFFSET_SCORE (4 байта)
+    unsigned long svscorehs;        // Соответствует OFFSET_HSCORE (4 байта)
+    byte gameIDEnd;             // Соответствует OFFSET_MYBL_END (1 байт)
+} __attribute__((packed));      // ЗАПРЕЩАЕТ выравнивание, упаковка байт в байт
+
+GameSaveData saveData;
+
 void loadSetEEPROM()
 {
-  if ((EEPROM.read(OFFSET_MYBL_START) != GAME_ID) && (EEPROM.read(OFFSET_MYBL_END) != GAME_ID))
+    EEPROM.get(OFFSET_MYBL_START, saveData);
+  if ((saveData.gameIDStart != GAME_ID) && (saveData.gameIDEnd != GAME_ID))
   {
     byte GAME_ID1=(byte)GAME_ID;
     int LEVEL_TO_START_WITH_1=(byte)LEVEL_TO_START_WITH-1;
@@ -112,13 +126,26 @@ void loadSetEEPROM()
     //EEPROM.put(OFFSET_SCORE, (unsigned long)0); // clear score
     //EEPROM.put(OFFSET_HSCORE, (unsigned long)0); // clear high score
     //EEPROM.put(OFFSET_MYBL_END, (byte)GAME_ID); // game id
-    EEPROM.put(OFFSET_MYBL_START, GAME_ID1); // game id
-    EEPROM.put(OFFSET_LEVEL, LEVEL_TO_START_WITH_1); // beginning level
-    EEPROM.put(OFFSET_COINS, byte_zero); // coins current run
-    EEPROM.put(OFFSET_COINSHS, byte_zero); // coins highscore run
-    EEPROM.put(OFFSET_SCORE, ulong_zero); // clear score
-    EEPROM.put(OFFSET_HSCORE, ulong_zero); // clear high score
-    EEPROM.put(OFFSET_MYBL_END,GAME_ID1); // game id
+    
+    //EEPROM.put(OFFSET_MYBL_START, GAME_ID1); // game id
+    //EEPROM.put(OFFSET_LEVEL, LEVEL_TO_START_WITH_1); // beginning level
+    //EEPROM.put(OFFSET_COINS, byte_zero); // coins current run
+    //EEPROM.put(OFFSET_COINSHS, byte_zero); // coins highscore run
+    //EEPROM.put(OFFSET_SCORE, ulong_zero); // clear score
+    //EEPROM.put(OFFSET_HSCORE, ulong_zero); // clear high score
+    //EEPROM.put(OFFSET_MYBL_END,GAME_ID1); // game id
+
+
+    saveData.gameIDStart = GAME_ID1;
+    saveData.svlevel = LEVEL_TO_START_WITH_1;          
+    saveData.svcoins = byte_zero;
+    saveData.svcoinshs = byte_zero;
+    saveData.svscore = ulong_zero;
+    saveData.svscorehs = ulong_zero;
+    saveData.gameIDEnd =GAME_ID1;
+
+      EEPROM.put(OFFSET_MYBL_START, saveData);
+
   }
 }
 

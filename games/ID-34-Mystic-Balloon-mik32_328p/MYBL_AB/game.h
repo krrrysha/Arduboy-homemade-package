@@ -34,12 +34,21 @@ void stateMenuPlayNew()
 
 void stateMenuPlayContinue()
 {
-  level = EEPROM.read(OFFSET_LEVEL);
-  totalCoins = EEPROM.read(OFFSET_COINS);
+  
+    EEPROM.get(OFFSET_MYBL_START, saveData);
+  
+  //level = EEPROM.read(OFFSET_LEVEL);
+  //totalCoins = EEPROM.read(OFFSET_COINS);
+
+  level = saveData.svlevel;
+  totalCoins = saveData.svcoins;
+
+
   coinsCollected = 0;
   balloonsLeft = 0;
   //scorePlayer = 0;
-  EEPROM.get(OFFSET_SCORE, scorePlayer);
+  //EEPROM.get(OFFSET_SCORE, scorePlayer);
+  scorePlayer=saveData.svscore;
   globalCounter = 0;
   kid.balloons = 3;
   gameState = STATE_GAME_NEXT_LEVEL;
@@ -90,9 +99,16 @@ void stateGameNextLevel()
   }*/
 
   // Update EEPROM
-  EEPROM.put(OFFSET_LEVEL, level);
-  EEPROM.put(OFFSET_COINS, totalCoins);
-  EEPROM.put(OFFSET_SCORE, scorePlayer);
+  
+  EEPROM.get(OFFSET_MYBL_START, saveData);
+  
+saveData.svlevel=level;
+saveData.svcoins=totalCoins;
+saveData.svscore=scorePlayer;
+  //EEPROM.put(OFFSET_LEVEL, level);
+  //EEPROM.put(OFFSET_COINS, totalCoins);
+  //EEPROM.put(OFFSET_SCORE, scorePlayer);
+
 
 
   //if (nextLevelIsVisible)
@@ -106,12 +122,16 @@ void stateGameNextLevel()
   {
     int LEVEL_TO_START_WITH_1=(byte)LEVEL_TO_START_WITH - 1;
     unsigned long ulong_zero=0;
-    EEPROM.put(OFFSET_LEVEL, LEVEL_TO_START_WITH_1);
+    //EEPROM.put(OFFSET_LEVEL, LEVEL_TO_START_WITH_1);
+    saveData.svlevel=LEVEL_TO_START_WITH_1;
     // Score remains after completing game? (no)
-    EEPROM.put(OFFSET_SCORE, ulong_zero);
+    //EEPROM.put(OFFSET_SCORE, ulong_zero);
+    saveData.svscore=ulong_zero;
   }
   drawNumbers(43, 49, FONT_BIG, DATA_SCORE);
   //}
+EEPROM.put(OFFSET_MYBL_START, saveData);
+
 
   if (scoreIsVisible)
   {
@@ -182,10 +202,18 @@ void stateGameOver()
   drawNumbers(43, 49, FONT_BIG, DATA_SCORE);
 
   unsigned long highscore = 0;
-  EEPROM.get(OFFSET_HSCORE, highscore);
+//  EEPROM.get(OFFSET_HSCORE, highscore);
+  EEPROM.get(OFFSET_MYBL_START, saveData);
+  highscore= saveData.svscorehs;
+
+
   if (scorePlayer > highscore) {
-    EEPROM.put(OFFSET_COINSHS, totalCoins);
-    EEPROM.put(OFFSET_HSCORE, scorePlayer);
+
+    saveData.svcoinshs = totalCoins;
+    saveData.svscorehs = scorePlayer;
+    //EEPROM.put(OFFSET_COINSHS, totalCoins);
+    //EEPROM.put(OFFSET_HSCORE, scorePlayer);
+    EEPROM.put(OFFSET_MYBL_START, saveData);
   }
     
   if (arduboy.justPressed(A_BUTTON | B_BUTTON))
