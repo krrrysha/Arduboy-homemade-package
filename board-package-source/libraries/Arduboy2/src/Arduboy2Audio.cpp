@@ -12,25 +12,22 @@ void Arduboy2Audio::on()
 {
   // fire up audio pins by seting them as outputs
 #ifndef ELBEARBOY
-#ifdef ARDUBOY_10
-  bitSet(SPEAKER_1_DDR, SPEAKER_1_BIT);
-  bitSet(SPEAKER_2_DDR, SPEAKER_2_BIT);
-#else
-  bitSet(SPEAKER_1_DDR, SPEAKER_1_BIT);
-#endif
+	#ifdef ARDUBOY_10
+	  bitSet(SPEAKER_1_DDR, SPEAKER_1_BIT);
+	  bitSet(SPEAKER_2_DDR, SPEAKER_2_BIT);
+	#else
+	  bitSet(SPEAKER_1_DDR, SPEAKER_1_BIT);
+	#endif
 #else
 
-	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPEAKER_1_BIT)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
+
+	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPEAKER_1_BIT)); // установка вывода 3 или 10 (для SPIBEAR) порта 0 (в режим 0xb00).  Timer Disconnect!
 	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPEAKER_2_BIT)); // установка вывода 7 порта 0 (в режим 0xb00).  Timer Disconnect!
-	////PAD_CONFIG->PORT_0_CFG |= (0b10 << (2 * SPEAKER_1_BIT)); // установка вывода 3 порта 0 (в режим 0xb10). Timer Connect!
-	////PAD_CONFIG->PORT_1_CFG |= (0b10 << (2 * SPEAKER_2_BIT)); // установка вывода 1 порта 1 (в режим 0xb10). Timer Connect!
 	GPIO_0->DIRECTION_OUT = (1 << SPEAKER_1_BIT);
-	//GPIO_1->DIRECTION_OUT = (1 << SPEAKER_2_BIT);
 	GPIO_0->DIRECTION_OUT = (1 << SPEAKER_2_BIT);
 	GPIO_0->CLEAR = (1 << SPEAKER_1_BIT);
-    //GPIO_1->CLEAR = (1 << SPEAKER_2_BIT);
 	GPIO_0->CLEAR = (1 << SPEAKER_2_BIT);
-	
+
 #endif	
   audio_enabled = true;
 }
@@ -47,12 +44,14 @@ void Arduboy2Audio::off()
   bitClear(SPEAKER_1_DDR, SPEAKER_1_BIT);
 #endif
 #else
-	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPEAKER_1_BIT)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
-	//PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * SPEAKER_2_BIT)); // установка вывода 1 порта 1 (в режим 0xb00).  Timer Disconnect!
+
+
+
+	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPEAKER_1_BIT)); // установка вывода 3 или 10 для SPIBEAR порта 0 (в режим 0xb00).  Timer Disconnect!
 	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPEAKER_2_BIT)); // установка вывода 7 порта 0 (в режим 0xb00).  Timer Disconnect!
 	GPIO_0->DIRECTION_IN = (1 << SPEAKER_1_BIT);
-	//GPIO_1->DIRECTION_IN = (1 << SPEAKER_2_BIT);
 	GPIO_0->DIRECTION_IN = (1 << SPEAKER_2_BIT);
+
 #endif
 }
 
@@ -69,7 +68,7 @@ void Arduboy2Audio::saveOnOff()
 #ifndef ELBEARBOY
   EEPROM.update(Arduboy2Base::eepromAudioOnOff, audio_enabled);
 #else
-	Arduboy2Core::update_eeprom_1st_page_byte(Arduboy2Base::eepromAudioOnOff, audio_enabled);
+	Arduboy2Core::update_eeprom_byte(Arduboy2Base::eepromAudioOnOff, audio_enabled);
 #endif
 }
 
@@ -78,7 +77,7 @@ void Arduboy2Audio::begin()
 #ifndef ELBEARBOY
   if (EEPROM.read(Arduboy2Base::eepromAudioOnOff))
 #else
-  if (Arduboy2Core::read_eeprom_byte(Arduboy2Base::eepromAudioOnOff))
+	if (Arduboy2Core::read_eeprom_byte(Arduboy2Base::eepromAudioOnOff))
 #endif
 
   on();
