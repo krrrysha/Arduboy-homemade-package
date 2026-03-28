@@ -80,6 +80,7 @@ ArduboyTonesFX::ArduboyTonesFX(boolean (*outEn)())
 	  bitSet(TONE_PIN2_DDR, TONE_PIN2); // set pin 2 to output mode
 	#endif
 #else	 // ELBEARBOY
+	#ifndef SPIBEAR_TM16					 
 	// Timer32_1_ch4, D9= PORT 0.3 
 	PM->CLK_APB_P_SET |= PM_CLOCK_APB_P_TIMER32_1_M | PM_CLOCK_APB_P_GPIO_0_M;
 	PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M | PM_CLOCK_APB_M_EPIC_M;
@@ -104,6 +105,30 @@ ArduboyTonesFX::ArduboyTonesFX(boolean (*outEn)())
 	TIMER32_1->CHANNELS[3].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
 	TIMER32_1->CHANNELS[3].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
 	
+	#else
+		// Timer16_1, D2= PORT 0.10 
+		PM->CLK_APB_P_SET |= PM_CLOCK_APB_P_TIMER16_1_M | PM_CLOCK_APB_P_GPIO_0_M;
+		PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M | PM_CLOCK_APB_M_EPIC_M;
+				// Глобальное включение прерываний (если часто дергать эти функции, то, кажется,  может зависнуть)
+		set_csr(mstatus, MSTATUS_MIE);
+		set_csr(mie, MIE_MEIE);
+		
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN)); // установка вывода 10 порта 0 (в режим 0xb00).  Timer Disconnect!
+		GPIO_0->DIRECTION_OUT = 1 << TONE_PIN; //
+		GPIO_0->CLEAR = 1 << TONE_PIN;
+		
+		TIMER16_1->CR &= ~TIMER16_CR_ENABLE_M;
+		TIMER16_1->CFGR = (TIMER16_1->CFGR & ~TIMER16_CFGR_PRESC_M) | (0b101 << TIMER16_CFGR_PRESC_S);  // делитель /32
+		TIMER16_1->CFGR &= ~TIMER16_CFGR_WAVE_M; //Настроить таймер с ШИМ сигналом
+
+		//TIMER16_1->ICR = 0xFFFFFFFF;
+		TIMER16_1->ICR = TIMER16_ICR_ARRMCF_M;
+		
+		TIMER16_1->ARR = 0; //При отключении таймера и повторном включении необходимо заново проинициализировать значение в регистре ARR.
+		TIMER16_1->CMP = 0;								  
+		TIMER16_1->IER = TIMER16_IER_ARRMIE_M;	
+		TIMER16_1->CR |= TIMER16_CR_ENABLE_M;																			
+	#endif																													   
 
 	
 	#ifdef TONES_2_SPEAKER_PINS
@@ -116,7 +141,7 @@ ArduboyTonesFX::ArduboyTonesFX(boolean (*outEn)())
 */
 		// D17=PORT_0_7 
 		PM->CLK_APB_P_SET |=  PM_CLOCK_APB_P_GPIO_0_M;
-		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 7 порта 0 (в режим 0xb00).  Timer Disconnect!
 		GPIO_0->DIRECTION_OUT = 1 << TONE_PIN2; //
 		GPIO_0->CLEAR = 1 << TONE_PIN2;
 	#endif
@@ -139,6 +164,7 @@ ArduboyTonesFX::ArduboyTonesFX(boolean (*outEn)(), uint16_t *tonesArray, uint8_t
 	  bitSet(TONE_PIN2_DDR, TONE_PIN2); // set pin 2 to output mode
 	#endif
 #else	 // ELBEARBOY
+	#ifndef SPIBEAR_TM16
 	// Timer32_1_ch4, D9= PORT 0.3 
 	PM->CLK_APB_P_SET |= PM_CLOCK_APB_P_TIMER32_1_M | PM_CLOCK_APB_P_GPIO_0_M;
 	PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M | PM_CLOCK_APB_M_EPIC_M;
@@ -162,9 +188,32 @@ ArduboyTonesFX::ArduboyTonesFX(boolean (*outEn)(), uint16_t *tonesArray, uint8_t
 	TIMER32_1->CHANNELS[3].OCR = 0;
 	TIMER32_1->CHANNELS[3].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
 	TIMER32_1->CHANNELS[3].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
-	
+	#else
+		// Timer16_1, D2= PORT 0.10 
+		PM->CLK_APB_P_SET |= PM_CLOCK_APB_P_TIMER16_1_M | PM_CLOCK_APB_P_GPIO_0_M;
+		PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M | PM_CLOCK_APB_M_EPIC_M;
+				// Глобальное включение прерываний (если часто дергать эти функции, то, кажется,  может зависнуть)
+		set_csr(mstatus, MSTATUS_MIE);
+		set_csr(mie, MIE_MEIE);
+		
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN)); // установка вывода 10 порта 0 (в режим 0xb00).  Timer Disconnect!
+		GPIO_0->DIRECTION_OUT = 1 << TONE_PIN; //
+		GPIO_0->CLEAR = 1 << TONE_PIN;
+		
+		TIMER16_1->CR &= ~TIMER16_CR_ENABLE_M;
+		TIMER16_1->CFGR = (TIMER16_1->CFGR & ~TIMER16_CFGR_PRESC_M) | (0b101 << TIMER16_CFGR_PRESC_S);  // делитель /32
+		TIMER16_1->CFGR &= ~TIMER16_CFGR_WAVE_M; //Настроить таймер с ШИМ сигналом
 
-	
+		//TIMER16_1->ICR = 0xFFFFFFFF;
+		TIMER16_1->ICR = TIMER16_ICR_ARRMCF_M;
+		
+		TIMER16_1->ARR = 0; //При отключении таймера и повторном включении необходимо заново проинициализировать значение в регистре ARR.
+		TIMER16_1->CMP = 0;								  
+
+		TIMER16_1->IER = TIMER16_IER_ARRMIE_M;	
+		TIMER16_1->CR |= TIMER16_CR_ENABLE_M;																			
+  
+	#endif		
 	#ifdef TONES_2_SPEAKER_PINS
 		/*
 		// // Timer32_2_ch2, D11= PORT 1.1 
@@ -175,7 +224,7 @@ ArduboyTonesFX::ArduboyTonesFX(boolean (*outEn)(), uint16_t *tonesArray, uint8_t
 		*/
 		// D17=PORT_0_7 
 		PM->CLK_APB_P_SET |=  PM_CLOCK_APB_P_GPIO_0_M;
-		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN2)); // установка вывода 7 порта 0 (в режим 0xb00).  Timer Disconnect!
 		GPIO_0->DIRECTION_OUT = 1 << TONE_PIN2; //
 		GPIO_0->CLEAR = 1 << TONE_PIN2;											
 	#endif
@@ -192,7 +241,11 @@ void ArduboyTonesFX::tone(uint16_t freq, uint16_t dur)
 	#endif
 #else // ELBEARBOY
 	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
+	#ifndef SPIBEAR_TM16
 		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER16_1_MASK;
+	#endif											   
 #endif
   inProgmem = false;
   tonesStart = tonesIndex = toneSequence; // set to start of sequence array
@@ -214,8 +267,11 @@ void ArduboyTonesFX::tone(uint16_t freq1, uint16_t dur1,
 	#endif
 #else // ELBEARBOY
 	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
-
-	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#ifndef SPIBEAR_TM16
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER16_1_MASK;
+	#endif																																																										   
 #endif
   inProgmem = false;
   tonesStart = tonesIndex = toneSequence; // set to start of sequence array
@@ -240,8 +296,11 @@ void ArduboyTonesFX::tone(uint16_t freq1, uint16_t dur1,
 	#endif
 #else // ELBEARBOY
 	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
- 
-	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#ifndef SPIBEAR_TM16
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER16_1_MASK;
+	#endif			 
 #endif
   inProgmem = false;
   tonesStart = tonesIndex = toneSequence; // set to start of sequence array
@@ -265,8 +324,11 @@ void ArduboyTonesFX::tones(const uint16_t *tones)
 	#endif
 #else // ELBEARBOY
 	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
-
-	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#ifndef SPIBEAR_TM16
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER16_1_MASK;
+	#endif				
 #endif		
   inProgmem = true;
   tonesStart = tonesIndex = (uint16_t *)tones; // set to start of sequence array
@@ -284,8 +346,11 @@ void ArduboyTonesFX::tonesInRAM(uint16_t *tones)
 	#endif
 #else // ELBEARBOY
 	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
-
-	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#ifndef SPIBEAR_TM16
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER16_1_MASK;
+	#endif
 #endif	
   inProgmem = false;
   tonesStart = tonesIndex = tones; // set to start of sequence array
@@ -312,8 +377,11 @@ void ArduboyTonesFX::tonesFromFX(uint24_t tones)
 	#endif
 #else // ELBEARBOY
 	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
-
-	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#ifndef SPIBEAR_TM16
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER16_1_MASK;
+	#endif
 #endif
   nextTone(); // start playing
 }
@@ -366,10 +434,12 @@ void ArduboyTonesFX::noTone()
 	  bitClear(TONE_PIN2_PORT, TONE_PIN2); // set pin 2 low
 	#endif
 #else // ELBEARBOY
-	//Serial.println("!STOP HERE!");
 	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
-
-	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#ifndef SPIBEAR_TM16
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER16_1_MASK;
+	#endif
   	GPIO_0->CLEAR = 1 << TONE_PIN;
 	#ifdef TONES_VOLUME_CONTROL
 	  //bitClear(TONE_PIN2_PORT, TONE_PIN2); // set pin 2 low
@@ -474,7 +544,11 @@ void ArduboyTonesFX::nextTone()
       GPIO_0->CLEAR = 1 << TONE_PIN; // set the pin low
     }
     else {
-      ocrValue = F_CPU / freq / 2 - 1; // счет без делителя
+	  #ifndef SPIBEAR_TM16
+	  ocrValue = F_CPU / freq / 2 - 1; // счет без делителя
+	  #else
+	  ocrValue = F_CPU / 32 /freq / 2 - 1; // счет без делителя
+	  #endif									  
       toneSilent = false;
     }
 #endif
@@ -545,7 +619,7 @@ void ArduboyTonesFX::nextTone()
 	#endif
 	
 	
-	
+	#ifndef SPIBEAR_TM16	
 	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | ~(TIMER32_ENABLE_TIM_EN_M); // без  этого таймер временно "зависает" при быстрой смене TOP/OCR
 	TIMER32_1->TOP = (ocrValue); // счет без делителя, не умножаем на 2
 	//TIMER32_1->CHANNELS[3].OCR = 0;
@@ -559,6 +633,23 @@ void ArduboyTonesFX::nextTone()
 	//HAL_IRQ_EnableInterrupts();
 	//set_csr(mstatus, MSTATUS_MIE);
     //set_csr(mie, MIE_MEIE);
+	#else
+
+		TIMER16_1->CR &= ~TIMER16_CR_ENABLE_M;
+		TIMER16_1->CFGR &= ~TIMER16_CFGR_WAVE_M; //Запустить таймер с ШИМ сигналом
+		TIMER16_1->CR |= TIMER16_CR_ENABLE_M;	
+		
+		//TIMER16_1->ICR = TIMER16_ICR_ARRMCF_M;		
+		TIMER16_1->ARR = (ocrValue);
+		//TIMER16_1->IER = TIMER16_IER_ARRMIE_M;
+		
+		TIMER16_1->CR |=  TIMER16_CR_CNTSTRT_M;
+		
+		durationToggleCount = toggleCount;
+		EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER16_1_MASK;
+		
+
+	#endif	
 #endif
 }
 
@@ -593,9 +684,13 @@ uint16_t ArduboyTonesFX::getNext()
 {
 
   #ifdef ELBEARBOY
-	TIMER32_1->INT_CLEAR =   0xFFFFFFFF;
+	#ifndef SPIBEAR_TM16
+		TIMER32_1->INT_CLEAR =   0xFFFFFFFF;
+	#endif
+		//TIMER16_1->ICR = 0xFFFFFFFF;
+		TIMER16_1->ICR = TIMER16_ICR_ARRMCF_M;
   #endif 
- //Serial.print(" toggleCount="); Serial.println(toggleCount);
+
   if (durationToggleCount != 0) {
     if (!toneSilent) {
 	#ifndef ELBEARBOY
@@ -624,7 +719,11 @@ uint16_t ArduboyTonesFX::getNext()
   }
   else {
   #ifdef ELBEARBOY
-		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+		#ifndef SPIBEAR_TM16
+			EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+		#else
+			EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER16_1_MASK;
+	#endif																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														   
  #endif
 	ArduboyTonesFX::nextTone();
   }

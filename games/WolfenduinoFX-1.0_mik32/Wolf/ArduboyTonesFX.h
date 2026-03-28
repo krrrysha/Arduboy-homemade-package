@@ -51,7 +51,12 @@ THE SOFTWARE.
   #define ELBEARBOY
   #warning ELBEARBOY!
   #include <mik32_hal_irq.h>
+  	#include "Arduboy2.h" // в оригинальной библиотеке нет связи с Arduboy2. видимо может использоваться отдельно. Но у нас надо загрузить конкретные варианты пинов для разных схем....
   typedef uint32_t uint24_t;
+	#ifdef SPIBEAR
+		#define SPIBEAR_TM16 // вообще конечно в этой библиотеке ничего не мешает использовать для SPIBEAR и TIMER32. Дело вкуса
+		#include "mik32_hal_timer16.h"
+	#endif			   
 #endif
 
 // ************************************************************
@@ -149,6 +154,7 @@ THE SOFTWARE.
 	#define TONE_PIN2 PORTB3
 	#define TONE_PIN2_MASK _BV(TONE_PIN2)
 #elif defined (ELBEARBOY)
+	#ifndef SPIBEAR				
 	#define TONE_PIN 3  // D9/3 port_0_3
 	#define TONE_PIN_PORT GPIO_0->STATE
 	#define TONE_PIN_MASK _BV(TONE_PIN)
@@ -156,7 +162,11 @@ THE SOFTWARE.
 	//#define TONE_PIN2 1 //D11/1 port_1_1
 	//#define TONE_PIN2_PORT GPIO_1->STATE
 	//#define TONE_PIN2_MASK _BV(TONE_PIN2)
-
+	#else
+		#define TONE_PIN 10  // D2 port_0_10
+		#define TONE_PIN_PORT GPIO_0->STATE
+		#define TONE_PIN_MASK _BV(TONE_PIN)		
+	#endif
 	#define TONE_PIN2 7 //D17 port_0_7
 	#define TONE_PIN2_PORT GPIO_0->STATE
 	#define TONE_PIN2_MASK _BV(TONE_PIN2)	
