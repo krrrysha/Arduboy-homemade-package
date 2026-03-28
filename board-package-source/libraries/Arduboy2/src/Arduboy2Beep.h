@@ -14,10 +14,16 @@
 
 #ifdef MCU_MIK32_Amur
 #include "mik32_hal_timer16.h"
+	#include "Arduboy2.h" // в оригинальной библиотеке нет связи с Arduboy2. видимо может использоваться отдельно. Но у нас надо загрузить конкретные варианты пинов для разных схем....
 	#define ELBEARBOY
 	#warning ELBEARBOY!
-	#define BEEPER_1_BIT 3 // Добавлены отдельне от SPEAKER_PIN, т.к. оригинальная библиотека не зависит от других
-	#define BEEPER_2_BIT 7	
+	// Добавлены отдельне от SPEAKER_PIN, т.к. оригинальная библиотека не зависит от других
+	#ifndef SPIBEAR // это не работает без ссылки на Arduboy2
+		#define BEEPER_1_BIT 3 //D9
+	#else
+		#define BEEPER_1_BIT 10 // для SPIBEAR D2 
+	#endif
+		#define BEEPER_2_BIT 7	
 #endif	
 /** \brief
  * Play simple square wave tones using speaker pin 1.
