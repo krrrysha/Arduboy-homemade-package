@@ -1,4 +1,5 @@
 /**
+/**
  * @file Arduboy2Core.cpp
  * \brief
  * The Arduboy2Core class for Arduboy hardware initilization and control.
@@ -13,7 +14,7 @@ unsigned int Arduboy2Core::JoystickYZero = 5000; // first run indicator. number 
 #endif
 #ifdef ELBEARBOY
 	uint8_t Arduboy2Core::chan_converted = 0;
-	uint8_t Arduboy2Core::chan_selected = 0;  
+	uint8_t Arduboy2Core::chan_selected = 0; 
 #endif
 
 #ifndef ELBEARBOY
@@ -30,6 +31,18 @@ unsigned int Arduboy2Core::JoystickYZero = 5000; // first run indicator. number 
 //========== class Arduboy2Core ==========
 //========================================
 
+
+#if defined TFT_ST7735_BLK
+
+	
+	uint16_t color_buffer[WIDTH];
+	//uint16_t color_buffer[WIDTH * HEIGHT];
+	//uint16_t row_buffer[8 * WIDTH];  // 2 КБ вместо 16 КБ
+	#define XSTART 16
+	#define YSTART 32
+	#define BorderHEIGHT 128
+	#define BorderWIDTH 160
+#endif 
 // Commands sent to the OLED display to initialize it
 const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
   // boot defaults are commented out but left here in case they
@@ -44,12 +57,90 @@ const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
   0x84,                         // address mode set: X increment
 #elif defined(OLED_SH1106) || defined(OLED_SH1106_I2C)
   0x8D, 0x14,                   // Charge Pump Setting v = enable (0x14)
-  0xA1,                         // Set Segment Re-map
-  0xC8,                         // Set COM Output Scan Direction
+  #ifndef FLIPPED
+	// Set Segment Re-map (A0) | (b0001)
+	// default is (b0000)
+	0xA1,
+	// Set COM Output Scan Direction
+	0xC8,
+  #else
+  	0xA0,
+	0xC0,
+  #endif
   0x81, OLED_CONTRAST,          // Set Contrast v = 0xCF
   0xD9, 0xF1,                   // Set Precharge = 0xF1
   OLED_SET_COLUMN_ADDRESS_LO,   //Set column address for left most pixel
   0xAF                          // Display On
+#elif defined(TFT_ST7735_BLK)
+
+// 7735R init, part 1 (red or green tab)
+                             // 15 commands in list:
+    ST77XX_SWRESET,   ST_CMD_DELAY, //  1: Software reset, 0 args, w/delay
+      150,                          //     150 ms delay
+    ST77XX_SLPOUT,    ST_CMD_DELAY, //  2: Out of sleep mode, 0 args, w/delay
+      255,                          //     500 ms delay
+    ST7735_FRMCTR1, 3,              //  3: Framerate ctrl - normal mode, 3 arg:
+      0x01, 0x2C, 0x2D,             //     Rate = fosc/(1x2+40) * (LINE+2C+2D)
+    ST7735_FRMCTR2, 3,              //  4: Framerate ctrl - idle mode, 3 args:
+      0x01, 0x2C, 0x2D,             //     Rate = fosc/(1x2+40) * (LINE+2C+2D)
+    ST7735_FRMCTR3, 6,              //  5: Framerate - partial mode, 6 args:
+      0x01, 0x2C, 0x2D,             //     Dot inversion mode
+      0x01, 0x2C, 0x2D,             //     Line inversion mode
+    ST7735_INVCTR,  1,              //  6: Display inversion ctrl, 1 arg:
+      0x07,                         //     No inversion
+    ST7735_PWCTR1,  3,              //  7: Power control, 3 args, no delay:
+      0xA2,
+      0x02,                         //     -4.6V
+      0x84,                         //     AUTO mode
+    ST7735_PWCTR2,  1,              //  8: Power control, 1 arg, no delay:
+      0xC5,                         //     VGH25=2.4C VGSEL=-10 VGH=3 * AVDD
+    ST7735_PWCTR3,  2,              //  9: Power control, 2 args, no delay:
+      0x0A,                         //     Opamp current small
+      0x00,                         //     Boost frequency
+    ST7735_PWCTR4,  2,              // 10: Power control, 2 args, no delay:
+      0x8A,                         //     BCLK/2,
+      0x2A,                         //     opamp current small & medium low
+    ST7735_PWCTR5,  2,              // 11: Power control, 2 args, no delay:
+      0x8A, 0xEE,
+    ST7735_VMCTR1,  1,              // 12: Power control, 1 arg, no delay:
+      0x0E,
+    ST77XX_INVOFF,  0,              // 13: Don't invert display, no args
+    ST77XX_MADCTL,  1,              // 14: Mem access ctl (directions), 1 arg:
+      0xC8,                         //     row/col addr, bottom-top refresh
+    ST77XX_COLMOD,  1,              // 15: set color mode, 1 arg, no delay:
+      0x05,                       //     16-bit color
+// next part
+                            //  2 commands in list:
+    ST77XX_CASET,   4,              //  1: Column addr set, 4 args, no delay:
+      0x00, YSTART,                   //     XSTART = 0
+      0x00, BorderHEIGHT,                   //     XEND = 127
+    ST77XX_RASET,   4,              //  2: Row addr set, 4 args, no delay:
+      0x00, XSTART,                   //     XSTART = 0
+      0x00, BorderWIDTH,                  //     XEND = 159// 7735R 3F=63
+									
+								//	init, part 3 (red or green tab)
+                              //  4 commands in list:
+    ST7735_GMCTRP1, 16      ,       //  1: Gamma Adjustments (pos. polarity), 16 args + delay:
+      0x02, 0x1c, 0x07, 0x12,       //     (Not entirely necessary, but provides
+      0x37, 0x32, 0x29, 0x2d,       //      accurate colors)
+      0x29, 0x25, 0x2B, 0x39,
+      0x00, 0x01, 0x03, 0x10,
+    ST7735_GMCTRN1, 16      ,       //  2: Gamma Adjustments (neg. polarity), 16 args + delay:
+      0x03, 0x1d, 0x07, 0x06,       //     (Not entirely necessary, but provides
+      0x2E, 0x2C, 0x29, 0x2D,       //      accurate colors)
+      0x2E, 0x2E, 0x37, 0x3F,
+      0x00, 0x00, 0x02, 0x10,
+    ST77XX_NORON,     ST_CMD_DELAY, //  3: Normal display on, no args, w/delay
+      10,                           //     10 ms delay
+    ST77XX_DISPON,    ST_CMD_DELAY, //  4: Main screen turn on, no args w/delay
+      100,                         //     100 ms delay
+
+// Black TAB:
+	ST77XX_MADCTL, 1, 
+	//0xC0
+	0xAE
+	
+  
 #elif defined(LCD_ST7565)
   0xC8,                         //SET_COM_REVERSE
   0x28 | 0x7,                   //SET_POWER_CONTROL  | 0x7
@@ -109,11 +200,9 @@ const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
 
   // Set Display Clock Divisor v = 0xF0
   // default is 0x80
-#if defined (ECONSOLE)
+
   0xD5, 0x80, //0xF0 for low frequency or 0x80 for high frequency (Reduces coil noise for some OLED displays)
-#else
-0xD5, 0x80,
-#endif
+
   // Set Multiplex Ratio v = 0x3F
   // 0xA8, 0x3F,
 
@@ -132,7 +221,7 @@ const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
  #endif
 
 
-  #ifndef FLIPED
+  #ifndef FLIPPED
   // Set Segment Re-map (A0) | (b0001)
   // default is (b0000)
   0xA1,
@@ -166,6 +255,7 @@ const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
 
   // set display mode = horizontal addressing mode (0x00)
   0x20, 0x00,
+
  #if defined(OLED_SSD1306_I2C) || (OLED_SSD1306_I2CX)
   // set col address range
   0x21, 0x00, COLUMN_ADDRESS_END,
@@ -173,13 +263,14 @@ const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
   // set page address range
   0x22, 0x00, PAGE_ADDRESS_END
  #endif
+ 
 #endif
 };
 
 void Arduboy2Core::boot()
 {
 
-  
+
   #ifdef ARDUBOY_SET_CPU_8MHZ
   // ARDUBOY_SET_CPU_8MHZ will be set by the IDE using boards.txt
   setCPUSpeed8MHz();
@@ -199,8 +290,16 @@ void Arduboy2Core::boot()
   bootPowerSaving(); 
     
   #else
-  bootPins();
-  bootOLED();	  
+
+	  bootPins();
+
+	  #ifdef SPIBEAR
+		bootSPI();
+	  #endif
+
+
+	  bootOLED();	  
+
   #endif
 }
 
@@ -272,29 +371,84 @@ void Arduboy2Core::bootPins()
 	PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M; 
 	// инициализация I2C
 	
-	// SDA and SCL as inputs without pullups
-	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SDA)); // Обнуление вывода 12 порта 1 (в режим GPIO)
-	PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SCL)); // Обнуление вывода 13 порта 1 (в режим GPIO)
-	//PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SDA)); // Обнуление. Отключается подтяжка при работе в режиме выхода
-	//PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SCL)); // Обнуление. Отключается подтяжка при работе в режиме выхода
-	//PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SDA)); // Обнуление.
-	//PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SCL)); // Обнуление
-	PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SDA)); // Нагрузочная способность 8 мА
-	PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SCL)); // Нагрузочная способность 8 мА
-	i2c_stop();
+	#if defined(OLED_SSD1306_I2C) || defined(OLED_SH1106_I2C)
+		
+		// порт селектора: I2C/аналог включаем A7/D25 (ADC5) к PORT 0.9
+		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * SELA_A_PIN)); // Обнуление  (в режим GPIO)
+		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * SELA_B_PIN)); // Обнуление  (в режим GPIO)	
+		GPIO_1->DIRECTION_OUT = (1 << SELA_A_PIN) ;
+		GPIO_1->DIRECTION_OUT = (1 << SELA_B_PIN) ;
+		GPIO_1->SET = (1 << SELA_A_PIN) ; // ace-uno, ace-nano
+		GPIO_1->SET = (1 << SELA_B_PIN) ; // ace-nano
+		
+		
+		
+		// SDA and SCL as inputs without pullups
+		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SDA)); // Обнуление вывода 12 порта 1 (в режим GPIO)
+		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SCL)); // Обнуление вывода 13 порта 1 (в режим GPIO)
+		//PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SDA)); // Обнуление. Отключается подтяжка при работе в режиме выхода
+		//PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SCL)); // Обнуление. Отключается подтяжка при работе в режиме выхода
+		//PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SDA)); // Обнуление.
+		//PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SCL)); // Обнуление
+		PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SDA)); // Нагрузочная способность 8 мА
+		PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SCL)); // Нагрузочная способность 8 мА
+		i2c_stop();
+	#endif		
+	#if defined (OLED_SSD1306_SPI) || defined(TFT_ST7735_BLK) // OLED_SSD1306_SPI  !(defined(OLED_SSD1306_I2C) || defined(OLED_SH1106_I2C)) 
+
+		PM->CLK_APB_P_SET |=  PM_CLOCK_APB_P_SPI_0_M; // включаем тактирование SPI_0
+		
+		
+		// порт селектора: SPI
+		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * SELSPI_BIT)); // Обнуление  (в режим GPIO)
+		GPIO_1->DIRECTION_OUT = (1 << SELSPI_BIT) ;
+		GPIO_1->SET = (1 << SELSPI_BIT) ; // ace-uno, ace-nano SPI отключает nss IN, включает nss out к D9
+
+		
+		
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * CSIN_BIT)); // Обнуление вывода  (в режим GPIO)
+		PAD_CONFIG->PORT_0_CFG |= (0b01 << (2 * CSIN_BIT)); // режим SPI
+		PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * CSIN_BIT)); // подтяжка к +
+		//GPIO_0->DIRECTION_OUT = (1 << CSIN_BIT);
+		
+		
+		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * CSOUT_BIT)); // Обнуление вывода  (в режим GPIO)
+		GPIO_1->DIRECTION_OUT = (1 << CSOUT_BIT);
+		GPIO_1->CLEAR = (1 << CSOUT_BIT) ; // oled display enabled
+	  		
+		//PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * CSOUT_BIT)); // подтяжка к +
+		
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * DC_BIT)); // Обнуление вывода  (в режим GPIO)
+		GPIO_0->DIRECTION_OUT = (1 << DC_BIT) ;
+		GPIO_0->SET = (1 << DC_BIT) ; // data mode
+
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPI_MOSI_BIT)); // Обнуление вывода  (в режим GPIO)
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPI_SCK_BIT)); // Обнуление вывода  (в режим GPIO)
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPI_MISO_BIT)); // Обнуление вывода  (в режим GPIO)
+	
+		PAD_CONFIG->PORT_0_CFG |= (0b01 << (2 * SPI_MOSI_BIT)); //   (в режим 01 SPI)
+		PAD_CONFIG->PORT_0_CFG |= (0b01 << (2 * SPI_SCK_BIT)); //   (в режим 01 SPI)
+		PAD_CONFIG->PORT_0_CFG |= (0b01 << (2 * SPI_MISO_BIT)); //  (в режим 01 SPI)
+	#endif
+
+
+	
 	// инициализация EEPROM. Пользовательские данные Arduino содержатся с EEPROM_START_ADDR=0x1C00 до EEPROM_END=0x1FFF
-	#define EEPROM_START_word_ADDR 0x700
+
 	EEPROM_REGS->EECON = 0;
 	// инициализация ADC
 	
-	chan_selected = CHAN_RANDOM; //
-    
+	chan_selected = CHAN_RANDOM; 
 	
-	PAD_CONFIG->PORT_0_CFG |= (0b11 << (2 * PIN_RANDOM)); // аналоговый сигнал. порт A2=0.4
-	GPIO_0->DIRECTION_IN = 1 << PIN_RANDOM; // 
+	PAD_CONFIG->PORT_0_CFG |= (0b11 << (2 * PIN_RANDOM)); // аналоговый сигнал. порт 
+ 
+	//PAD_CONFIG->PORT_0_PUPD &= ~(0b11 << (2 * PIN_RANDOM)); // без подтяжки
+	GPIO_0->DIRECTION_IN = 1 << PIN_RANDOM; //	
+	//PAD_CONFIG->PORT_0_PUPD |= (0b10 << (2 * PIN_RANDOM)); // подтяжка к -. ну
+	//PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к PW. Нужна для ACE-NANO, у которой без подтяжки не "шумят" аналоговые каналы A0-A2 
+	
 
-	//PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к +
-	PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * PIN_RANDOM)); // подтяжка к PW. Нужна для ACE-NANO, у которой без подтяжки не "шумят" аналоговые каналы A0-A2 
+	
 	#if defined (JOYSTICKANALOG)
 		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISX)); // аналоговый сигнал. порт A0=1.5
 		PAD_CONFIG->PORT_1_CFG |= (0b11 << (2 * PIN_AXISY)); // аналоговый сигнал. порт A1=1.7
@@ -317,7 +471,19 @@ void Arduboy2Core::bootPins()
 		  
 	  	 GPIO_1->DIRECTION_OUT = (1 << RED_LED_BIT) | (1 << BLUE_LED_BIT) | (1 << GREEN_LED_BIT);
 		 GPIO_1->CLEAR = (1 << RED_LED_BIT) | (1 << BLUE_LED_BIT) | (1 << GREEN_LED_BIT); //RGB LED off
+	
+	#elif defined (SPIBEAR)
+		//SPIBEAR
+		  // Задаем направление без "|=", т.к. для установки DIRECTION - только запись "1"
+		  // подтяжка к "-" pull down т.к. на аналоговых входах частично уже есть  внешняя подтяжка к "-"
+		  PAD_CONFIG->PORT_0_PUPD |=  (0b10 << (2 * RIGHT_BUTTON_BIT));
+		  PAD_CONFIG->PORT_1_PUPD |=  (0b10 << (2 * B_BUTTON_BIT) | 0b10 << (2 * A_BUTTON_BIT) | 0b10 << (2 * LEFT_BUTTON_BIT) | 0b10 << (2 * UP_BUTTON_BIT) | 0b10 << (2 * DOWN_BUTTON_BIT));
+		  GPIO_0->DIRECTION_IN = _BV(RIGHT_BUTTON_BIT);
+		  GPIO_1->DIRECTION_IN = _BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT) | _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
 		  
+	  	 GPIO_1->DIRECTION_OUT = (1 << RED_LED_BIT) | (1 << BLUE_LED_BIT) | (1 << GREEN_LED_BIT);
+		 GPIO_1->CLEAR = (1 << RED_LED_BIT) | (1 << BLUE_LED_BIT) | (1 << GREEN_LED_BIT); //RGB LED off
+
 	#else // ECOSOLE KEYS
 		  //PAD_CONFIG->PORT_0_PUPD &= ~ (0b11 << (2 * LEFT_BUTTON_BIT) | 0b11 << (2 * RIGHT_BUTTON_BIT) | 0b11 << (2 * UP_BUTTON_BIT) | 0b11 << (2 * DOWN_BUTTON_BIT) | 0b11 << (2 * A_BUTTON_BIT));
 		  //PAD_CONFIG->PORT_1_PUPD &= ~ (0b11 << (2 * B_BUTTON_BIT));
@@ -546,17 +712,34 @@ void Arduboy2Core::bootOLED()
       displayWrite(pgm_read_byte(lcdBootProgram + i - 8));
   }
   displayDisable();
+#elif   defined(OLED_SSD1306_SPI) && defined(OLED_SSD1306_I2C) 
+  // reset the display
+  uint8_t cmd;
+  const uint8_t* ptr = lcdBootProgram;
+  delayByte(5);                          //for a short active low reset pulse   
+   const uint8_t* end = lcdBootProgram + sizeof(lcdBootProgram);	  
+   delayByte(5);     
+	 LCDCommandMode();
+	while (ptr != end) {
+		cmd = pgm_read_byte(ptr++);
+        SPItransfer(cmd);
+    }
+    LCDDataMode();  // Переключиться в режим данных после отправки команд
+  i2c_start(SSD1306_I2C_CMD);
+  for (uint8_t i = 0; i < sizeof(lcdBootProgram); i++)
+    i2c_sendByte(pgm_read_byte(lcdBootProgram + i));
+  i2c_stop();	
 #elif defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
   i2c_start(SSD1306_I2C_CMD);
   for (uint8_t i = 0; i < sizeof(lcdBootProgram); i++)
     i2c_sendByte(pgm_read_byte(lcdBootProgram + i));
   i2c_stop();
-#else
-  // reset the display
-  uint8_t cmd;
-  const uint8_t* ptr = lcdBootProgram;
-  delayByte(5);                          //for a short active low reset pulse
- #if !(defined(AB_ALTERNATE_WIRING) && defined(CART_CS_SDA))
+#else // варианты с SPI
+	// reset the display
+	  uint8_t cmd;
+	  const uint8_t* ptr = lcdBootProgram;
+	  delayByte(5);                          //for a short active low reset pulse
+ #if !(defined(AB_ALTERNATE_WIRING) && defined(CART_CS_SDA)) && !defined(SPIBEAR)
   bitSet(RST_PORT, RST_BIT);             //deactivate reset
  #endif
   delayByte(5);
@@ -564,8 +747,9 @@ void Arduboy2Core::bootOLED()
   for (uint16_t i = 0; i < 8192; i++) SPItransfer(0); //make sure all display ram is cleared
  #endif
   //bitClear(CS_PORT, CS_BIT);               // select the display as default SPI device, already cleared by boot pins)
-  LCDCommandMode();
+
  #if defined __AVR_ARCH__  
+  LCDCommandMode(); 
   asm volatile
   (
     "3:  lpm  %[cmd], Z+             \n" 
@@ -583,14 +767,51 @@ void Arduboy2Core::bootOLED()
     :
   );
   LCDDataMode();
- #else
-   for (uint8_t i = 0; i < sizeof(lcdBootProgram); i++) 
-   {
-     cmd = pgm_read_byte(lcdBootProgram + i));       
-     SPItransfer(cmd);                      
-   }
+ #else 	// только SPIBEAR
+	#if defined OLED_SSD1306_SPI
+	   LCDCommandMode();
+	   //for (uint8_t i = 0; i < sizeof(lcdBootProgram); i++) 
+	   //{
+	   //  cmd = pgm_read_byte(lcdBootProgram + i);    
+		// SPItransfer(cmd);       
+		//}
+		//LCDCommandMode();
+		const uint8_t* end = lcdBootProgram + sizeof(lcdBootProgram);	  
+		while (ptr != end) {
+
+			cmd = pgm_read_byte(ptr++);
+			SPItransfer(cmd);
+		}
+		LCDDataMode();  // Переключиться в режим данных после отправки команд	
+	#elif defined TFT_ST7735_BLK
+	
+
+	
+	uint8_t numArgs;	
+	uint8_t ms;
+	const uint8_t* end = lcdBootProgram + sizeof(lcdBootProgram);
+
+
+	while (ptr != end) {
+		  cmd = pgm_read_byte(ptr++);       // Read command
+		  numArgs = pgm_read_byte(ptr++);   // Number of args to follow
+          ms = numArgs & ST_CMD_DELAY;       // If hibit set, delay follows args
+          numArgs &= ~ST_CMD_DELAY;          // Mask out delay bit
+		  sendTFTCommand(cmd,ptr,numArgs);
+		  ptr += numArgs;
+		  if (ms) {
+			ms = pgm_read_byte(ptr++); // Read post-command delay time (ms)
+			if (ms == 255) {delayByte(ms);delayByte(ms);} else {delayByte(ms);}
+		  }	
+	}
+	
+
+	blank();
+	#endif
  #endif
 #endif  
+
+
 }
 
 // Initialize the SPI interface for the display
@@ -600,11 +821,39 @@ void Arduboy2Core::bootSPI()
 // master, mode 0, MSB first, CPU clock / 2 (8MHz)
   SPCR = _BV(SPE) | _BV(MSTR);
   SPSR = _BV(SPI2X);
+#else
+	#ifdef SPIBEAR
+	SPI_0->ENABLE &= ~SPI_ENABLE_M;
+	SPI_0->ENABLE |= SPI_ENABLE_CLEAR_RX_FIFO_M;
+	SPI_0->ENABLE |= SPI_ENABLE_CLEAR_TX_FIFO_M;
+	
+
+	
+	volatile uint32_t unused = SPI_0->INT_STATUS; /* Очистка флагов ошибок чтением */
+    (void) unused;
+	
+		volatile uint32_t dummy;
+		while ((SPI_0->INT_STATUS & SPI_INT_STATUS_RX_FIFO_NOT_EMPTY_M) != 0)
+		{
+			dummy = SPI_0->RXDATA;
+		}
+		(void) dummy;
+	#ifdef OLED_SSD1306_SPI
+		SPI_0->CONFIG = SPI_CONFIG_MASTER_M | SPI_CONFIG_BAUD_RATE_DIV_8_M | SPI_CONFIG_MANUAL_CS_M | SPI_CONFIG_CS_NONE_M;  // мастер, деление на 8 т.е. 32/8=4 МГц. В оригинале 16/4=4 МГц. Ручное управление CS
+	#elif defined TFT_ST7735_BLK
+		SPI_0->CONFIG = SPI_CONFIG_MASTER_M | SPI_CONFIG_BAUD_RATE_DIV_2_M | SPI_CONFIG_MANUAL_CS_M | SPI_CONFIG_CS_NONE_M;  // мастер, деление на 8 т.е. 32/8=4 МГц. В оригинале 16/4=4 МГц. Ручное управление CS
+	#endif
+	// Декодер - по умолчанию 0, фаза 0, полярность 0
+	SPI_0->ENABLE = SPI_ENABLE_M;
+	#endif
 #endif  
 }
 
 // Write to the SPI bus (MOSI pin)
-void Arduboy2Core::SPItransfer(uint8_t data)
+
+
+void Arduboy2Core::SPItransfer(uint8_t data)	
+
 {
 #ifndef ELBEARBOY
   SPDR = data;
@@ -616,8 +865,24 @@ void Arduboy2Core::SPItransfer(uint8_t data)
    */
   asm volatile("nop");
   while (!(SPSR & _BV(SPIF))) { } // wait
+#else
+	
+
+#ifdef SPIBEAR
+	SPI_0->TXDATA = data;
+	while (!(SPI_0->INT_STATUS & SPI_INT_STATUS_RX_FIFO_NOT_EMPTY_M));
+	(void) SPI_0->RXDATA;
+#endif
+	
+
+
 #endif
 }
+
+
+
+
+
 
 #if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
 void Arduboy2Core::i2c_start(uint8_t mode)
@@ -681,16 +946,26 @@ void Arduboy2Core::i2c_sendByte(uint8_t byte)
 			{	I2C_SDA_AS_OUTPUT();
 			}
 			byte<<=1; // сдвигаем на 1 бит влево // 5NOP ok for 1306 & 1309
-			 __5NOP();
+			__NOP();
+			__NOP();
+			//__5NOP();
 			I2C_SCL_AS_INPUT();   // Записать его импульсом на SCL       // отпустить SCL (лог.1) // 5 NOP ok for sh1106 // 20 NOP ok for ssd1309
-			 __10NOP(); __10NOP();  
+			//__10NOP();
+			//__10NOP();
+			//__NOP();
+			__NOP();
+			__NOP();
+			__5NOP();
 			I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0) // 5 NOP ok for sh1106
 			//__5NOP();
 
 		}
 		I2C_SDA_AS_INPUT(); // отпустить SDA (лог.1), чтобы ведомое устройство смогло сгенерировать ACK. В оригинальном тексте Arduboy2 тут выставляется лог.0. Вероятно, чтобы не дожидаться, пока это сделает ведомый?
 		I2C_SCL_AS_INPUT(); // отпустить SCL (лог.1), чтобы ведомое устройство передало ACK // 20 NOP ok for ssd1309
-			__10NOP(); __10NOP();
+			//__10NOP(); 
+			//__10NOP();
+			__5NOP();
+			__NOP();
 			__NOP();
 			__NOP();
 		I2C_SCL_AS_OUTPUT(); // притянуть SCL (лог.0)  // приём ACK завершён // 1 nop for 1309
@@ -772,6 +1047,8 @@ void Arduboy2Core::displayWrite(uint8_t data)
 }
 #endif
 
+
+
 // Shut down the display
 void Arduboy2Core::displayOff()
 {
@@ -780,17 +1057,32 @@ void Arduboy2Core::displayOff()
   displayWrite(0x20);
   displayWrite(0x00);
   displayDisable();
+#elif defined(OLED_SSD1306_I2C) && defined(OLED_SSD1306_SPI)
+  i2c_start(SSD1306_I2C_CMD);    
+  i2c_sendByte(0xAE); // display off
+  i2c_sendByte(0x8D); // charge pump:
+  i2c_sendByte(0x10); //   disable
+  i2c_stop();
+  LCDCommandMode();
+  SPItransfer(0xAE); // display off
+  SPItransfer(0x8D); // charge pump:
+  SPItransfer(0x10); //   disable
+  LCDDataMode();
 #elif defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
   i2c_start(SSD1306_I2C_CMD);    
   i2c_sendByte(0xAE); // display off
   i2c_sendByte(0x8D); // charge pump:
   i2c_sendByte(0x10); //   disable
   i2c_stop();
+#elif defined (TFT_ST7735_BLK)
+    sendLCDCommand(ST77XX_DISPOFF);
+	sendLCDCommand(ST77XX_SLPIN);
 #else
   LCDCommandMode();
   SPItransfer(0xAE); // display off
   SPItransfer(0x8D); // charge pump:
   SPItransfer(0x10); //   disable
+  LCDDataMode();
 #endif  
 }
 
@@ -801,11 +1093,19 @@ void Arduboy2Core::displayOn()
 }
 
 
+
+
+
 /* Drawing */
 
 void Arduboy2Core::paint8Pixels(uint8_t pixels)
 {
-#if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
+#if defined(OLED_SSD1306_I2C) && defined(OLED_SSD1306_SPI)
+  i2c_start(SSD1306_I2C_DATA);
+  i2c_sendByte(pixels);
+  i2c_stop();
+  SPItransfer(pixels);
+#elif defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
   i2c_start(SSD1306_I2C_DATA);
   i2c_sendByte(pixels);
   i2c_stop();
@@ -833,12 +1133,97 @@ void Arduboy2Core::paintScreen(const uint8_t *image)
     }
   }
   displayDisable();
-
-#elif defined(OLED_SSD1306_I2C) || (OLED_SSD1306_I2CX)
+#elif defined(OLED_SSD1306_I2C) && defined(OLED_SSD1306_SPI)
   i2c_start(SSD1306_I2C_DATA);
   for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++)
-    i2c_sendByte(pgm_read_byte(image+i));
+  {
+	i2c_sendByte(pgm_read_byte(image+i));
+	SPItransfer(pgm_read_byte(image + i));
+  }
   i2c_stop();
+
+#elif defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX)
+  i2c_start(SSD1306_I2C_DATA);
+  for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++)
+  {
+	i2c_sendByte(pgm_read_byte(image+i));
+	
+  }
+  i2c_stop();
+#elif defined(TFT_ST7735_BLK)
+  GPIO_1->CLEAR = (1 << CSOUT_BIT);	
+  LCDCommandMode();
+	SPItransfer(ST77XX_CASET);
+  LCDDataMode();
+  SPItransfer(0x00);SPItransfer(XSTART);SPItransfer(0x00);SPItransfer(XSTART+WIDTH-1);
+  LCDCommandMode();
+	SPItransfer(ST77XX_RASET);
+  LCDDataMode();
+  SPItransfer(0x00);SPItransfer(YSTART);SPItransfer(0x00);SPItransfer(YSTART+HEIGHT-1);
+  LCDCommandMode();
+	SPItransfer(ST77XX_RAMWR);
+  LCDDataMode();	
+
+    // Определяем цвета для монохромного режима
+    #define MONOCHROME_ON  ST77XX_GREEN
+    #define MONOCHROME_OFF ST77XX_BLACK
+    
+	
+/*
+    // Предварительно разворачиваем страницы
+    for (int page = 0; page < 8; page++) {
+        int base_idx = page * WIDTH;
+        
+        // Для каждого бита в странице (8 строк)
+        for (int bit = 0; bit < 8; bit++) {
+            // Выводим все пиксели текущей строки
+            for (int x = 0; x < WIDTH; x++) {
+                uint8_t byte = image[base_idx + x];
+                uint16_t color = (byte & (1 << bit)) ? MONOCHROME_ON : MONOCHROME_OFF;
+                SPItransfer(color >> 8);
+                SPItransfer(color & 0xFF);
+            }
+        }
+    }
+*/
+
+    for (int page = 0; page < 8; page++) {
+        int base_idx = page * WIDTH;
+        
+        for (int bit = 0; bit < 8; bit++) {
+
+            for (int x = 0; x < WIDTH; x++) {
+                uint8_t byte = image[base_idx + x];
+                color_buffer[x] = ((byte & (1 << bit)) ? 0xFFFF : 0x0000) ;
+            }
+            spi_transfer_block((uint8_t*)(color_buffer), WIDTH*2);
+        }
+    }
+
+
+/*
+ // Формируем ПОЛНЫЙ буфер цвета перед отправкой
+    for (int page = 0; page < 8; page++) {
+        int base_idx = page * WIDTH;  // Смещение в исходном буфере SSD1306
+        
+        // Формируем 8 строк для текущей "страницы"
+        for (int x = 0; x < WIDTH; x++) {
+            uint8_t byte = image[base_idx + x];
+            
+            // Распаковываем 8 вертикальных пикселей в 8 горизонтальных строк
+            for (int bit = 0; bit < 8; bit++) {
+                // bit (0-7) становится строкой внутри блока из 8 строк
+                row_buffer[bit * WIDTH + x] = (byte & (1 << bit)) ? 0xFFFF : 0x0000;
+				//row_buffer[bit * WIDTH + x] = BIT_LUT[byte][bit];
+            }
+        }
+        
+        // Отправляем блок из 8 строк ОДНИМ вызовом SPI
+        spi_transfer_block((uint8_t*)row_buffer, 8 * WIDTH * 2);
+    }
+*/
+		
+  GPIO_1->SET = (1 << CSOUT_BIT);
 #elif  defined (OLED_SH1106_I2C) 
   for (int page = 0; page < HEIGHT/8; page++)
   {
@@ -916,9 +1301,11 @@ void Arduboy2Core::paintScreen(const uint8_t *image)
   }
 #else 
   //OLED SSD1306 and compatibles
+
   for (int i = 0; i < (HEIGHT*WIDTH)/8; i++)
   {
     SPItransfer(pgm_read_byte(image + i));
+
   }
 #endif
 }
@@ -927,6 +1314,7 @@ void Arduboy2Core::paintScreen(const uint8_t *image)
 // will be used by any buffer based subclass
 void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 {
+
 #if defined(GU12864_800B) 
   displayEnable();
   for (uint8_t r = 0; r < (HEIGHT/8); r++)
@@ -1072,20 +1460,153 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
   );
  #endif
   i2c_stop();
-#elif ( defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) ) && defined(ELBEARBOY)
+#elif defined(ELBEARBOY) 
+	 #if  ( defined(OLED_SSD1306_I2C) && defined(OLED_SSD1306_SPI))
+	  i2c_start(SSD1306_I2C_DATA);
+	  if (clear)
+	  {
+		for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++){
+			SPItransfer(*(image));			
+			i2c_sendByte(*(image));
+			*(image++) = 0;
+		}
+	  } else {
+		for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++)
+		{
+			SPItransfer(*(image++));
+			i2c_sendByte(*(image));
+		}
+	  }
+	  i2c_stop();
+
+		 
+	 #elif ( defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) ) 
+	  i2c_start(SSD1306_I2C_DATA);
+	  if (clear)
+	  {
+		for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++){
+			i2c_sendByte(*(image));
+			*(image++) = 0;
+		}
+	  } else {
+		for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++)
+		{
+			i2c_sendByte(*(image++));
+		}
+	  }
+	  i2c_stop();
+	 #elif defined(OLED_SSD1306_SPI) // OLED_SSD1306
+	  if (clear)
+	  {
+
+		for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++){
+			SPItransfer(*(image));
+			*(image++) = 0;
+		}
+
+	  } else {
+	  for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++)
+		{
+			SPItransfer(*(image++));
+		  }
+	  }
+
+
+	#elif defined(TFT_ST7735_BLK)
+
+  GPIO_1->CLEAR = (1 << CSOUT_BIT);	
+  LCDCommandMode();
+	SPItransfer(ST77XX_CASET);
+  LCDDataMode();
+  SPItransfer(0x00);SPItransfer(XSTART);SPItransfer(0x00);SPItransfer(XSTART+WIDTH-1);
+  LCDCommandMode();
+	SPItransfer(ST77XX_RASET);
+  LCDDataMode();
+  SPItransfer(0x00);SPItransfer(YSTART);SPItransfer(0x00);SPItransfer(YSTART+HEIGHT-1);
+  LCDCommandMode();
+	SPItransfer(ST77XX_RAMWR);
+  LCDDataMode();	
+
+    // Определяем цвета для монохромного режима
+    #define MONOCHROME_ON  ST77XX_GREEN
+    #define MONOCHROME_OFF ST77XX_BLACK
  
-  i2c_start(SSD1306_I2C_DATA);
-  if (clear)
-  {
-  	for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++){
-		i2c_sendByte(*(image));
-		*(image++) = 0;
-	}
-  } else {
-	for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++)
-	i2c_sendByte(*(image++));
-  }
-  i2c_stop();
+/*
+   // Предварительно разворачиваем страницы
+    for (int page = 0; page < 8; page++) {
+        int base_idx = page * WIDTH;
+        
+        // Для каждого бита в странице (8 строк)
+        for (int bit = 0; bit < 8; bit++) {
+            // Выводим все пиксели текущей строки
+            for (int x = 0; x < WIDTH; x++) {
+                uint8_t byte = image[base_idx + x];
+                uint16_t color = (byte & (1 << bit)) ? MONOCHROME_ON : MONOCHROME_OFF;
+                SPItransfer(color >> 8);
+                SPItransfer(color & 0xFF);
+            }
+        }
+    }
+  */  
+  
+  /*
+    for (int page = 0; page < 8; page++) {
+        int base_idx = page * WIDTH;
+        
+        for (int bit = 0; bit < 8; bit++) {
+            for (int x = 0; x < WIDTH; x++) {
+                uint8_t byte = image[base_idx + x];
+                color_buffer[x] = ((byte & (1 << bit)) ? 0xFFFF : 0x0000) ;
+            }
+            spi_transfer_block((uint8_t*)(color_buffer), WIDTH*2);
+        }
+    }
+*/
+
+
+      for (int page = 0; page < 8; page++) {
+        int base_idx = page * WIDTH;
+        
+        for (int bit = 0; bit < 8; bit++) {
+            for (int x = 0; x < WIDTH; x++) {
+                uint8_t byte = image[base_idx + x];
+                color_buffer[x] = ((byte & (1 << bit)) ? 0xFFFF : 0x0000) ;
+            }
+            spi_transfer_block((uint8_t*)(color_buffer), WIDTH*2);
+        }
+    }
+
+ /* 
+  
+  // Формируем ПОЛНЫЙ буфер цвета перед отправкой
+    for (int page = 0; page < 8; page++) {
+        int base_idx = page * WIDTH;  // Смещение в исходном буфере SSD1306
+        
+        // Формируем 8 строк для текущей "страницы"
+        for (int x = 0; x < WIDTH; x++) {
+            uint8_t byte = image[base_idx + x];
+            
+            // Распаковываем 8 вертикальных пикселей в 8 горизонтальных строк
+            for (int bit = 0; bit < 8; bit++) {
+                // bit (0-7) становится строкой внутри блока из 8 строк
+                row_buffer[bit * WIDTH + x] = (byte & (1 << bit)) ? 0xFFFF : 0x0000;
+				//row_buffer[bit * WIDTH + x] = BIT_LUT[byte][bit];
+            }
+        }
+        
+        // Отправляем блок из 8 строк ОДНИМ вызовом SPI
+        spi_transfer_block((uint8_t*)row_buffer, 8 * WIDTH * 2);
+    }
+ */ 
+    // Очистка, если нужно
+    if (clear) {
+        memset(image, 0, WIDTH * 8); // 8 страниц по 128 байт = 1024 байта
+    }
+
+	
+  GPIO_1->SET = (1 << CSOUT_BIT);			
+	 #endif
+	
 #elif  defined (OLED_SH1106_I2C)
 
   for (int page = 0; page < HEIGHT/8; page++)
@@ -1109,7 +1630,9 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
     }
     i2c_stop();
   }
-#elif defined(OLED_SH1106) || defined(LCD_ST7565)
+
+  
+#elif (defined(OLED_SH1106) || defined(LCD_ST7565)) && !defined(ELBEARBOY)
   //Assembly optimized page mode display code with clear support.
   //Each byte transfer takes 18 cycles
   asm volatile (
@@ -1278,6 +1801,7 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
       [clear]   "r"   (clear)
   );
   #endif  
+
 }
 #if 0
 // For reference, this is the "closed loop" C++ version of paintScreen()
@@ -1322,7 +1846,14 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 
 void Arduboy2Core::blank()
 {
-#if defined(OLED_SSD1306_I2C) || (OLED_SSD1306_I2CX)
+#if defined(OLED_SSD1306_I2C) && defined(OLED_SSD1306_SPI)
+  i2c_start(SSD1306_I2C_DATA);
+  for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++) {
+    SPItransfer(0x00);
+	i2c_sendByte(0);
+  }
+  i2c_stop();
+#elif defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX)
   i2c_start(SSD1306_I2C_DATA);
   for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++)
     i2c_sendByte(0);
@@ -1339,6 +1870,28 @@ void Arduboy2Core::blank()
       i2c_sendByte(0);
     i2c_stop();
   }
+#elif defined(TFT_ST7735_BLK)
+
+  GPIO_1->CLEAR = (1 << CSOUT_BIT);	
+  LCDCommandMode();
+	SPItransfer(ST77XX_CASET);
+  LCDDataMode();
+  SPItransfer(0x00);SPItransfer(0);SPItransfer(0x00);SPItransfer(BorderWIDTH-1); //BorderWIDTH
+  LCDCommandMode();
+	SPItransfer(ST77XX_RASET);
+  LCDDataMode();
+  SPItransfer(0x00);SPItransfer(0);SPItransfer(0x00);SPItransfer(BorderHEIGHT-1); //BorderHEIGHT
+  LCDCommandMode();
+	SPItransfer(ST77XX_RAMWR);
+  LCDDataMode();	
+    // Отправка 8192 пикселей (черных)
+
+	
+	for (uint16_t i = 0; i < (128 * 160); i++) {
+        SPItransfer(0x00);
+        SPItransfer(0x00);
+    }
+	GPIO_1->SET = (1 << CSOUT_BIT);
 #else
  #if defined (OLED_SH1106)
   for (int i = 0; i < (HEIGHT * 132) / 8; i++)
@@ -1353,16 +1906,73 @@ void Arduboy2Core::blank()
 
 void Arduboy2Core::sendLCDCommand(uint8_t command)
 {
-#if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
+#if defined(OLED_SSD1306_I2C) && defined(OLED_SSD1306_SPI) 
+  LCDCommandMode();
+  SPItransfer(command);
+  LCDDataMode();
   i2c_start(SSD1306_I2C_CMD);
   i2c_sendByte(command);
   i2c_stop();
+#elif defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
+  i2c_start(SSD1306_I2C_CMD);
+  i2c_sendByte(command);
+  i2c_stop();
+#elif defined TFT_ST7735_BLK
+	LCDCommandMode();
+	GPIO_1->CLEAR = (1 << CSOUT_BIT);
+    SPItransfer(command);
+	GPIO_1->SET = (1 << CSOUT_BIT);
+    LCDDataMode();
 #elif !defined GU12864_800B 
   LCDCommandMode();
   SPItransfer(command);
   LCDDataMode();
 #endif
 }
+
+#ifdef TFT_ST7735_BLK
+void Arduboy2Core::sendTFTCommand(uint8_t commandByte, uint8_t *dataBytes, uint8_t numDataBytes)
+{
+	GPIO_1->CLEAR = (1 << CSOUT_BIT);	
+	LCDCommandMode();
+    SPItransfer(commandByte); // Send the command byte
+	LCDDataMode();
+		  for (int i = 0; i < numDataBytes; i++) {
+			   SPItransfer(*dataBytes); // Send the data bytes
+			  dataBytes++;
+			}
+	GPIO_1->SET = (1 << CSOUT_BIT);
+
+}
+
+void Arduboy2Core::sendTFTCommand(uint8_t commandByte, const uint8_t *dataBytes, uint8_t numDataBytes)
+{
+	GPIO_1->CLEAR = (1 << CSOUT_BIT);	
+	LCDCommandMode();
+    SPItransfer(commandByte); // Send the command byte
+	LCDDataMode();
+		  for (int i = 0; i < numDataBytes; i++) {
+			   SPItransfer(*dataBytes); // Send the data bytes
+			  dataBytes++;
+			}
+	GPIO_1->SET = (1 << CSOUT_BIT);
+
+}
+
+void Arduboy2Core::spi_transfer_block(uint8_t *data, int len) {
+    for (int i = 0; i < len; i++) {
+	SPI_0->TXDATA = data[i];
+	//while (!(SPI_0->INT_STATUS & SPI_INT_STATUS_RX_FIFO_NOT_EMPTY_M));
+	(void) SPI_0->RXDATA;		
+    }
+}
+
+#endif
+
+
+
+
+
 
 // invert the display or set to normal
 // when inverted, a pixel set to 0 will be on
@@ -1375,6 +1985,8 @@ void Arduboy2Core::invert(bool inverse)
   else displayWrite(0x40);
   LCDDataMode();
   displayDisable();
+ #elif defined(TFT_ST7735_BLK)
+    sendLCDCommand(inverse ? ST77XX_INVON : ST77XX_INVOFF);
  #else
   sendLCDCommand(inverse ? OLED_PIXELS_INVERTED : OLED_PIXELS_NORMAL);
  #endif
@@ -1714,10 +2326,17 @@ uint8_t Arduboy2Core::buttonsState()
   #elif defined(ELBEARBOY)
 	buttons = 0;
 	#ifndef JOYSTICKANALOG
-		if (bitRead(UP_BUTTON_PORTIN, UP_BUTTON_BIT) == 0) { buttons |= UP_BUTTON; }
-		if (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT) == 0) { buttons |= DOWN_BUTTON; }
-		if (bitRead(LEFT_BUTTON_PORTIN, LEFT_BUTTON_BIT) == 0) { buttons |= LEFT_BUTTON; }
-		if (bitRead(RIGHT_BUTTON_PORTIN, RIGHT_BUTTON_BIT) == 0) { buttons |= RIGHT_BUTTON; }
+		#ifndef SPIBEAR
+			if (bitRead(UP_BUTTON_PORTIN, UP_BUTTON_BIT) == 0) { buttons |= UP_BUTTON; }
+			if (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT) == 0) { buttons |= DOWN_BUTTON; }
+			if (bitRead(LEFT_BUTTON_PORTIN, LEFT_BUTTON_BIT) == 0) { buttons |= LEFT_BUTTON; }
+			if (bitRead(RIGHT_BUTTON_PORTIN, RIGHT_BUTTON_BIT) == 0) { buttons |= RIGHT_BUTTON; }
+		#else
+			if (bitRead(UP_BUTTON_PORTIN, UP_BUTTON_BIT) == 1) { buttons |= UP_BUTTON; }
+			if (bitRead(DOWN_BUTTON_PORTIN, DOWN_BUTTON_BIT) == 1) { buttons |= DOWN_BUTTON; }
+			if (bitRead(LEFT_BUTTON_PORTIN, LEFT_BUTTON_BIT) == 1) { buttons |= LEFT_BUTTON; }
+			if (bitRead(RIGHT_BUTTON_PORTIN, RIGHT_BUTTON_BIT) == 1) { buttons |= RIGHT_BUTTON; }		
+		#endif
 	#else
 		if (ANALOG_REG->ADC_VALID) {
 			if ((chan_converted == CHAN_AXISX | chan_converted==CHAN_AXISY ) & (chan_selected==CHAN_AXISY|chan_selected==CHAN_AXISX))  
@@ -1756,8 +2375,13 @@ uint8_t Arduboy2Core::buttonsState()
 		}
 		buttons |= ADCJoystickState;
 	#endif
-		if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
-		if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
+		#ifndef SPIBEAR
+			if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 0) { buttons |= A_BUTTON; }
+			if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
+		#else
+			if (bitRead(A_BUTTON_PORTIN, A_BUTTON_BIT) == 1) { buttons |= A_BUTTON; }
+			if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 1) { buttons |= B_BUTTON; }
+		#endif
   #else
   // up, right, left, down
   buttons = ((~PINF) &
@@ -1787,7 +2411,7 @@ uint8_t Arduboy2Core::buttonsState()
   // B
   if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
 #endif
-
+//Serial.println(buttons,BIN);
   return buttons;
 }
 
@@ -1823,6 +2447,7 @@ unsigned long Arduboy2Core::generateRandomSeed()
 	  while (bit_is_set(ADCSRA, ADSC)) { } // wait for conversion complete
 
 	  seed = ((unsigned long)ADC << 16) + micros();
+	  
 
 	  power_adc_disable(); // ADC off
 	  
@@ -1839,8 +2464,7 @@ unsigned long Arduboy2Core::generateRandomSeed()
 	while (!ANALOG_REG->ADC_VALID) {};
 	
 	seed = ((unsigned long) ANALOG_REG->ADC_VALUE << 16) + micros();
-	
-	
+	//seed = ((unsigned long) ANALOG_REG->ADC_VALUE << 16) ;
 	
 #endif
  
@@ -1890,25 +2514,41 @@ void inline Arduboy2Core::Delay_us (uint32_t us) //Функция задержк
 }
 */
 #define myEEPROM_TIMEOUT 100000 
+
+
+#define myEEPROM_PAGE_WORDS 32      // words number per page
+#define myEEPROM_PAGE_COUNT 8       // user EEPROM pages number
+#define myEEPROM_START_ADDR 0x1C00  // user EEPROM start address
+#define myEEPROM_WORD_SIZE  4       // word takes 4 bytes
+#define myEEPROM_PAGE_SIZE  ( myEEPROM_PAGE_WORDS * myEEPROM_WORD_SIZE )   // page takes 32*4 = 128 bytes
+#define myEEPROM_END        0x1FFF
+#define myEEPROM_LENGHT     (myEEPROM_PAGE_SIZE * myEEPROM_PAGE_COUNT)
+
+#define EEPROM_START_word_ADDR (myEEPROM_START_ADDR / myEEPROM_WORD_SIZE ) // 0x700
+
 uint8_t Arduboy2Core::read_eeprom_byte(uint16_t idx) {
-	if (idx >= 1024) {
+    if (idx >= myEEPROM_LENGHT)
+    {
+        //idx = idx % myEEPROM_LENGHT;   
 		return 0x00;
-	}
-	// выбираем слово
-    uint8_t word_idx = idx >> 2; // делим на 4
-    EEPROM_REGS->EEA  = (EEPROM_START_word_ADDR + word_idx)<<2;
+    }
+
+	// выбираем слово  //uint8_t word_idx = idx >> 2; // делим на 4
+    EEPROM_REGS->EEA  = myEEPROM_START_ADDR + idx; // считаем, что биты 0,1 просто проигнорируются после чего в регистре останется адрес 4х байтового слова
 	// ожидаем готовность
 	uint32_t timeout=myEEPROM_TIMEOUT;
 	while (timeout-- && (EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M));
 	// читаем
 	uint32_t word_data = EEPROM_REGS->EEDAT;
 	// выбираем байт
-	uint8_t byte_offset = idx % 4;
+	uint8_t byte_offset = idx % myEEPROM_WORD_SIZE;
 	// меняем порядок байт в слове
 	uint32_t word_order= ((word_data & 0xFF)<<24) | ((word_data & (0xFF<<8))<<8) | ((word_data & (0xFF<<16))>>8) | ((word_data & (0xFF<<24))>>24);
 	return (word_order >> (byte_offset * 8)) & 0xFF;
 }
+/*
 void Arduboy2Core::update_eeprom_1st_page_byte(uint16_t idx, uint8_t val){
+  
   if (idx<128) {
 	// выбираем слово
     uint8_t word_idx = idx >> 2;  // делим на 4
@@ -1921,9 +2561,9 @@ void Arduboy2Core::update_eeprom_1st_page_byte(uint16_t idx, uint8_t val){
 	//выбираем байт
 	uint8_t byte_offset = idx % 4;
 	// прямой порядок существующего слова
-	uint32_t exist_val= ((exist_order & 0xFF)<<24) | ((exist_order & (0xFF<<8))<<8) | ((exist_order & (0xFF<<16))>>8) | ((exist_order & (0xFF<<24))>>24);
+	uint32_t exist_redro= ((exist_order & 0xFF)<<24) | ((exist_order & (0xFF<<8))<<8) | ((exist_order & (0xFF<<16))>>8) | ((exist_order & (0xFF<<24))>>24);
 	// добавляем наш байт в прямой порядок
-	uint32_t word_data=exist_val & (~(0xFF << (byte_offset*8))) |  ((uint32_t)val << (byte_offset * 8));
+	uint32_t word_data=exist_redro & (~(0xFF << (byte_offset*8))) |  ((uint32_t)val << (byte_offset * 8));
 	// делаем обратный порядок измененного слова
 	uint32_t word_order=((word_data & 0xFF)<<24) | ((word_data & (0xFF<<8))<<8) | ((word_data & (0xFF<<16))>>8) | ((word_data & (0xFF<<24))>>24);
 		 
@@ -1951,6 +2591,165 @@ void Arduboy2Core::update_eeprom_1st_page_byte(uint16_t idx, uint8_t val){
       }
   } 
 }
+*/
+
+
+
+void Arduboy2Core::update_eeprom_byte(uint16_t idx, uint8_t val){
+  
+    if (idx >= myEEPROM_LENGHT)
+    {
+        //idx = idx % myEEPROM_LENGHT;   
+		return;
+    }
+	// выбираем слово
+	EEPROM_REGS->EEA  = myEEPROM_START_ADDR + idx;
+	// ожидаем готовность
+	uint32_t timeout=myEEPROM_TIMEOUT;
+	while (timeout-- && (EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M));
+	// читаем существующее слово в обратном порядке
+	uint32_t exist_order= EEPROM_REGS->EEDAT;
+	//выбираем байт
+	uint8_t byte_offset = idx % myEEPROM_WORD_SIZE;
+	// прямой порядок существующего слова
+	uint32_t exist_redro= ((exist_order & 0xFF)<<24) | ((exist_order & (0xFF<<8))<<8) | ((exist_order & (0xFF<<16))>>8) | ((exist_order & (0xFF<<24))>>24);
+	// добавляем наш байт в прямой порядок
+	uint32_t word_data=exist_redro & (~(0xFF << (byte_offset*8))) |  ((uint32_t)val << (byte_offset * 8));
+	// делаем обратный порядок измененного слова
+	uint32_t word_order=((word_data & 0xFF)<<24) | ((word_data & (0xFF<<8))<<8) | ((word_data & (0xFF<<16))>>8) | ((word_data & (0xFF<<24))>>24);
+		 
+      //uint32_t a32=EEPROM_REGS->EEDAT;
+      //uint8_t a = (uint8_t)a32;
+
+      if (exist_order != word_order) {
+        //erase
+ 		EEPROM_REGS->EECON |= EEPROM_EECON_BWE_M;
+		// При заполнении буфера записи адрес слова внутри буфера определяется разрядами EEA[6:2]
+        EEPROM_REGS->EEA  = myEEPROM_START_ADDR + idx;
+        EEPROM_REGS->EEDAT= exist_order;
+        EEPROM_REGS->EECON |= EEPROM_EECON_OP(EEPROM_EECON_OP_ER) | EEPROM_EECON_EX_M;
+		timeout=myEEPROM_TIMEOUT;		
+		while (timeout-- && (EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M));
+        //update
+
+        EEPROM_REGS->EECON |= EEPROM_EECON_BWE_M;
+        EEPROM_REGS->EEA  = myEEPROM_START_ADDR + idx;
+        EEPROM_REGS->EEDAT= word_order;
+        EEPROM_REGS->EECON |= EEPROM_EECON_OP(EEPROM_EECON_OP_PR) | EEPROM_EECON_EX_M;
+		timeout=myEEPROM_TIMEOUT;
+		while (timeout-- && (EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M));
+      }
+  } 
+
+
+uint8_t eeprom_read_byte(void *__src) {
+    uint16_t idx = (uint16_t)( (uintptr_t)__src);
+	if (idx >= myEEPROM_LENGHT)
+    {
+        //idx = idx % myEEPROM_LENGHT;   
+		return 0x00;
+    }
+
+	// выбираем слово  //uint8_t word_idx = idx >> 2; // делим на 4
+    EEPROM_REGS->EEA  = myEEPROM_START_ADDR + idx; // считаем, что биты 0,1 просто проигнорируются после чего в регистре останется адрес 4х байтового слова
+	// ожидаем готовность
+	uint32_t timeout=myEEPROM_TIMEOUT;
+	while (timeout-- && (EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M));
+	// читаем
+	uint32_t word_data = EEPROM_REGS->EEDAT;
+	// выбираем байт
+	uint8_t byte_offset = idx % myEEPROM_WORD_SIZE;
+	// меняем порядок байт в слове
+	uint32_t word_order= ((word_data & 0xFF)<<24) | ((word_data & (0xFF<<8))<<8) | ((word_data & (0xFF<<16))>>8) | ((word_data & (0xFF<<24))>>24);
+	return (word_order >> (byte_offset * 8)) & 0xFF;
+}
+
+
+void eeprom_write_block(const void *__src, void *__dst, size_t __n)
+{
+    // Преобразуем адреса
+    uint16_t dst_idx = (uint16_t) (uintptr_t)(__dst);
+    const uint8_t *src_ptr = (const uint8_t *)__src;
+    
+    // Проверка границ
+    if (dst_idx >= myEEPROM_LENGHT || dst_idx + __n > myEEPROM_LENGHT)
+    {
+        // Выход за пределы EEPROM - ничего не пишем
+        return;
+    }
+    
+    // Пишем побайтово, используя существующую функцию
+    for (size_t i = 0; i < __n; i++)
+    {
+        eeprom_update_byte((void*) (uintptr_t)(dst_idx + i ),src_ptr[i]);
+    }
+}  
+
+void eeprom_read_block(void *__dst, const void *__src, size_t __n)
+{
+    // Преобразуем адреса
+    uint16_t src_idx = (uint16_t)(uintptr_t)(__src);
+    uint8_t *dst_ptr = (uint8_t *)__dst;
+    
+    // Проверка границ
+    if (src_idx >= myEEPROM_LENGHT || src_idx + __n > myEEPROM_LENGHT)
+    {
+        return;
+    }
+    
+    // Читаем побайтово, используя существующую функцию
+    for (size_t i = 0; i < __n; i++)
+    {
+        dst_ptr[i]=eeprom_read_byte((void*)(uintptr_t)(src_idx + i ));
+    }
+}
+  
+  
+void eeprom_update_byte(void *__dst, uint8_t val){
+	uint16_t idx = (uint16_t)(uintptr_t)(__dst);
+    if (idx >= myEEPROM_LENGHT)
+    {
+        //idx = idx % myEEPROM_LENGHT;   
+		return;
+    }
+	// выбираем слово
+	EEPROM_REGS->EEA  = myEEPROM_START_ADDR + idx;
+	// ожидаем готовность
+	uint32_t timeout=myEEPROM_TIMEOUT;
+	while (timeout-- && (EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M));
+	// читаем существующее слово в обратном порядке
+	uint32_t exist_order= EEPROM_REGS->EEDAT;
+	//выбираем байт
+	uint8_t byte_offset = idx % myEEPROM_WORD_SIZE;
+	// прямой порядок существующего слова
+	uint32_t exist_redro= ((exist_order & 0xFF)<<24) | ((exist_order & (0xFF<<8))<<8) | ((exist_order & (0xFF<<16))>>8) | ((exist_order & (0xFF<<24))>>24);
+	// добавляем наш байт в прямой порядок
+	uint32_t word_data=exist_redro & (~(0xFF << (byte_offset*8))) |  ((uint32_t)val << (byte_offset * 8));
+	// делаем обратный порядок измененного слова
+	uint32_t word_order=((word_data & 0xFF)<<24) | ((word_data & (0xFF<<8))<<8) | ((word_data & (0xFF<<16))>>8) | ((word_data & (0xFF<<24))>>24);
+		 
+      //uint32_t a32=EEPROM_REGS->EEDAT;
+      //uint8_t a = (uint8_t)a32;
+
+      if (exist_order != word_order) {
+        //erase
+ 		EEPROM_REGS->EECON |= EEPROM_EECON_BWE_M;
+		// При заполнении буфера записи адрес слова внутри буфера определяется разрядами EEA[6:2]
+        EEPROM_REGS->EEA  = myEEPROM_START_ADDR + idx;
+        EEPROM_REGS->EEDAT= exist_order;
+        EEPROM_REGS->EECON |= EEPROM_EECON_OP(EEPROM_EECON_OP_ER) | EEPROM_EECON_EX_M;
+		timeout=myEEPROM_TIMEOUT;		
+		while (timeout-- && (EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M));
+        //update
+
+        EEPROM_REGS->EECON |= EEPROM_EECON_BWE_M;
+        EEPROM_REGS->EEA  = myEEPROM_START_ADDR + idx;
+        EEPROM_REGS->EEDAT= word_order;
+        EEPROM_REGS->EECON |= EEPROM_EECON_OP(EEPROM_EECON_OP_PR) | EEPROM_EECON_EX_M;
+		timeout=myEEPROM_TIMEOUT;
+		while (timeout-- && (EEPROM_REGS->EESTA & EEPROM_EESTA_BSY_M));
+      }
+  }   
 #endif
 
 void Arduboy2Core::exitToBootloader()
