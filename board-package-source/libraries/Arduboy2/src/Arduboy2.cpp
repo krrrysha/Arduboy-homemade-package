@@ -43,14 +43,16 @@ void Arduboy2Base::begin()
 //  bootLogoSpritesBOverwrite();
 
   waitNoButtons(); // wait for all buttons to be released
+
 }
 
 void Arduboy2Base::beginDoFirst()
 {
 
-  boot(); // raw hardware
-  display(); // blank the display (sBuffer is global, so cleared automatically)
 
+  boot(); // raw hardware
+
+  display(); // blank the display (sBuffer is global, so cleared automatically)
 
   flashlight(); // light the RGB LED and screen if UP button is being held.
 
@@ -59,6 +61,7 @@ void Arduboy2Base::beginDoFirst()
   systemButtons();
 
   audio.begin();
+
 }
 
 void Arduboy2Base::flashlight()
@@ -130,7 +133,7 @@ void Arduboy2Base::sysCtrlSound(uint8_t buttons, uint8_t led, uint8_t eeVal)
 #ifndef ELBEARBOY
     eeprom_update_byte((uint8_t*)eepromAudioOnOff, eeVal);
 #else
-    update_eeprom_1st_page_byte(eepromAudioOnOff, eeVal);
+    update_eeprom_byte(eepromAudioOnOff, eeVal);
 #endif
     delayShort(500);
     digitalWriteRGB(led, RGB_OFF); // turn off "acknowledge" LED
@@ -205,11 +208,16 @@ void Arduboy2Base::drawLogoSpritesBOverwrite(int16_t y)
 bool Arduboy2Base::bootLogoShell(void (&drawLogo)(int16_t))
 {
 
+
+
+
   bool showLEDs = readShowBootLogoLEDsFlag();
 
 
   if (!readShowBootLogoFlag()) {
-    return false;
+
+	return false;
+	
   }
 
   if (showLEDs) {
@@ -221,8 +229,8 @@ bool Arduboy2Base::bootLogoShell(void (&drawLogo)(int16_t))
   }
 
   for (int16_t y = -15; y <= 24; y++) {
-
     if (pressed(RIGHT_BUTTON)) {
+
      #if defined(MICROCADE)
       setRGBledRedOn();
       setRGBledGreenOn();
@@ -245,6 +253,7 @@ bool Arduboy2Base::bootLogoShell(void (&drawLogo)(int16_t))
     display(CLEAR_BUFFER);
     (*drawLogo)(y); // call the function that actually draws the logo
     display();
+
     delayByte(15);
   }
 
@@ -286,6 +295,7 @@ void Arduboy2Base::waitNoButtons()
 {
   do {
     delayByte(50); // simple button debounce
+
   } while (buttonsState());
 }
 
@@ -1176,8 +1186,8 @@ void Arduboy2Base::writeUnitID(uint16_t id)
   eeprom_update_byte((uint8_t*)eepromUnitID, (uint8_t)(id & 0xff));
   eeprom_update_byte((uint8_t*)eepromUnitID + 1, (uint8_t)(id >> 8));
 #else  
-  update_eeprom_1st_page_byte(eepromUnitID, (uint8_t)(id & 0xff));
-  update_eeprom_1st_page_byte(eepromUnitID + 1, (uint8_t)(id >> 8));
+  update_eeprom_byte(eepromUnitID, (uint8_t)(id & 0xff));
+  update_eeprom_byte(eepromUnitID + 1, (uint8_t)(id >> 8));
 #endif
 }
 
@@ -1225,7 +1235,7 @@ void Arduboy2Base::writeUnitName(const char* name)
 #ifndef ELBEARBOY
     eeprom_update_byte(dest, done ? 0x00 : name[src]);
 #else
-	 update_eeprom_1st_page_byte(dest, done ? 0x00 : name[src]);
+	 update_eeprom_byte(dest, done ? 0x00 : name[src]);
 #endif	
     dest++;
   }
@@ -1249,7 +1259,7 @@ void Arduboy2Base::writeShowBootLogoFlag(bool val)
 #else
   uint8_t flags = read_eeprom_byte(eepromSysFlags);
   bitWrite(flags, sysFlagShowLogoBit, val);
-  update_eeprom_1st_page_byte(eepromSysFlags, flags);
+  update_eeprom_byte(eepromSysFlags, flags);
   
   
 #endif	
@@ -1273,7 +1283,7 @@ void Arduboy2Base::writeShowUnitNameFlag(bool val)
 #else
   uint8_t flags = read_eeprom_byte(eepromSysFlags);
   bitWrite(flags, sysFlagUnameBit, val);
-  update_eeprom_1st_page_byte(eepromSysFlags, flags);  
+  update_eeprom_byte(eepromSysFlags, flags);  
   
 #endif	
 }
@@ -1296,7 +1306,7 @@ void Arduboy2Base::writeShowBootLogoLEDsFlag(bool val)
 #else
   uint8_t flags = read_eeprom_byte(eepromSysFlags);
   bitWrite(flags, sysFlagShowLogoLEDsBit, val);
-  update_eeprom_1st_page_byte(eepromSysFlags, flags);  
+  update_eeprom_byte(eepromSysFlags, flags);  
 #endif
 }
 
@@ -1346,6 +1356,7 @@ void Arduboy2::begin()
 
 void Arduboy2::bootLogo()
 {
+  
   if (bootLogoShell(drawLogoBitmap))
   {
     bootLogoExtra();
