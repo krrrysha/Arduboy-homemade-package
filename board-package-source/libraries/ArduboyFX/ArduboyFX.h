@@ -64,13 +64,14 @@ constexpr uint16_t FX_DATA_VECTOR_PAGE_POINTER = 0x0016;
 constexpr uint16_t FX_SAVE_VECTOR_KEY_POINTER  = 0x0018; /* reserved interrupt vector 6  area */
 constexpr uint16_t FX_SAVE_VECTOR_PAGE_POINTER = 0x001A;
 
+#ifdef ELBEARBOY
 constexpr uint32_t SampeDataKeyPointer[2]={0x4658424F, 0x59444154}; //FXBOYDAT  // когда адрес задан, содержит маскированный ключ: инвертированные FXBOYDAT 
 
 typedef struct {
     const uint32_t VectrorKeyPointer[2]={0x00000000, 0x00000000}; 
     uint16_t VectrorPagePointer; // 
 } FxArea;
-
+#endif
 
 
 constexpr uint32_t SampeSaveKeyPointer[2]= {0x4658424F, 0x59534156}; //FXBOYSAV //  когда адрес задан, содержит маскированный ключ: инвертированные FXBOYSAV 
@@ -229,7 +230,9 @@ struct FrameData
   uint24_t bmp;
   uint8_t  frame;
   uint8_t  mode;
-};
+} ;
+
+
 
 
 #ifdef ELBEARBOY
