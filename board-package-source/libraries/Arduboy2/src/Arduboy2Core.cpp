@@ -32,16 +32,25 @@ unsigned int Arduboy2Core::JoystickYZero = 5000; // first run indicator. number 
 //========================================
 
 
-#if defined TFT_ST7735_BLK
+#if defined (TFT_ST7735_BLK) || defined (TFT_IL9341)
 
 	
-	uint16_t color_buffer[WIDTH];
+
 	//uint16_t color_buffer[WIDTH * HEIGHT];
 	//uint16_t row_buffer[8 * WIDTH];  // 2 КБ вместо 16 КБ
-	#define XSTART 16
-	#define YSTART 32
-	#define BorderHEIGHT 128
-	#define BorderWIDTH 160
+
+	
+
+	
+	#if defined SCALED
+		#define SCALE 2
+		uint8_t dstBuffer[WIDTH*SCALE];    
+	#else
+		#define SCALE 1
+	#endif
+
+//uint16_t color_buffer[WIDTH*SCALE];
+uint8_t color_buffer[WIDTH*SCALE];
 #endif 
 // Commands sent to the OLED display to initialize it
 const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
@@ -71,72 +80,102 @@ const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
   0xD9, 0xF1,                   // Set Precharge = 0xF1
   OLED_SET_COLUMN_ADDRESS_LO,   //Set column address for left most pixel
   0xAF                          // Display On
+#elif defined (TFT_IL9341)
+  0xEF, 3, 0x03, 0x80, 0x02,
+  0xCF, 3, 0x00, 0xC1, 0x30,
+  0xED, 4, 0x64, 0x03, 0x12, 0x81,
+  0xE8, 3, 0x85, 0x00, 0x78,
+  0xCB, 5, 0x39, 0x2C, 0x00, 0x34, 0x02,
+  0xF7, 1, 0x20,
+  0xEA, 2, 0x00, 0x00,
+  TFTCMD_PWCTR1  , 1, 0x23,             // Power control VRH[5:0]
+  TFTCMD_PWCTR2  , 1, 0x10,             // Power control SAP[2:0];BT[3:0]
+  TFTCMD_VMCTR1  , 2, 0x3e, 0x28,       // VCM control
+  TFTCMD_VMCTR2  , 1, 0x86,             // VCM control2
+  //TFTCMD_MADCTL  , 1, 0x48,             // Memory Access Control
+  TFTCMD_VSCRSADD, 1, 0x00,             // Vertical scroll zero
+  TFTCMD_PIXFMT  , 1, 0x55,
+  //TFTCMD_PIXFMT  , 1, 0x11,  
+  TFTCMD_FRMCTR1 , 2, 0x00, 0x18,
+  TFTCMD_DFUNCTR , 3, 0x08, 0x82, 0x27, // Display Function Control
+  0xF2, 1, 0x00,                         // 3Gamma Function Disable
+  TFTCMD_GAMMASET , 1, 0x01,             // Gamma curve selected
+  TFTCMD_GMCTRP1 , 15, 0x0F, 0x31, 0x2B, 0x0C, 0x0E, 0x08, // Set Gamma
+    0x4E, 0xF1, 0x37, 0x07, 0x10, 0x03, 0x0E, 0x09, 0x00,
+  TFTCMD_GMCTRN1 , 15, 0x00, 0x0E, 0x14, 0x03, 0x11, 0x07, // Set Gamma
+    0x31, 0xC1, 0x48, 0x08, 0x0F, 0x0C, 0x31, 0x36, 0x0F,
+  TFTCMD_SLPOUT  , 0x80,                // Exit Sleep
+  TFTCMD_DISPON  , 0x80,                // Display on
+  //0x00                                   // End of list
+  //TFTCMD_MADCTL, 1, 0x00,
+  TFTCMD_MADCTL, 1, 0x20
+  
 #elif defined(TFT_ST7735_BLK)
 
 // 7735R init, part 1 (red or green tab)
                              // 15 commands in list:
-    ST77XX_SWRESET,   ST_CMD_DELAY, //  1: Software reset, 0 args, w/delay
+    TFTCMD_SWRESET,   TFTCMD_DELAY, //  1: Software reset, 0 args, w/delay
       150,                          //     150 ms delay
-    ST77XX_SLPOUT,    ST_CMD_DELAY, //  2: Out of sleep mode, 0 args, w/delay
+    TFTCMD_SLPOUT,    TFTCMD_DELAY, //  2: Out of sleep mode, 0 args, w/delay
       255,                          //     500 ms delay
-    ST7735_FRMCTR1, 3,              //  3: Framerate ctrl - normal mode, 3 arg:
+    TFTCMD_FRMCTR1, 3,              //  3: Framerate ctrl - normal mode, 3 arg:
       0x01, 0x2C, 0x2D,             //     Rate = fosc/(1x2+40) * (LINE+2C+2D)
-    ST7735_FRMCTR2, 3,              //  4: Framerate ctrl - idle mode, 3 args:
+    TFTCMD_FRMCTR2, 3,              //  4: Framerate ctrl - idle mode, 3 args:
       0x01, 0x2C, 0x2D,             //     Rate = fosc/(1x2+40) * (LINE+2C+2D)
-    ST7735_FRMCTR3, 6,              //  5: Framerate - partial mode, 6 args:
+    TFTCMD_FRMCTR3, 6,              //  5: Framerate - partial mode, 6 args:
       0x01, 0x2C, 0x2D,             //     Dot inversion mode
       0x01, 0x2C, 0x2D,             //     Line inversion mode
-    ST7735_INVCTR,  1,              //  6: Display inversion ctrl, 1 arg:
+    TFTCMD_INVCTR,  1,              //  6: Display inversion ctrl, 1 arg:
       0x07,                         //     No inversion
-    ST7735_PWCTR1,  3,              //  7: Power control, 3 args, no delay:
+    TFTCMD_PWCTR1,  3,              //  7: Power control, 3 args, no delay:
       0xA2,
       0x02,                         //     -4.6V
       0x84,                         //     AUTO mode
-    ST7735_PWCTR2,  1,              //  8: Power control, 1 arg, no delay:
+    TFTCMD_PWCTR2,  1,              //  8: Power control, 1 arg, no delay:
       0xC5,                         //     VGH25=2.4C VGSEL=-10 VGH=3 * AVDD
-    ST7735_PWCTR3,  2,              //  9: Power control, 2 args, no delay:
+    TFTCMD_PWCTR3,  2,              //  9: Power control, 2 args, no delay:
       0x0A,                         //     Opamp current small
       0x00,                         //     Boost frequency
-    ST7735_PWCTR4,  2,              // 10: Power control, 2 args, no delay:
+    TFTCMD_PWCTR4,  2,              // 10: Power control, 2 args, no delay:
       0x8A,                         //     BCLK/2,
       0x2A,                         //     opamp current small & medium low
-    ST7735_PWCTR5,  2,              // 11: Power control, 2 args, no delay:
+    TFTCMD_PWCTR5,  2,              // 11: Power control, 2 args, no delay:
       0x8A, 0xEE,
-    ST7735_VMCTR1,  1,              // 12: Power control, 1 arg, no delay:
+    TFTCMD_VMCTR1,  1,              // 12: Power control, 1 arg, no delay:
       0x0E,
-    ST77XX_INVOFF,  0,              // 13: Don't invert display, no args
-    ST77XX_MADCTL,  1,              // 14: Mem access ctl (directions), 1 arg:
+    TFTCMD_INVOFF,  0,              // 13: Don't invert display, no args
+    TFTCMD_MADCTL,  1,              // 14: Mem access ctl (directions), 1 arg:
       0xC8,                         //     row/col addr, bottom-top refresh
-    ST77XX_COLMOD,  1,              // 15: set color mode, 1 arg, no delay:
+    TFTCMD_COLMOD,  1,              // 15: set color mode, 1 arg, no delay:
       0x05,                       //     16-bit color
 // next part
                             //  2 commands in list:
-    ST77XX_CASET,   4,              //  1: Column addr set, 4 args, no delay:
-      0x00, YSTART,                   //     XSTART = 0
-      0x00, BorderHEIGHT,                   //     XEND = 127
-    ST77XX_RASET,   4,              //  2: Row addr set, 4 args, no delay:
-      0x00, XSTART,                   //     XSTART = 0
-      0x00, BorderWIDTH,                  //     XEND = 159// 7735R 3F=63
+    TFTCMD_CASET,   4,              //  1: Column addr set, 4 args, no delay:
+      0x00, 0x00,                   //     XSTART = 0
+      0x00, 0x00,                   //     XEND = 127
+    TFTCMD_RASET,   4,              //  2: Row addr set, 4 args, no delay:
+      0x00, 0x00,                   //     XSTART = 0
+      0x00, 0x00,                  //     XEND = 159// 7735R 3F=63
 									
 								//	init, part 3 (red or green tab)
                               //  4 commands in list:
-    ST7735_GMCTRP1, 16      ,       //  1: Gamma Adjustments (pos. polarity), 16 args + delay:
+    TFTCMD_GMCTRP1, 16      ,       //  1: Gamma Adjustments (pos. polarity), 16 args + delay:
       0x02, 0x1c, 0x07, 0x12,       //     (Not entirely necessary, but provides
       0x37, 0x32, 0x29, 0x2d,       //      accurate colors)
       0x29, 0x25, 0x2B, 0x39,
       0x00, 0x01, 0x03, 0x10,
-    ST7735_GMCTRN1, 16      ,       //  2: Gamma Adjustments (neg. polarity), 16 args + delay:
+    TFTCMD_GMCTRN1, 16      ,       //  2: Gamma Adjustments (neg. polarity), 16 args + delay:
       0x03, 0x1d, 0x07, 0x06,       //     (Not entirely necessary, but provides
       0x2E, 0x2C, 0x29, 0x2D,       //      accurate colors)
       0x2E, 0x2E, 0x37, 0x3F,
       0x00, 0x00, 0x02, 0x10,
-    ST77XX_NORON,     ST_CMD_DELAY, //  3: Normal display on, no args, w/delay
+    TFTCMD_NORON,     TFTCMD_DELAY, //  3: Normal display on, no args, w/delay
       10,                           //     10 ms delay
-    ST77XX_DISPON,    ST_CMD_DELAY, //  4: Main screen turn on, no args w/delay
+    TFTCMD_DISPON,    TFTCMD_DELAY, //  4: Main screen turn on, no args w/delay
       100,                         //     100 ms delay
 
 // Black TAB:
-	ST77XX_MADCTL, 1, 
+	TFTCMD_MADCTL, 1, 
 	//0xC0
 	0xAE
 	
@@ -197,6 +236,11 @@ const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
   //
   // Display Off
   // 0xAE,
+	#if defined(OLED_SSD1306_SPI)
+		0xA6, // сброс инверсии
+		0xA4, // команда отключения режима 0xA5
+		0xAE, 0x8D, 0x10,
+	#endif
 
   // Set Display Clock Divisor v = 0xF0
   // default is 0x80
@@ -256,7 +300,7 @@ const PROGMEM uint8_t Arduboy2Core::lcdBootProgram[] = {
   // set display mode = horizontal addressing mode (0x00)
   0x20, 0x00,
 
- #if defined(OLED_SSD1306_I2C) || (OLED_SSD1306_I2CX)
+ #if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SSD1306_SPI)
   // set col address range
   0x21, 0x00, COLUMN_ADDRESS_END,
 
@@ -384,8 +428,8 @@ void Arduboy2Core::bootPins()
 		
 		
 		// SDA and SCL as inputs without pullups
-		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SDA)); // Обнуление вывода 12 порта 1 (в режим GPIO)
-		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SCL)); // Обнуление вывода 13 порта 1 (в режим GPIO)
+		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SDA)); // Обнуление для вывода 12 порта 1 (в режим GPIO)
+		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * I2C_SCL)); // Обнуление для вывода 13 порта 1 (в режим GPIO)
 		//PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SDA)); // Обнуление. Отключается подтяжка при работе в режиме выхода
 		//PAD_CONFIG->PORT_1_PUPD &= ~(0b11 << (2 * I2C_SCL)); // Обнуление. Отключается подтяжка при работе в режиме выхода
 		//PAD_CONFIG->PORT_1_DS &= ~(0b11 << (2 * I2C_SDA)); // Обнуление.
@@ -394,41 +438,44 @@ void Arduboy2Core::bootPins()
 		PAD_CONFIG->PORT_1_DS |= (0b10 << (2 * I2C_SCL)); // Нагрузочная способность 8 мА
 		i2c_stop();
 	#endif		
-	#if defined (OLED_SSD1306_SPI) || defined(TFT_ST7735_BLK) // OLED_SSD1306_SPI  !(defined(OLED_SSD1306_I2C) || defined(OLED_SH1106_I2C)) 
+	#if defined (OLED_SSD1306_SPI) || defined(TFT_ST7735_BLK)  || defined (TFT_IL9341)// OLED_SSD1306_SPI  !(defined(OLED_SSD1306_I2C) || defined(OLED_SH1106_I2C)) 
+
+		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * CSOUT_BIT)); // Обнуление  (в режим GPIO)
+		GPIO_1->DIRECTION_OUT = (1 << CSOUT_BIT);
+		//GPIO_1->CLEAR = (1 << CSOUT_BIT) ; // oled display enabled
+		GPIO_1->SET = (1 << CSOUT_BIT) ;// отключаем OLED на время инициализации (чтобы туда не улетел мусор, если OLED уже инициализирован)
 
 		PM->CLK_APB_P_SET |=  PM_CLOCK_APB_P_SPI_0_M; // включаем тактирование SPI_0
-		
-		
+
 		// порт селектора: SPI
 		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * SELSPI_BIT)); // Обнуление  (в режим GPIO)
 		GPIO_1->DIRECTION_OUT = (1 << SELSPI_BIT) ;
 		GPIO_1->SET = (1 << SELSPI_BIT) ; // ace-uno, ace-nano SPI отключает nss IN, включает nss out к D9
 
-		
-		
-		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * CSIN_BIT)); // Обнуление вывода  (в режим GPIO)
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * CSIN_BIT)); // Обнуление (в режим GPIO)
 		PAD_CONFIG->PORT_0_CFG |= (0b01 << (2 * CSIN_BIT)); // режим SPI
 		PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * CSIN_BIT)); // подтяжка к +
 		//GPIO_0->DIRECTION_OUT = (1 << CSIN_BIT);
-		
-		
-		PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * CSOUT_BIT)); // Обнуление вывода  (в режим GPIO)
-		GPIO_1->DIRECTION_OUT = (1 << CSOUT_BIT);
-		GPIO_1->CLEAR = (1 << CSOUT_BIT) ; // oled display enabled
+	
+		// data mode
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * DC_BIT)); // Обнуление (в режим GPIO)
+		GPIO_0->DIRECTION_OUT = (1 << DC_BIT) ;
+		GPIO_0->SET = (1 << DC_BIT) ; // data mode		
+
 	  		
 		//PAD_CONFIG->PORT_0_PUPD |= (0b01 << (2 * CSOUT_BIT)); // подтяжка к +
 		
-		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * DC_BIT)); // Обнуление вывода  (в режим GPIO)
-		GPIO_0->DIRECTION_OUT = (1 << DC_BIT) ;
-		GPIO_0->SET = (1 << DC_BIT) ; // data mode
-
-		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPI_MOSI_BIT)); // Обнуление вывода  (в режим GPIO)
-		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPI_SCK_BIT)); // Обнуление вывода  (в режим GPIO)
-		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPI_MISO_BIT)); // Обнуление вывода  (в режим GPIO)
+		// создает трафик несущесвующих данных и команд, но обнуляет старший разряд. на случай режима b10 
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPI_MOSI_BIT)); // Обнуление (в режим GPIO)
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPI_SCK_BIT)); // Обнуление (в режим GPIO)
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * SPI_MISO_BIT)); // Обнуление (в режим GPIO)
 	
 		PAD_CONFIG->PORT_0_CFG |= (0b01 << (2 * SPI_MOSI_BIT)); //   (в режим 01 SPI)
 		PAD_CONFIG->PORT_0_CFG |= (0b01 << (2 * SPI_SCK_BIT)); //   (в режим 01 SPI)
 		PAD_CONFIG->PORT_0_CFG |= (0b01 << (2 * SPI_MISO_BIT)); //  (в режим 01 SPI)
+		
+
+		
 	#endif
 
 
@@ -476,10 +523,10 @@ void Arduboy2Core::bootPins()
 		//SPIBEAR
 		  // Задаем направление без "|=", т.к. для установки DIRECTION - только запись "1"
 		  // подтяжка к "-" pull down т.к. на аналоговых входах частично уже есть  внешняя подтяжка к "-"
-		  PAD_CONFIG->PORT_0_PUPD |=  (0b10 << (2 * RIGHT_BUTTON_BIT));
-		  PAD_CONFIG->PORT_1_PUPD |=  (0b10 << (2 * B_BUTTON_BIT) | 0b10 << (2 * A_BUTTON_BIT) | 0b10 << (2 * LEFT_BUTTON_BIT) | 0b10 << (2 * UP_BUTTON_BIT) | 0b10 << (2 * DOWN_BUTTON_BIT));
-		  GPIO_0->DIRECTION_IN = _BV(RIGHT_BUTTON_BIT);
-		  GPIO_1->DIRECTION_IN = _BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT) | _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
+		  PAD_CONFIG->PORT_0_PUPD |=  (0b10 << (2 * DOWN_BUTTON_BIT));
+		  PAD_CONFIG->PORT_1_PUPD |=  (0b10 << (2 * B_BUTTON_BIT) | 0b10 << (2 * A_BUTTON_BIT) | 0b10 << (2 * LEFT_BUTTON_BIT) | 0b10 << (2 * UP_BUTTON_BIT) | 0b10 << (2 * RIGHT_BUTTON_BIT));
+		  GPIO_0->DIRECTION_IN = _BV(DOWN_BUTTON_BIT);
+		  GPIO_1->DIRECTION_IN = _BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT) | _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT);
 		  
 	  	 GPIO_1->DIRECTION_OUT = (1 << RED_LED_BIT) | (1 << BLUE_LED_BIT) | (1 << GREEN_LED_BIT);
 		 GPIO_1->CLEAR = (1 << RED_LED_BIT) | (1 << BLUE_LED_BIT) | (1 << GREEN_LED_BIT); //RGB LED off
@@ -769,39 +816,42 @@ void Arduboy2Core::bootOLED()
   LCDDataMode();
  #else 	// только SPIBEAR
 	#if defined OLED_SSD1306_SPI
+	   
+
 	   LCDCommandMode();
-	   //for (uint8_t i = 0; i < sizeof(lcdBootProgram); i++) 
-	   //{
-	   //  cmd = pgm_read_byte(lcdBootProgram + i);    
-		// SPItransfer(cmd);       
-		//}
-		//LCDCommandMode();
-		const uint8_t* end = lcdBootProgram + sizeof(lcdBootProgram);	  
+	   const uint8_t* end = lcdBootProgram + sizeof(lcdBootProgram);	  
 		while (ptr != end) {
 
 			cmd = pgm_read_byte(ptr++);
 			SPItransfer(cmd);
 		}
 		LCDDataMode();  // Переключиться в режим данных после отправки команд	
-	#elif defined TFT_ST7735_BLK
+	#elif defined (TFT_ST7735_BLK) || defined (TFT_IL9341)
 	
 
-	
 	uint8_t numArgs;	
 	uint8_t ms;
 	const uint8_t* end = lcdBootProgram + sizeof(lcdBootProgram);
-
+		#if defined (TFT_IL9341)
+			sendLCDCommand(TFTCMD_SWRESET);
+			delayByte(150);
+		#endif
 
 	while (ptr != end) {
 		  cmd = pgm_read_byte(ptr++);       // Read command
 		  numArgs = pgm_read_byte(ptr++);   // Number of args to follow
-          ms = numArgs & ST_CMD_DELAY;       // If hibit set, delay follows args
-          numArgs &= ~ST_CMD_DELAY;          // Mask out delay bit
+		  ms = numArgs & TFTCMD_DELAY;       // If hibit set, delay follows args
+		  numArgs &= ~TFTCMD_DELAY;          // Mask out delay bit
+
 		  sendTFTCommand(cmd,ptr,numArgs);
 		  ptr += numArgs;
 		  if (ms) {
-			ms = pgm_read_byte(ptr++); // Read post-command delay time (ms)
-			if (ms == 255) {delayByte(ms);delayByte(ms);} else {delayByte(ms);}
+			#if defined TFT_ST7735_BLK
+				ms = pgm_read_byte(ptr++); // Read post-command delay time (ms)
+				if (ms == 255) {delayByte(ms);delayByte(ms);} else {delayByte(ms);}
+			#elif defined  TFT_IL9341
+				delayByte(150);
+			#endif
 		  }	
 	}
 	
@@ -823,7 +873,10 @@ void Arduboy2Core::bootSPI()
   SPSR = _BV(SPI2X);
 #else
 	#ifdef SPIBEAR
+
 	SPI_0->ENABLE &= ~SPI_ENABLE_M;
+
+	
 	SPI_0->ENABLE |= SPI_ENABLE_CLEAR_RX_FIFO_M;
 	SPI_0->ENABLE |= SPI_ENABLE_CLEAR_TX_FIFO_M;
 	
@@ -838,18 +891,25 @@ void Arduboy2Core::bootSPI()
 			dummy = SPI_0->RXDATA;
 		}
 		(void) dummy;
-	#ifdef OLED_SSD1306_SPI
+	#if defined (OLED_SSD1306_SPI) 
 		SPI_0->CONFIG = SPI_CONFIG_MASTER_M | SPI_CONFIG_BAUD_RATE_DIV_8_M | SPI_CONFIG_MANUAL_CS_M | SPI_CONFIG_CS_NONE_M;  // мастер, деление на 8 т.е. 32/8=4 МГц. В оригинале 16/4=4 МГц. Ручное управление CS
-	#elif defined TFT_ST7735_BLK
-		SPI_0->CONFIG = SPI_CONFIG_MASTER_M | SPI_CONFIG_BAUD_RATE_DIV_2_M | SPI_CONFIG_MANUAL_CS_M | SPI_CONFIG_CS_NONE_M;  // мастер, деление на 8 т.е. 32/8=4 МГц. В оригинале 16/4=4 МГц. Ручное управление CS
+	#elif defined (TFT_ST7735_BLK) || defined (TFT_IL9341)
+		SPI_0->CONFIG = SPI_CONFIG_MASTER_M | SPI_CONFIG_BAUD_RATE_DIV_2_M | SPI_CONFIG_MANUAL_CS_M | SPI_CONFIG_CS_NONE_M;  // мастер, деление на 2 т.е. 32/2=16 МГц. В оригинале 16/4=4 МГц. Ручное управление CS
 	#endif
 	// Декодер - по умолчанию 0, фаза 0, полярность 0
 	SPI_0->ENABLE = SPI_ENABLE_M;
+
+
+		GPIO_1->CLEAR = (1 << CSOUT_BIT) ; // Включаем OLED обратно (выключали, чтобы не прилетал мусор)
 	#endif
 #endif  
 }
 
 // Write to the SPI bus (MOSI pin)
+
+
+
+
 
 
 void Arduboy2Core::SPItransfer(uint8_t data)	
@@ -1074,9 +1134,9 @@ void Arduboy2Core::displayOff()
   i2c_sendByte(0x8D); // charge pump:
   i2c_sendByte(0x10); //   disable
   i2c_stop();
-#elif defined (TFT_ST7735_BLK)
-    sendLCDCommand(ST77XX_DISPOFF);
-	sendLCDCommand(ST77XX_SLPIN);
+#elif defined (TFT_ST7735_BLK) || defined (TFT_IL9341)
+    sendLCDCommand(TFTCMD_DISPOFF);
+	sendLCDCommand(TFTCMD_SLPIN);
 #else
   LCDCommandMode();
   SPItransfer(0xAE); // display off
@@ -1150,23 +1210,20 @@ void Arduboy2Core::paintScreen(const uint8_t *image)
 	
   }
   i2c_stop();
-#elif defined(TFT_ST7735_BLK)
+#elif defined(TFT_ST7735_BLK) || defined(TFT_IL9341)
   GPIO_1->CLEAR = (1 << CSOUT_BIT);	
   LCDCommandMode();
-	SPItransfer(ST77XX_CASET);
+	SPItransfer(TFTCMD_CASET);
   LCDDataMode();
-  SPItransfer(0x00);SPItransfer(XSTART);SPItransfer(0x00);SPItransfer(XSTART+WIDTH-1);
+  SPItransfer(0x00);SPItransfer(0);SPItransfer((WIDTH*SCALE-1)>>8);SPItransfer(WIDTH*SCALE-1); 
   LCDCommandMode();
-	SPItransfer(ST77XX_RASET);
+	SPItransfer(TFTCMD_RASET);
   LCDDataMode();
-  SPItransfer(0x00);SPItransfer(YSTART);SPItransfer(0x00);SPItransfer(YSTART+HEIGHT-1);
+  SPItransfer(0x00);SPItransfer(0);SPItransfer((HEIGHT*SCALE-1)>>8);SPItransfer(HEIGHT*SCALE-1);
   LCDCommandMode();
-	SPItransfer(ST77XX_RAMWR);
+	SPItransfer(TFTCMD_RAMWR);
   LCDDataMode();	
 
-    // Определяем цвета для монохромного режима
-    #define MONOCHROME_ON  ST77XX_GREEN
-    #define MONOCHROME_OFF ST77XX_BLACK
     
 	
 /*
@@ -1187,18 +1244,28 @@ void Arduboy2Core::paintScreen(const uint8_t *image)
     }
 */
 
-    for (int page = 0; page < 8; page++) {
-        int base_idx = page * WIDTH;
-        
-        for (int bit = 0; bit < 8; bit++) {
 
-            for (int x = 0; x < WIDTH; x++) {
-                uint8_t byte = image[base_idx + x];
-                color_buffer[x] = ((byte & (1 << bit)) ? 0xFFFF : 0x0000) ;
+
+	for (int page = 0; page < 8*SCALE; page++) {
+        int base_idx = page * WIDTH*SCALE;
+        for (int bit = 0; bit < 8; bit++) {
+            for (int x = 0; x < WIDTH*SCALE; x++) {
+                #if defined SCALED
+					uint8_t byte = dstBuffer[base_idx + x];
+				#else
+					uint8_t byte = image[base_idx + x];
+				#endif 
+                color_buffer[x] = ((byte & (1 << bit)) ? MONOCHROME_ON : MONOCHROME_OFF) ;
             }
-            spi_transfer_block((uint8_t*)(color_buffer), WIDTH*2);
+            //spi_transfer_block((uint8_t*)(color_buffer), WIDTH*2*SCALE);
+			spi_transfer_block((uint8_t*)(color_buffer), WIDTH*SCALE);
         }
     }
+
+
+
+
+
 
 
 /*
@@ -1496,6 +1563,9 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 	  }
 	  i2c_stop();
 	 #elif defined(OLED_SSD1306_SPI) // OLED_SSD1306
+
+
+
 	  if (clear)
 	  {
 
@@ -1508,28 +1578,28 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 	  for (int i = 0; i < (HEIGHT * WIDTH) / 8; i++)
 		{
 			SPItransfer(*(image++));
+			//GPIO_SPI_transfer(*(image++));
 		  }
 	  }
 
 
-	#elif defined(TFT_ST7735_BLK)
+	#elif defined(TFT_ST7735_BLK) || defined (TFT_IL9341)
 
   GPIO_1->CLEAR = (1 << CSOUT_BIT);	
   LCDCommandMode();
-	SPItransfer(ST77XX_CASET);
+	SPItransfer(TFTCMD_CASET);
   LCDDataMode();
-  SPItransfer(0x00);SPItransfer(XSTART);SPItransfer(0x00);SPItransfer(XSTART+WIDTH-1);
+  SPItransfer(0x00);SPItransfer(0);SPItransfer((WIDTH*SCALE-1)>>8);SPItransfer(WIDTH*SCALE-1); 
   LCDCommandMode();
-	SPItransfer(ST77XX_RASET);
+	SPItransfer(TFTCMD_RASET);
   LCDDataMode();
-  SPItransfer(0x00);SPItransfer(YSTART);SPItransfer(0x00);SPItransfer(YSTART+HEIGHT-1);
+  SPItransfer(0x00);SPItransfer(0);SPItransfer((HEIGHT*SCALE-1)>>8);SPItransfer(HEIGHT*SCALE-1);
   LCDCommandMode();
-	SPItransfer(ST77XX_RAMWR);
+	SPItransfer(TFTCMD_RAMWR);
   LCDDataMode();	
 
-    // Определяем цвета для монохромного режима
-    #define MONOCHROME_ON  ST77XX_GREEN
-    #define MONOCHROME_OFF ST77XX_BLACK
+
+
  
 /*
    // Предварительно разворачиваем страницы
@@ -1563,48 +1633,81 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
     }
 */
 
-
+/*
       for (int page = 0; page < 8; page++) {
         int base_idx = page * WIDTH;
         
         for (int bit = 0; bit < 8; bit++) {
             for (int x = 0; x < WIDTH; x++) {
                 uint8_t byte = image[base_idx + x];
-                color_buffer[x] = ((byte & (1 << bit)) ? 0xFFFF : 0x0000) ;
+                color_buffer[x] = ((byte & (1 << bit)) ? MONOCHROME_ON : MONOCHROME_OFF) ;
             }
             spi_transfer_block((uint8_t*)(color_buffer), WIDTH*2);
         }
     }
+*/
 
- /* 
-  
-  // Формируем ПОЛНЫЙ буфер цвета перед отправкой
-    for (int page = 0; page < 8; page++) {
-        int base_idx = page * WIDTH;  // Смещение в исходном буфере SSD1306
-        
-        // Формируем 8 строк для текущей "страницы"
-        for (int x = 0; x < WIDTH; x++) {
-            uint8_t byte = image[base_idx + x];
-            
-            // Распаковываем 8 вертикальных пикселей в 8 горизонтальных строк
-            for (int bit = 0; bit < 8; bit++) {
-                // bit (0-7) становится строкой внутри блока из 8 строк
-                row_buffer[bit * WIDTH + x] = (byte & (1 << bit)) ? 0xFFFF : 0x0000;
-				//row_buffer[bit * WIDTH + x] = BIT_LUT[byte][bit];
-            }
-        }
-        
-        // Отправляем блок из 8 строк ОДНИМ вызовом SPI
-        spi_transfer_block((uint8_t*)row_buffer, 8 * WIDTH * 2);
-    }
- */ 
-    // Очистка, если нужно
-    if (clear) {
-        memset(image, 0, WIDTH * 8); // 8 страниц по 128 байт = 1024 байта
-    }
-
+	#if defined SCALED
+	//scaleBuffer2x(image,dstBuffer);
+		
+		
 	
-  GPIO_1->SET = (1 << CSOUT_BIT);			
+//	memset(dstBuffer, 0, 4096);
+
+// 2. Рисуем точки НАПРЯМУЮ в dstBuffer
+// Формат: 16 страниц × 256 байт, 1 байт = 8 вертикальных пикселей
+
+// Точка А: Страница 0, байт 0, бит 0 → строки 0-1, столбец 0-1
+//dstBuffer[0 * 256 + 0] = 0x03;  // 0b00000011 = биты 0 и 1 установлены
+//dstBuffer[0 * 256 + 1] = 0x03;  // Дублируем для горизонтального ×2
+
+// Точка Б: Страница 4, байт 10, бит 0 → строки 64-65, столбец 80-81
+//dstBuffer[4 * 256 + 10] = 0x03;
+//dstBuffer[4 * 256 + 11] = 0x03;
+
+// Точка В: Страница 8, байт 50, бит 0 → строки 128-129 (если экран позволяет)
+//dstBuffer[8 * 256 + 50] = 0x03;
+//dstBuffer[8 * 256 + 51] = 0x03;
+	//Serial.println("тут2");
+		
+		
+		
+		
+	#endif
+		for (int page = 0; page < 8; page++) {
+			int base_idx = page * WIDTH;
+			
+			#if defined SCALED
+				scaleBuffer2x(image+base_idx,dstBuffer);
+				//memset(dstBuffer,0xFF,256);
+			#endif
+			for (int bit = 0; bit < 8; bit++) {
+				for (int x = 0; x < WIDTH*SCALE; x++) {
+					#if defined SCALED
+						uint8_t byte = dstBuffer[x];
+					#else
+						uint8_t byte = image[base_idx + x];
+					#endif 
+					color_buffer[x] = ((byte & (1 << bit)) ? MONOCHROME_ON : MONOCHROME_OFF) ;
+				}
+				#if defined SCALED
+					//spi_transfer_block((uint8_t*)(color_buffer), WIDTH*2*SCALE);
+					//spi_transfer_block((uint8_t*)(color_buffer), WIDTH*2*SCALE);
+					spi_transfer_block((uint8_t*)(color_buffer), WIDTH*SCALE);
+					spi_transfer_block((uint8_t*)(color_buffer), WIDTH*SCALE);
+				#else
+					//spi_transfer_block((uint8_t*)(color_buffer), WIDTH*2*SCALE);
+					spi_transfer_block((uint8_t*)(color_buffer), WIDTH*SCALE);
+				#endif
+			}
+		}
+
+
+		if (clear) {
+			memset(image, 0, WIDTH * 8); // 8 страниц по 128 байт = 1024 байта
+		}
+
+	GPIO_1->SET = (1 << CSOUT_BIT);			
 	 #endif
 	
 #elif  defined (OLED_SH1106_I2C)
@@ -1870,27 +1973,30 @@ void Arduboy2Core::blank()
       i2c_sendByte(0);
     i2c_stop();
   }
-#elif defined(TFT_ST7735_BLK)
+#elif defined(TFT_ST7735_BLK) || defined(TFT_IL9341)
 
   GPIO_1->CLEAR = (1 << CSOUT_BIT);	
-  LCDCommandMode();
-	SPItransfer(ST77XX_CASET);
+ LCDCommandMode();
+	SPItransfer(TFTCMD_CASET);
   LCDDataMode();
-  SPItransfer(0x00);SPItransfer(0);SPItransfer(0x00);SPItransfer(BorderWIDTH-1); //BorderWIDTH
+  SPItransfer(0x00);SPItransfer(0);SPItransfer((WIDTH*SCALE-1)>>8);SPItransfer(WIDTH*SCALE-1); 
   LCDCommandMode();
-	SPItransfer(ST77XX_RASET);
+	SPItransfer(TFTCMD_RASET);
   LCDDataMode();
-  SPItransfer(0x00);SPItransfer(0);SPItransfer(0x00);SPItransfer(BorderHEIGHT-1); //BorderHEIGHT
+  SPItransfer(0x00);SPItransfer(0);SPItransfer((HEIGHT*SCALE-1)>>8);SPItransfer(HEIGHT*SCALE-1);
   LCDCommandMode();
-	SPItransfer(ST77XX_RAMWR);
-  LCDDataMode();	
+	SPItransfer(TFTCMD_RAMWR);
+  LCDDataMode();
     // Отправка 8192 пикселей (черных)
 
 	
-	for (uint16_t i = 0; i < (128 * 160); i++) {
+	for (uint32_t i = 0; i < (WIDTH*SCALE+HEIGHT*SCALE); i++) {
         SPItransfer(0x00);
         SPItransfer(0x00);
     }
+
+
+
 	GPIO_1->SET = (1 << CSOUT_BIT);
 #else
  #if defined (OLED_SH1106)
@@ -1917,12 +2023,14 @@ void Arduboy2Core::sendLCDCommand(uint8_t command)
   i2c_start(SSD1306_I2C_CMD);
   i2c_sendByte(command);
   i2c_stop();
-#elif defined TFT_ST7735_BLK
-	LCDCommandMode();
+#elif defined (TFT_ST7735_BLK) || defined (TFT_IL9341)
+	//LCDCommandMode();
 	GPIO_1->CLEAR = (1 << CSOUT_BIT);
+		LCDCommandMode();
     SPItransfer(command);
+		LCDDataMode();
 	GPIO_1->SET = (1 << CSOUT_BIT);
-    LCDDataMode();
+    //LCDDataMode();
 #elif !defined GU12864_800B 
   LCDCommandMode();
   SPItransfer(command);
@@ -1930,7 +2038,19 @@ void Arduboy2Core::sendLCDCommand(uint8_t command)
 #endif
 }
 
-#ifdef TFT_ST7735_BLK
+#if defined (TFT_ST7735_BLK) || defined (TFT_IL9341)
+
+
+	#if defined SCALED
+	void Arduboy2Core::scaleBuffer2x (const uint8_t* src, uint8_t* dst) {
+			for (uint8_t x = 0; x < WIDTH; x++) {
+			  dst[x * 2]     = src[x];
+			  dst[x * 2 + 1] = src[x];
+		}
+	}
+	#endif
+
+
 void Arduboy2Core::sendTFTCommand(uint8_t commandByte, uint8_t *dataBytes, uint8_t numDataBytes)
 {
 	GPIO_1->CLEAR = (1 << CSOUT_BIT);	
@@ -1960,10 +2080,31 @@ void Arduboy2Core::sendTFTCommand(uint8_t commandByte, const uint8_t *dataBytes,
 }
 
 void Arduboy2Core::spi_transfer_block(uint8_t *data, int len) {
-    for (int i = 0; i < len; i++) {
-	SPI_0->TXDATA = data[i];
-	//while (!(SPI_0->INT_STATUS & SPI_INT_STATUS_RX_FIFO_NOT_EMPTY_M));
-	(void) SPI_0->RXDATA;		
+	uint8_t* end = data + len;
+    while (data< end) {
+
+	#if defined (TFT_ST7735_BLK) || defined (TFT_IL9341)
+//uint8_t current_byte = *data++;
+
+		SPI_0->TXDATA = 0;
+		__NOP();
+		__NOP();
+		__NOP();
+		(void) SPI_0->RXDATA;
+		__NOP();
+		__NOP();
+		__NOP();
+		SPI_0->TXDATA = *data++;
+		__NOP();
+		__NOP();
+		__NOP();		
+		(void) SPI_0->RXDATA;
+		//while (!(SPI_0->INT_STATUS & SPI_INT_STATUS_RX_FIFO_NOT_EMPTY_M)); 
+		//while (!(SPI_0->INT_STATUS & SPI_INT_STATUS_RX_FIFO_NOT_EMPTY_M)) {(void) SPI_0->RXDATA;};
+	#else // такого варианта нет....
+		while (!(SPI_0->INT_STATUS & SPI_INT_STATUS_RX_FIFO_NOT_EMPTY_M));
+		(void) SPI_0->RXDATA;		
+	#endif
     }
 }
 
@@ -1985,8 +2126,8 @@ void Arduboy2Core::invert(bool inverse)
   else displayWrite(0x40);
   LCDDataMode();
   displayDisable();
- #elif defined(TFT_ST7735_BLK)
-    sendLCDCommand(inverse ? ST77XX_INVON : ST77XX_INVOFF);
+ #elif defined(TFT_ST7735_BLK) | defined (TFT_IL9341)
+    sendLCDCommand(inverse ? TFTCMD_INVON : TFTCMD_INVOFF);
  #else
   sendLCDCommand(inverse ? OLED_PIXELS_INVERTED : OLED_PIXELS_NORMAL);
  #endif
@@ -2091,18 +2232,18 @@ void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
 #endif
 #else
 
-	PM->CLK_APB_P_SET = PM_CLOCK_APB_P_TIMER32_2_M | PM_CLOCK_APB_P_GPIO_1_M;
+	PM->CLK_APB_P_SET |= PM_CLOCK_APB_P_TIMER32_2_M | PM_CLOCK_APB_P_GPIO_1_M;
 	PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M;
 
 	PAD_CONFIG->PORT_1_CFG |= (0b10 << (2 * RED_LED)) | (0b10 << (2 * GREEN_LED)) | (0b10 << (2 * BLUE_LED)) ; // установка вывода в режим 0xb10. Timer Connect!
 
 	TIMER32_2->CHANNELS[0].CNTRL &=  TIMER32_CH_CNTRL_DISABLE_M;
 	TIMER32_2->CHANNELS[2].CNTRL &=  TIMER32_CH_CNTRL_DISABLE_M;
-	TIMER32_2->CHANNELS[3].CNTRL &=  TIMER32_CH_CNTRL_DISABLE_M;
+	TIMER32_2->CHANNELS[1].CNTRL &=  TIMER32_CH_CNTRL_DISABLE_M;
 	
 	TIMER32_2->CHANNELS[0].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
 	TIMER32_2->CHANNELS[2].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
-	TIMER32_2->CHANNELS[3].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
+	TIMER32_2->CHANNELS[1].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
 	
 	TIMER32_2->PRESCALER =  0; //Divide by 1 clock prescale
 	TIMER32_2->INT_MASK =  0;
@@ -2110,17 +2251,17 @@ void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
 	
 	TIMER32_2->CHANNELS[0].OCR = 0;
 	TIMER32_2->CHANNELS[2].OCR = 0;
-	TIMER32_2->CHANNELS[3].OCR = 0;
+	TIMER32_2->CHANNELS[1].OCR = 0;
 	
 	TIMER32_2->CHANNELS[0].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
 	TIMER32_2->CHANNELS[2].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
-	TIMER32_2->CHANNELS[3].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
+	TIMER32_2->CHANNELS[1].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
 
 	TIMER32_2->ENABLE = TIMER32_ENABLE_TIM_CLR_M | ~(TIMER32_ENABLE_TIM_EN_M); // без  этого таймер временно "зависает" при быстрой смене TOP/OCR
 	TIMER32_2->TOP = (255); // максимальное значение 255
 	TIMER32_2->CHANNELS[2].OCR = 255- red; // D13 - PORT_1_2 - Timer32_2_ch3 R
 	TIMER32_2->CHANNELS[0].OCR = 255- green; // D12 - PORT_1_0 - Timer32_2_ch1 G
-	TIMER32_2->CHANNELS[3].OCR = 255- blue; // D10 - PORT_1_3 - Timer32_2_ch4 B
+	TIMER32_2->CHANNELS[1].OCR = 255- blue; // D11 - PORT_1_1 - Timer32_2_ch2 B
 	TIMER32_2->ENABLE = TIMER32_ENABLE_TIM_CLR_M | TIMER32_ENABLE_TIM_EN_M;
 #endif
 }
@@ -2177,7 +2318,7 @@ void Arduboy2Core::setRGBled(uint8_t color, uint8_t val)
 	  }
 	  else if (color == BLUE_LED)
 	  {
-		TIMER32_2->CHANNELS[3].OCR = 255- val;
+		TIMER32_2->CHANNELS[1].OCR = 255- val;
 	  }
 #endif
 }

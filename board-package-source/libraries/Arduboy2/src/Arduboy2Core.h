@@ -16,14 +16,22 @@
 // 3v3 - (1IF)
 // GND - (2IF)
 // RESET - (3IF)
+
+// Удалить!
 // D13 -R, D12- B, D10-G
-//			
-// 
 // D11 <-, D14 ^, D15 v, D16 ->
+
+// !!! Исправлено: 
+//D16/A2 v PORT 0.4 ,  D15/A1 <-PORT 1.7, !!! D10 ^ PORT_1_3, D14/A0 -> PORT 1.5
+// D13 - PORT_1_2 - Timer32_2_ch3 R
+// D12 - PORT_1_0 - Timer32_2_ch1 G
+// !!! D11 - PORT_1_1 - Timer32_2_ch2 B
+// RND: ADC6 Port 0.11
+
 // Speaker2 PORT_0_7 A3,D17		PORT 0.7
-// D18-SDA (11F) 				PORT 1.12
-// D19 -SCL (10IF) 				PORT 1.13
-// D24- (8IF)
+// D18/A4-SDA (11F) 				PORT 1.12
+// D19/A5 -SCL (10IF) 				PORT 1.13
+// D24/A6- (8IF)
 // D8 A
 // D7 B
 // D9 SC						D9 (OUT) PORT 1.14 / -- (снимается с D9)  PORT 0.3
@@ -43,9 +51,13 @@
 #define ARDUBOY2_CORE_H
 
 #ifdef MCU_MIK32_Amur
-	//#define OLED_SSD1306_I2C //  define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
-	//#define OLED_SSD1306_SPI
-	#define TFT_ST7735_BLK
+	#define _OLED_SSD1306_I2C //  define OLED_SSD1306_I2C or define OLED_SH1106_I2C 
+	#define _OLED_SH1106_I2C
+	#define OLED_SSD1306_SPI
+	#define _TFT_ST7735_BLK
+	
+	#define _SCALED
+	#define _TFT_IL9341
 	#define FLIPPED
 	//#define OLED_SH1106_I2C
 	//#define JOYSTICKANALOG // undef or JOYSTICKANALOG or JOYSTICKDISCRETE.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
@@ -328,8 +340,9 @@
 	#if defined (JOYSTICKDISCRETE) || defined (JOYSTICKANALOG) || defined (SPIBEAR)
 		#define RED_LED 2  // D13 port 1.2
 		#define GREEN_LED 0  // D12 port 1.0
-		#define BLUE_LED 3  // D10 port 1.3
-
+		//#define BLUE_LED 3  // D10 port 1.3
+		#define BLUE_LED 1  // D11 port 1.1
+		
 		#define RED_LED_PORT GPIO_1->STATE
 		#define RED_LED_BIT  2 //
 
@@ -337,7 +350,7 @@
 		#define GREEN_LED_BIT 0
 
 		#define BLUE_LED_PORT GPIO_1->STATE
-		#define BLUE_LED_BIT 3
+		#define BLUE_LED_BIT 1
 	#else // ECONSOLE KEYS
 		#define RED_LED 2  // D13 port 1.2
 		#define GREEN_LED 9 // D8/9 port_1_9
@@ -525,7 +538,7 @@
 		#define DOWN_BUTTON_PORTIN GPIO_0->STATE
 
 	#elif defined (SPIBEAR) // SPIBEAR KEYS 
-//// D10 <-, D14 ^, D15 v, D16 ->
+//// D10 ^, D14 >, D15 <, D16 v
 // D8 A
 // D7 B	
 	
@@ -535,17 +548,17 @@
 		#define A_BUTTON_BIT 9 // D8/9 port_1_9
 		#define A_BUTTON_PORTIN GPIO_1->STATE
 
-		#define LEFT_BUTTON_BIT 1 // D11/1 port_1_1
+		#define LEFT_BUTTON_BIT 7 // D15 port_1_7
 		#define LEFT_BUTTON_PORTIN GPIO_1->STATE
 
-		#define RIGHT_BUTTON_BIT 4 // D16/4 port_0_4
-		#define RIGHT_BUTTON_PORTIN GPIO_0->STATE
+		#define RIGHT_BUTTON_BIT 5 // D14 port_1_5
+		#define RIGHT_BUTTON_PORTIN GPIO_1->STATE
 
-		#define UP_BUTTON_BIT 5 // D14/5 port_1_5
+		#define UP_BUTTON_BIT 3 // D10 port_1_3
 		#define UP_BUTTON_PORTIN GPIO_1->STATE
 
-		#define DOWN_BUTTON_BIT 7 // D15/7 port_1_7
-		#define DOWN_BUTTON_PORTIN GPIO_1->STATE
+		#define DOWN_BUTTON_BIT 4 // D16 port_0_4
+		#define DOWN_BUTTON_PORTIN GPIO_0->STATE
 
 	#else // ECOSOLE KEYS
 		
@@ -883,54 +896,99 @@
 #define OLED_HORIZ_NORMAL 0xA0 // normal segment re-map
 #endif	
 
+
+
+#if defined (TFT_IL9341) || defined (TFT_ST7735_BLK) 
+	
+	// Определяем цвета для монохромного режима
+    #define MONOCHROME_ON  0xFF //TFTCMD_GREEN
+    #define MONOCHROME_OFF 0x00
+    //#define MONOCHROME_ON  0xFFFF
+    //#define MONOCHROME_OFF 0x0000
+
+	
+	
+	#define TFTCMD_SWRESET 0x01
+	#define TFTCMD_SLPIN 0x10
+	#define TFTCMD_SLPOUT 0x11 ///< Sleep Out
+	#define TFTCMD_INVOFF  0x20
+	#define TFTCMD_INVON   0x21
+	
+	#define TFTCMD_DISPON 0x29   ///< Display ON
+	#define TFTCMD_CASET   0x2A
+	#define TFTCMD_RASET   0x2B
+	#define TFTCMD_RAMWR   0x2C	
+	
+	#define TFTCMD_MADCTL 0x36   ///< Memory Access Control
+
+		
+	#define TFTCMD_DELAY 0x80	
+
+	#define TFTCMD_FRMCTR1 0xB1 ///< Frame Rate Control (In Normal Mode/Full Colors  
+
+	#define TFTCMD_PWCTR1 0xC0 ///< Power Control 1
+	
+	#define TFTCMD_PWCTR2 0xC1 ///< Power Control 2
+	#define TFTCMD_VMCTR1 0xC5 ///< VCOM Control 1
+	#define TFTCMD_GMCTRP1 0xE0 ///< Positive Gamma Correction
+
+
+	#define TFTCMD_BLACK 0x0000
+	#define TFTCMD_WHITE 0xFFFF
+	#define TFTCMD_RED 0xF800
+	#define TFTCMD_GREEN 0x07E0
+	#define TFTCMD_BLUE 0x001F
+	#define TFTCMD_CYAN 0x07FF
+	#define TFTCMD_MAGENTA 0xF81F
+	#define TFTCMD_YELLOW 0xFFE0
+	#define TFTCMD_ORANGE 0xFC00
+		
+#endif
+
+#if defined TFT_IL9341
+
+
+	#define TFTCMD_GAMMASET 0x26 ///< Gamma Set
+	#define TFTCMD_DISPOFF 0x28	
+
+	#define TFTCMD_VSCRSADD 0x37 ///< Vertical Scrolling Start Address
+	#define TFTCMD_PIXFMT 0x3A   ///< COLMOD: Pixel Format Set
+
+	#define TFTCMD_DFUNCTR 0xB6 ///< Display Function Control
+
+	#define TFTCMD_VMCTR2 0xC7 ///< VCOM Control 2
+
+	#define TFTCMD_GMCTRN1 0xE1 ///< Negative Gamma Correction
+	
+
+
+
+#endif
+
+
 #if defined TFT_ST7735_BLK
 
+	#define TFTCMD_NORON 0x13
+	#define TFTCMD_DISPOFF 0x28
+	
+	#define TFTCMD_COLMOD 0x3A
+	
+	#define TFTCMD_FRMCTR2 0xB2
+	#define TFTCMD_FRMCTR3 0xB3
+	#define TFTCMD_INVCTR 0xB4
+	#define TFTCMD_DISSET5 0xB6
 
-#define ST77XX_SWRESET 0x01
-#define ST_CMD_DELAY 0x80
-#define ST77XX_SLPIN 0x10
-#define ST77XX_SLPOUT 0x11
-#define ST77XX_COLMOD 0x3A
-#define ST7735_FRMCTR1 0xB1
-#define ST77XX_MADCTL 0x36
-#define ST7735_DISSET5 0xB6
-#define ST7735_INVCTR 0xB4
-#define ST7735_PWCTR1 0xC0
-#define ST7735_PWCTR2 0xC1
-#define ST7735_PWCTR3 0xC2
-#define ST7735_VMCTR1 0xC5
-#define ST7735_PWCTR6 0xFC
-#define ST7735_GMCTRP1 0xE0
-#define ST7735_GMCTRN1 0xE1
-#define ST77XX_NORON 0x13
-#define ST77XX_DISPOFF 0x28
-#define ST77XX_DISPON 0x29
-#define ST77XX_CASET   0x2A
-#define ST77XX_RASET   0x2B
-#define ST77XX_RAMWR   0x2C
-#define ST7735_FRMCTR1 0xB1
-#define ST7735_FRMCTR2 0xB2
-#define ST7735_FRMCTR3 0xB3
-#define ST7735_PWCTR4 0xC3
-#define ST7735_PWCTR5 0xC4
+	#define TFTCMD_PWCTR3 0xC2
+
+	#define TFTCMD_PWCTR4 0xC3
+	#define TFTCMD_PWCTR5 0xC4
+
+	#define TFTCMD_PWCTR6 0xFC
+
+	#define TFTCMD_GMCTRN1 0xE1
 
 
-	
-	#define ST77XX_INVOFF  0x20
-	#define ST77XX_INVON   0x21
-	
-#define ST77XX_BLACK 0x0000
-#define ST77XX_WHITE 0xFFFF
-#define ST77XX_RED 0xF800
-#define ST77XX_GREEN 0x07E0
-#define ST77XX_BLUE 0x001F
-#define ST77XX_CYAN 0x07FF
-#define ST77XX_MAGENTA 0xF81F
-#define ST77XX_YELLOW 0xFFE0
-#define ST77XX_ORANGE 0xFC00
-	
-	
-	
+
 #endif
 
 
@@ -1162,6 +1220,7 @@ class Arduboy2Core : public Arduboy2NoUSB
      * \see LCDDataMode() LCDCommandMode() sendLCDCommand() SPItransferAndRead()
      */
 
+		//static void inline SPItransfer(uint8_t data) __attribute__((always_inline));
 		static void SPItransfer(uint8_t data);
 	
 
@@ -1444,10 +1503,16 @@ class Arduboy2Core : public Arduboy2NoUSB
      */
     static void sendLCDCommand(uint8_t command);
 
-#if defined TFT_ST7735_BLK
+#if defined (TFT_ST7735_BLK) || defined (TFT_IL9341)
+	#if defined SCALED
+		static void  scaleBuffer2x(const uint8_t* src, uint8_t* dst);
+	#endif
+	
 	static void sendTFTCommand(uint8_t commandByte, uint8_t *dataBytes, uint8_t numDataBytes);
 	static void sendTFTCommand(uint8_t commandByte, const uint8_t *dataBytes, uint8_t numDataBytes);
 		static void spi_transfer_block(uint8_t *data, int len);
+		#define __NOP() __asm volatile ("ADDI x0, x0, 0")
+		#define __10NOP() __asm volatile ("ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n  ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n ADDI x0, x0, 0 \n")
 #endif
 
     static void inline setRGBledRedOn()__attribute__((always_inline))
@@ -1788,9 +1853,7 @@ class Arduboy2Core : public Arduboy2NoUSB
     static void displayEnable();
     static void displayDisable();
 #endif
-#if defined(TFT_ST7735_BLK)
-	static const PROGMEM uint8_t tftWriteWindows[];
-#endif
+
 };
 
 #endif
