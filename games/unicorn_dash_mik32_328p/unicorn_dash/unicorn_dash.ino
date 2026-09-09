@@ -159,7 +159,8 @@ void loop() {
     }
 
     if (arduboy.everyXFrames(32)) {
-        randomSeed(analogRead(0)); // reset random
+        //randomSeed(analogRead(0)); // reset random
+        randomSeed(analogRead(6)); // reset random												  
     }
 
     stateUpdate();

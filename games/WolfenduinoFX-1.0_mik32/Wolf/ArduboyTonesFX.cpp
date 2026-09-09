@@ -165,29 +165,29 @@ ArduboyTonesFX::ArduboyTonesFX(boolean (*outEn)(), uint16_t *tonesArray, uint8_t
 	#endif
 #else	 // ELBEARBOY
 	#ifndef SPIBEAR_TM16
-	// Timer32_1_ch4, D9= PORT 0.3 
-	PM->CLK_APB_P_SET |= PM_CLOCK_APB_P_TIMER32_1_M | PM_CLOCK_APB_P_GPIO_0_M;
-	PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M | PM_CLOCK_APB_M_EPIC_M;
-	
-	// Глобальное включение прерываний (если часто дергать эти функции, то, кажется,  может зависнуть)
-	set_csr(mstatus, MSTATUS_MIE);
-    set_csr(mie, MIE_MEIE);
-	
-	PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
-	GPIO_0->DIRECTION_OUT = 1 << TONE_PIN; //
-	GPIO_0->CLEAR = 1 << TONE_PIN;
+		// Timer32_1_ch4, D9= PORT 0.3 
+		PM->CLK_APB_P_SET |= PM_CLOCK_APB_P_TIMER32_1_M | PM_CLOCK_APB_P_GPIO_0_M;
+		PM->CLK_APB_M_SET |= PM_CLOCK_APB_M_PAD_CONFIG_M | PM_CLOCK_APB_M_WU_M | PM_CLOCK_APB_M_PM_M | PM_CLOCK_APB_M_EPIC_M;
+		
+		// Глобальное включение прерываний (если часто дергать эти функции, то, кажется,  может зависнуть)
+		set_csr(mstatus, MSTATUS_MIE);
+		set_csr(mie, MIE_MEIE);
+		
+		PAD_CONFIG->PORT_0_CFG &= ~(0b11 << (2 * TONE_PIN)); // установка вывода 3 порта 0 (в режим 0xb00).  Timer Disconnect!
+		GPIO_0->DIRECTION_OUT = 1 << TONE_PIN; //
+		GPIO_0->CLEAR = 1 << TONE_PIN;
 
-	TIMER32_1->CHANNELS[3].CNTRL &=  TIMER32_CH_CNTRL_DISABLE_M;
+		TIMER32_1->CHANNELS[3].CNTRL &=  TIMER32_CH_CNTRL_DISABLE_M;
 
-	TIMER32_1->INT_MASK = TIMER32_INT_OVERFLOW_M;
-	TIMER32_1->INT_CLEAR =   0xFFFFFFFF;
-	TIMER32_1->PRESCALER =  0; //Divide by 16 clock prescale
-	
-	//Блок инициализации канала
-	
-	TIMER32_1->CHANNELS[3].OCR = 0;
-	TIMER32_1->CHANNELS[3].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
-	TIMER32_1->CHANNELS[3].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
+		TIMER32_1->INT_MASK = TIMER32_INT_OVERFLOW_M;
+		TIMER32_1->INT_CLEAR =   0xFFFFFFFF;
+		TIMER32_1->PRESCALER =  0; //Divide by 16 clock prescale
+		
+		//Блок инициализации канала
+		
+		TIMER32_1->CHANNELS[3].OCR = 0;
+		TIMER32_1->CHANNELS[3].CNTRL |=  TIMER32_CH_CNTRL_MODE_PWM_M; // 
+		TIMER32_1->CHANNELS[3].CNTRL |= TIMER32_CH_CNTRL_ENABLE_M;
 	#else
 		// Timer16_1, D2= PORT 0.10 
 		PM->CLK_APB_P_SET |= PM_CLOCK_APB_P_TIMER16_1_M | PM_CLOCK_APB_P_GPIO_0_M;
@@ -538,7 +538,11 @@ void ArduboyTonesFX::nextTone()
 	#endif
 #else // ELBEARBOY
 	if (freq == 0) { // if tone is silent
+	  #ifndef SPIBEAR_TM16
       ocrValue = F_CPU / SILENT_FREQ / 2 - 1; // dummy tone for silence
+	  #else
+	  ocrValue = F_CPU / 32 /SILENT_FREQ / 2 - 1; 
+	  #endif
       freq = SILENT_FREQ;
       toneSilent = true;
       GPIO_0->CLEAR = 1 << TONE_PIN; // set the pin low
@@ -547,7 +551,7 @@ void ArduboyTonesFX::nextTone()
 	  #ifndef SPIBEAR_TM16
 	  ocrValue = F_CPU / freq / 2 - 1; // счет без делителя
 	  #else
-	  ocrValue = F_CPU / 32 /freq / 2 - 1; // счет без делителя
+	  ocrValue = F_CPU / 32 /freq / 2 - 1; 
 	  #endif									  
       toneSilent = false;
     }

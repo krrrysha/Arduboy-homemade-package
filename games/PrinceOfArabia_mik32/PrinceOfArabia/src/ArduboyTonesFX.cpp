@@ -383,7 +383,11 @@ void ArduboyTonesFX::nextTone()
 #endif
 #else // ELBEARBOY
 	if (freq == 0) { // if tone is silent
-      ocrValue = F_CPU / SILENT_FREQ / 2 - 1; // dummy tone for silence
+      #ifndef SPIBEAR_TM16
+	  ocrValue = F_CPU / SILENT_FREQ / 2 - 1; // dummy tone for silence
+	  #else
+	  ocrValue = F_CPU / 32 /SILENT_FREQ / 2 - 1; 
+      #endif
       freq = SILENT_FREQ;
       tonesFX.toneSilent = true;
       GPIO_0->CLEAR = 1 << TONE_PIN; // set the pin low
@@ -471,19 +475,19 @@ void ArduboyTonesFX::nextTone()
 	
 	
 	#ifndef SPIBEAR_TM16	
-	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | ~(TIMER32_ENABLE_TIM_EN_M); // без  этого таймер временно "зависает" при быстрой смене TOP/OCR
-	TIMER32_1->TOP = (ocrValue); // счет без делителя, не умножаем на 2
-	//TIMER32_1->CHANNELS[3].OCR = 0;
-	TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | TIMER32_ENABLE_TIM_EN_M;
+		TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | ~(TIMER32_ENABLE_TIM_EN_M); // без  этого таймер временно "зависает" при быстрой смене TOP/OCR
+		TIMER32_1->TOP = (ocrValue); // счет без делителя, не умножаем на 2
+		//TIMER32_1->CHANNELS[3].OCR = 0;
+		TIMER32_1->ENABLE = TIMER32_ENABLE_TIM_CLR_M | TIMER32_ENABLE_TIM_EN_M;
 
-	// enable the output compare match interrupt
-  tonesFX.durationToggleCount = toggleCount;
-	
-	EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK ;
-    
-	//HAL_IRQ_EnableInterrupts();
-	//set_csr(mstatus, MSTATUS_MIE);
-    //set_csr(mie, MIE_MEIE);
+		// enable the output compare match interrupt
+		tonesFX.durationToggleCount = toggleCount;
+		
+		EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK ;
+		
+		//HAL_IRQ_EnableInterrupts();
+		//set_csr(mstatus, MSTATUS_MIE);
+		//set_csr(mie, MIE_MEIE);
 	#else
 
 		TIMER16_1->CR &= ~TIMER16_CR_ENABLE_M;
@@ -496,7 +500,7 @@ void ArduboyTonesFX::nextTone()
 		
 		TIMER16_1->CR |=  TIMER16_CR_CNTSTRT_M;
 		
-		durationToggleCount = toggleCount;
+		tonesFX.durationToggleCount = toggleCount;
 		EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER16_1_MASK;
 		
 
