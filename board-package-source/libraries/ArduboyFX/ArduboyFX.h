@@ -29,7 +29,10 @@
 //      volatile uint8_t CS_FLASH_DISABLE;         	    // сигнал  chip select, актуален при совместной работе с экраном??
 //     volatile uint8_t SPIF_TRANSFER_COMPLETE;           // передача завершена. Используется только в disable и writeByte (и вероятно в displayPrefetch). Исключено
  //   };
-
+	#ifdef SPIBEAR
+		#define SPIBEAR_TM16 
+		#include "mik32_hal_timer16.h"
+	#endif	
 #endif
 
 // For uint8_t, uint16_t
@@ -65,17 +68,26 @@ constexpr uint16_t FX_SAVE_VECTOR_KEY_POINTER  = 0x0018; /* reserved interrupt v
 constexpr uint16_t FX_SAVE_VECTOR_PAGE_POINTER = 0x001A;
 
 #ifdef ELBEARBOY
-constexpr uint32_t SampeDataKeyPointer[2]={0x4658424F, 0x59444154}; //FXBOYDAT  // когда адрес задан, содержит маскированный ключ: инвертированные FXBOYDAT 
+//constexpr uint32_t SampeDataKeyPointer[2]={0x4658424F, 0x59444154}; //FXBOYDAT  // когда адрес задан, содержит маскированный ключ: FXBOYDAT в обратном порядке
 
 typedef struct {
-    const uint32_t VectrorKeyPointer[2]={0x00000000, 0x00000000}; 
-    uint16_t VectrorPagePointer; // 
+    const uint8_t VectorKeyPointer[8] = {'F','X','B','O','Y','D','A','T'}; //FXBOYDAT  // маскированный ключ: FXBOYDAT в обратном порядке
+	uint8_t DataVectorKeyPointerMSB;
+	uint8_t DataVectorKeyPointerLSB;
+	
+	uint8_t DataVectorPagePointerMSB; // 
+	uint8_t DataVectorPagePointerLSB;
+	
+	uint8_t SaveVectorKeyPointerMSB;
+	uint8_t SaveVectorKeyPointerLSB;
+	
+	uint8_t SaveVectorPagePointerMSB;
+	uint8_t SaveVectorPagePointerLSB;
 } FxArea;
+
+	#define START_IMAGE_OFFSET_PAGE 0x200 // страница для адреса 0x00020000
+
 #endif
-
-
-constexpr uint32_t SampeSaveKeyPointer[2]= {0x4658424F, 0x59534156}; //FXBOYSAV //  когда адрес задан, содержит маскированный ключ: инвертированные FXBOYSAV 
-
 
 // Serial Flash Commands
 constexpr uint8_t SFC_JEDEC_ID          = 0x9F; // только команда | 3 байта ответа

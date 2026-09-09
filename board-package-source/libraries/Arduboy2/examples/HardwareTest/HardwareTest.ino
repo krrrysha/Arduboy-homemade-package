@@ -136,7 +136,7 @@ void loop()
 
         GPIO_0->DIRECTION_OUT = (1 << SPEAKER_1_BIT);
         GPIO_0->CLEAR = (1 << SPEAKER_1_BIT) ;
-		#ifndef SPIBEAR
+		#ifndef SPIBEAR_TM16 
 		GPIO_1->DIRECTION_OUT = (1 << SPEAKER_2_BIT);
         GPIO_1->SET =   (1 << SPEAKER_2_BIT);
 		#else
@@ -166,7 +166,7 @@ void loop()
                 //if ((i % 2) == 0) GPIO_1->CLEAR = (1 << SPEAKER_2_BIT); else GPIO_1->SET = (1 << SPEAKER_2_BIT);
 
 
-				#ifndef SPIBEAR
+				#ifndef SPIBEAR_TM16 
 								if ((GPIO_1->STATE & (1 << SPEAKER_2_BIT))) {GPIO_1->CLEAR = 1 << SPEAKER_2_BIT;} else {GPIO_1->SET = 1 << SPEAKER_2_BIT;}
 								}
 								else GPIO_1->SET =   (1 << SPEAKER_2_BIT);

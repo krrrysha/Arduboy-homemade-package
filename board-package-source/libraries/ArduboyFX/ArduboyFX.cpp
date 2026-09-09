@@ -1,16 +1,26 @@
 #include "ArduboyFX.h"
 
 #ifndef ELBEARBOY
-	#include <wiring.c>
+	#include <wiring.c>А
 #else
 	//my_SPDR.INPUT=0;
 	//my_SPDR.OUTPUT=0;
 	//my_SPDR.OPCODE=0;
 	uint32_t FX::my_SPDR_ADDR=0x00000000;	
 	//my_SPDR.CS_FLASH_DISABLE=0;
-	FxArea FxData;
-	FxArea FxSave;
+	//const FxArea* FxDataSave;
+
+	__attribute__((used))
+	const FxArea FxDataSaveArea = {
+    {'F', 'X', 'B', 'O', 'Y', 'D', 'A', 'T'}, // VectorKeyPointer (Уникальный маркер "FXBOYDAT")
+    0x00, 0x00, // DataVectorKeyPointerMSB, LSB (Пустые, будут пропатчены в 0x95, 0x18)
+    0x00, 0x00, // DataVectorPagePointerMSB, LSB (Пустые, будут пропатчены)
+    0x00, 0x00, // SaveVectorKeyPointerMSB, LSB (Пустые, будут пропатчены)
+    0x00, 0x00  // SaveVectorPagePointerMSB, LSB (Пустые, будут пропатчены)
+	};
+	const FxArea* FxDataSave = &FxDataSaveArea;
 #endif
+
 
 uint16_t FX::programDataPage; // program read only data location in flash memory
 uint16_t FX::programSavePage; // program read and write data location in flash memory
@@ -86,9 +96,9 @@ void FX::begin(uint16_t developmentDataPage) //
 			programDataPage = developmentDataPage;
 		  }
 	 #else
-		  if ( ( FxData.VectrorKeyPointer[1] == (~SampeDataKeyPointer[1]) ) && ( FxData.VectrorKeyPointer[2] == (~SampeDataKeyPointer[2]) ) )
+		  if (  ((uint16_t)FxDataSave->DataVectorKeyPointerMSB << 8 | FxDataSave->DataVectorKeyPointerLSB) == FX_VECTOR_KEY_VALUE  )
 		  {
-		   programDataPage = *(uint16_t*)(FxData.VectrorPagePointer);
+		   programDataPage = START_IMAGE_OFFSET_PAGE + ((uint16_t)FxDataSave->DataVectorPagePointerMSB << 8 | FxDataSave->DataVectorPagePointerLSB);
 		  } else  {
 			programDataPage = developmentDataPage; 
 		  }			
@@ -150,20 +160,21 @@ void FX::begin(uint16_t developmentDataPage, uint16_t developmentSavePage) //
 		  {
 			programSavePage = developmentSavePage;
 		  }
-	 #else
-		  if ( ( FxData.VectrorKeyPointer[1] == (~SampeDataKeyPointer[1]) ) && ( FxData.VectrorKeyPointer[2] == (~SampeDataKeyPointer[2]) ) )
+	 #else 
+	// здесь речь про 2 способа передачи адреса страниц data и save. 1) при сборке игры фиксировано в вызове begin 2) - через патчинг структуры скриптом fxcart.py. В оригинальной приставке для хранения положений блоков задействуются 5 неиспользуемых фиксированных на флешке областей для хранения векторов прерываний. У нас в BSP нет фиксированной области. 
+		  if (  ((uint16_t)FxDataSave->DataVectorKeyPointerMSB << 8 | FxDataSave->DataVectorKeyPointerLSB) == FX_VECTOR_KEY_VALUE  )
 		  {
-		   programDataPage = *(uint16_t*)(FxData.VectrorPagePointer);
+		   programDataPage =START_IMAGE_OFFSET_PAGE + ((uint16_t)FxDataSave->DataVectorPagePointerMSB << 8 | FxDataSave->DataVectorPagePointerLSB);
 		  } else  {
-			programDataPage = developmentDataPage; // 
-		  }
-		  
-		  if ( ( FxSave.VectrorKeyPointer[1] == (~SampeSaveKeyPointer[1]) ) && ( FxSave.VectrorKeyPointer[2] == (~SampeSaveKeyPointer[2]) ) )
+			programDataPage = developmentDataPage; 
+		  }	
+		  if (  ((uint16_t)FxDataSave->SaveVectorKeyPointerMSB << 8 | FxDataSave->SaveVectorKeyPointerLSB) == FX_VECTOR_KEY_VALUE  )
 		  {
-		   programSavePage = *(uint16_t*)(FxSave.VectrorPagePointer);
+		   programSavePage = START_IMAGE_OFFSET_PAGE +((uint16_t)FxDataSave->SaveVectorPagePointerMSB << 8 | FxDataSave->SaveVectorPagePointerLSB);
 		  } else  {
-			programSavePage =   (uint16_t)developmentSavePage; // 
-		  }		
+			programSavePage =   developmentSavePage; 
+		  }	
+
 	 #endif
  #endif
   wakeUp();
@@ -844,9 +855,13 @@ void FX::saveGameState(const uint8_t* gameState, size_t size) // ~152 bytes loca
 	  }	
 	  uint32_t MCMDbackup; 
 	  uint32_t CLIMITbackup;           // 
-
-
-		//EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK ; // отключаем прерывания по уровню (вывод звука)
+	// отключаем прерывания по уровню (вывод звука)
+	#ifndef SPIBEAR_TM16
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER16_1_MASK;
+	#endif	
+	
 	enableCMD(&CLIMITbackup,&MCMDbackup);
 	  static uint8_t swaped_size[2];
 	  swaped_size[0] = (size>>8) & 0xFF;
@@ -881,7 +896,12 @@ void FX::saveGameState(const uint8_t* gameState, size_t size) // ~152 bytes loca
 			waitWhileBusy();
 		}
    disableCMD(CLIMITbackup,MCMDbackup);	
-   //EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK ; // возвращаяем прерывания по уровню для вывода звука
+    // возвращаяем прерывания по уровню для вывода звука
+   	#ifndef SPIBEAR_TM16
+		EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER16_1_MASK;
+	#endif	
    }	
 #endif
 
@@ -892,19 +912,29 @@ void  FX::eraseSaveBlock(uint16_t page)
   seekCommand(SFC_ERASE, (uint24_t)(programSavePage + page) << 8);
   disable();
 }
-#else // возможно ли выравнивание по 256 при стирании? (вероятно нет)
+#else // выравниваение по 256 игнорируется флешкой при стирании блока 4к ! Пока нужно проверять на прикладном уровне!
 __attribute__((section(".ram_text"))) void  FX::eraseSaveBlock(uint16_t page)
 {
 	uint32_t MCMDbackup; 
 	uint32_t CLIMITbackup;           // 
-	EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK ; // отключаем прерывания по уровню (вывод звука)
+	// отключаем прерывания по уровню (вывод звука)
+	#ifndef SPIBEAR_TM16
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER16_1_MASK;
+	#endif
 	enableCMD(&CLIMITbackup,&MCMDbackup);
 	writeEnable();
 	//стирание
 	my_SPIFI_SendCommand_LL(cmd_erase_4k_qpi, (((uint24_t)(programSavePage + page)) << 8) + SPIFI_BASE_ADDRESS, 0, 0, 0, 0, HAL_SPIFI_TIMEOUT);
 	waitWhileBusy();
 	disableCMD(CLIMITbackup,MCMDbackup);
-	EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK ; // отключаем прерывания по уровню (вывод звука)
+    // возвращаяем прерывания по уровню для вывода звука
+   	#ifndef SPIBEAR_TM16
+		EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER16_1_MASK;
+	#endif	
 }
 #endif
 
@@ -926,11 +956,23 @@ __attribute__((section(".ram_text"))) void FX::writeSavePage(uint16_t page, uint
 {
 	uint32_t MCMDbackup; 
 	uint32_t CLIMITbackup;           // 
+	// отключаем прерывания по уровню (вывод звука)
+	#ifndef SPIBEAR_TM16
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER16_1_MASK;
+	#endif
 	enableCMD(&CLIMITbackup,&MCMDbackup);
 	writeEnable();
 	my_SPIFI_SendCommand_LL(cmd_write_bytes_qpi, (((uint24_t)(programSavePage + page)) << 8)+ SPIFI_BASE_ADDRESS, 256, 0, buffer, 0, HAL_SPIFI_TIMEOUT);
 	waitWhileBusy();
 	disableCMD(CLIMITbackup,MCMDbackup);
+    // возвращаяем прерывания по уровню для вывода звука
+   	#ifndef SPIBEAR_TM16
+		EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER32_1_MASK;
+	#else
+		EPIC->MASK_LEVEL_SET = HAL_EPIC_TIMER16_1_MASK;
+	#endif	
 }
 #endif
 
