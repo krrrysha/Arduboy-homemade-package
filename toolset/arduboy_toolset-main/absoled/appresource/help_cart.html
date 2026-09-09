@@ -1,0 +1,139 @@
+<h1>Arduboy Toolset - Cart Editor</h1>
+
+<p>
+    This tool lets you modify FX flashcart <b>.bin</b> files directly. You can then reflash your Arduboy FX with
+    the new flashcart. 
+</p>
+
+<h2>Quickstart</h2>
+
+<p>
+    If all you want to do is add a game, open the <u>File</u> menu and choose <b>Load from Arduboy</b>. This will
+    take some time. Once it's done, your arduboy flashcart will show up in the window. You can now edit the cart;
+    click on a category then drag + drop a <b>.arduboy</b> file or <b>.hex</b> file into the window to add the game
+    to that category. You can drag the games around to rearrange them. When you're done, use the <u>File</u> menu
+    and select <b>Flash to Arduboy</b>
+</p>
+
+<h2>About Arduboy flashcarts</h2>
+
+<p>
+    What is a flashcart? The base model Arduboy from several years ago contained only 32KB of flash memory, intended
+    to store one program. The community came up with a mod which would add a 16MB flash module, and wrote a special
+    menu program that lets you browse games written into that bigger flash. The games are stitched together into a 
+    special format, and that whole big file full of games is called a cart, which is stored on the mod's flash memory. 
+    Newer Arduboys, called Arduboy FX, come with this mod preinstalled. This program understands this big flashcart 
+    file, and can decompile + recompile it, allowing you to add or modify programs within it.
+</p>
+
+<h2>Finding games</h2>
+
+<p>
+    You can get packages of pre-existing games from community-made places like the
+    <a href="http://www.bloggingadeadhorse.com/cart/CartBuilder.html">Cart Builder website</a> or 
+    <a href="https://arduboy.ried.cl/">Erwin's Arduboy Collection</a>. The Cart Builder website is similar to this
+    cart builder in that you can customize a flashcart and download a compiled binary, which you 
+    can then flash directly to your Arduboy using any number of tools (including Arduboy Toolset). 
+    You can also open that compiled binary in this very cart editor and make modifications. Erwin's Collection
+    is a git repo full of individual games, setup to use his own tools to flash individual games to your Arduboy.
+    But you can still browse and download all the games, or even add them to your flashcart if you download the
+    relevant files.
+</p>
+
+<p>
+    You can also use the official <a href="https://community.arduboy.com/c/games/35">Arduboy forums</a> to 
+    find or post games. Note that you can add games to your cart in either <b>.hex</b> or <b>.arduboy</b> format,
+    the former is just the game, the latter contains additional information (such as screenshots) and can simplify 
+    the process of adding games.
+</p>
+
+<h2>Using the Cart Editor</h2>
+
+<p>
+    To modify the cart on your Arduboy, you might:
+</p>
+
+<ul>
+    <li>Open the flashcart off the Arduboy using the <b>File</b> menu in <u>Cart Editor</u>. It will take some time</li>
+    <li>Use the <u>Cart Editor</u> to add or modify the games in the cart</li>
+    <li>Flash the updated cart back to the Arduboy once again using the <b>File</b> menu.</li>
+</ul>
+
+<h3>Fx save-game data</h3>
+
+<p>
+    Some games store their saves directly on the cart itself, called "Fx saves".
+    Loading the flashcart directly off your Arduboy for editing preserves these saves. It first loads
+    the FX flashcart data into memory, so <b>modifications are done locally</b> (and can be saved to your computer) before
+    being written back to the Arduboy. Keep in mind that flashing older cart backups will <i>also</i> flash your older
+    FX saves, so always work off the latest cart in your Arduboy if you want to preserve your FX saves.
+</p>
+
+<h2>Cart List</h2>
+
+<p>
+    When you load a flashcart into the UI, the cart items are displayed in a list. This is how it is stored in 
+    the flashcart: each item in the cart is called a "Slot", and each Slot holds either a program or a category.
+    A category encompasses all programs that follow it, up until the next category. Note that Arduboy expects 
+    the first category to always be empty (this will be enforced whenever the cart is compiled).
+</p>
+
+<p>
+    There are keyboard shortcuts to make navigating the cart easier. You can check out all the navigation options
+    in the <b>Navigate</b> menu. You can also search for text within the cart, if you're looking for a specific 
+    program or category.
+</p>
+
+<h3>Adding games + categories</h3>
+
+<p>
+    <b>Make sure you set the device selector at the bottom of the window!</b> FX-enabled titles are slightly different
+    between Arduboy FX and Arduboy Mini, and .arduboy packages can have copies of both for you to use. The cart editor
+    will attempt to pick the right binaries from the .arduboy package based on this setting. The worst that could happen
+    is that the wrong binary is chosen and that game will not work properly.
+</p>
+
+<p>
+    To add a game, use the <b>Cart</b> menu or the keyboard shortcut. The game will be inserted below the currently
+    selected cart item, or at the bottom if none are selected. You can load a game from a .hex or a 
+    .arduboy. If you use .arduboy, some of the fields are auto-filled (if they exist). If you do not provide
+    a title image on write, one will be generated for you.
+</p>
+
+<p>
+    To add a category, you can also use the <b>Cart</b> menu or the keyboard shortcut. Categories have no 
+    associated program or FX data, and are simply the title screen and title/info fields. 
+</p>
+
+<p>
+    <b>Your cart must always start with an empty category!</b>
+</p>
+
+<h3>Editing games + categories</h3>
+
+<p>
+    To change game data, simply edit the text fields or click the buttons or image on the left of the 
+    game info. Images are automatically converted to the right format, though if it's not the right aspect 
+    ratio, it is currently stretched to fit rather than cropped. The three small buttons under the image
+    let you update the program, FX data, and FX save respectively. The numbers under the buttons indicate
+    the size currently stored for each.
+</p>
+
+<p>
+    There is a limit to how much text information you can put, at roughly 195 bytes total across all fields.
+    If you go over this, your information is truncated.
+</p>
+
+<p>
+    To move games around, simply drag + drop the items on screen. Note that you can move categories like this too, 
+    but it will not move all games in the category along with it. This is because the list mimics how it is stored
+    on flash: a category automatically encompasses all the games after it, until the next category. Moving entire
+    categories may come in the future.
+</p>
+
+<p>
+    To delete games, simply press the delete key while the game is selected, or use the <b>Cart</b> menu. 
+    There is no undo, so be careful (though nothing is written to your arduboy until you flash it back). 
+    If you delete a category, all games in that category remain in the same place, and so become children of the
+    previous category.
+</p>

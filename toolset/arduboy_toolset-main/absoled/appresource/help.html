@@ -1,0 +1,153 @@
+<h1>Arduboy Toolset</h1>
+
+<p>
+    Arduboy toolset lets you upload + backup <b>sketches</b>, <b>flashcart data</b>, and <b>EEPROM</b>.
+    There's a rudimentary <b>.arduboy</b> package creator with basic fields, an image tool for turning images into
+    code for use in your sketches, and a separate <b>Cart Editor</b> you can open from the <u>File</u> menu.
+</p>
+
+<h2>Quickstart: Adding games to Arduboy</h2>
+
+<p>
+    If your goal is to simply add games to your arduboy, you want to open the <b>Cart editor</b> from the 
+    <u>File</u> menu and load your flashcart into the program. From there, you can edit the games on your
+    Arduboy then flash them back. Please see the help attached to that window for more information.
+</p>
+
+<h2>Sketches</h2>
+
+<p>
+    Sketches are compiled singular programs, usually with a <b>.hex</b> extension. Sometimes a hex file will
+    be embedded inside a <b>.arduboy</b> file, which is just a <b>.zip</b> file in disguise. The sketch upload
+    endpoint only accepts .hex files; it is up to you choose the .hex file you want out of a .arduboy archive
+    if you have one. Note that Arduboy can only hold one sketch at a time, so uploading will overwrite whatever 
+    is currently there. 
+</p>
+
+<p>
+    Some sketches use data stored on the "Fx" flash memory. These games usually go on a flashcart, so this 
+    option is <b>only</b> used while developing FX games. It places the development FX data at the end of the
+    flash memory, so you don't have to reflash an entire flashcart while developing
+</p>
+
+<p>
+    The rest of the options on sketch upload are for special patches. They are not necessary if you have a
+    regular Arduboy, they are mostly for DIY hardware.
+</p>
+
+<p>
+    <b>Note:</b> sketch backups you make are raw .bin files, which have to be turned back into .hex
+    files before they can be reflashed. There's currently no way to do this yet, sorry! In the future,
+    flash backups will be .hex files by default.
+</p>
+
+<h2>Flashcart</h2>
+
+<p>
+    Arduboy FX and others with the "Fx modchip" have a special bootloader that boots before the sketch
+    to allow you to choose one of many games on the additional flash memory (usually 16MB). The bootloader 
+    will flash the game you choose to the "sketch" area and boot into it, just like this tool does 
+    when you upload a sketch.
+</p>
+
+<p> 
+    You can generate flashcart <b>.bin</b> files by using the 
+    <a href="http://www.bloggingadeadhorse.com/cart/CartBuilder.html">Cart Builder</a> website. The bin
+    file you download from there can be directly flashed to your Arduboy using the Flashcart upload 
+    portion of this tool
+</p>
+
+<p>
+    Alternatively, you can use the <b>Cart Editor</b> located in the <u>File</u> menu. This lets you
+    pull the FX flashcart off your device, make edits, and reflash it, but it also lets you create new
+    flashcarts and save them to the filesystem, in the same .bin format used for flashing.
+</p>
+
+<h2>EEPROM</h2>
+
+<p>
+    EEPROM is a small 1024 byte area made specifically for save game data. All games have to share the 
+    same space for saves, so they often overwrite each other. You can backup + restore this data
+    using this tool
+</p>
+
+<h2>Package</h2>
+
+<p>
+    Arduboy games are generally distributed in a <b>.arduboy</b> file format. It's a simple zip archive 
+    with the extension renamed, containing the game, extra data, images, and information about the game.
+</p>
+
+<p>
+    You can generate <b>.arduboy</b> archives for distribution using this package generator. You 
+    can also modify existing packages (such as updating the version + binaries inside).
+</p>
+
+<p>
+    Note that this package generator does not have the complete set of fields supported by the 
+    <b>.arduboy</b> format, but it is enough for most use cases. However, if you open a package
+    which contains these extra fields, they will <b>not</b> be saved back when you save the 
+    package. Use this package creator with caution. More fields may become available in the future.
+</p>
+
+<p>
+    <b>This package generator uses an updated .arduboy format from 2023</b>, which was agreed upon 
+    by the community at that time. All parts of the toolset will read this format (v4) and all older 
+    ones, but it will only <b>write</b> v4 packages. Some older/unmaintained tools may not be 
+    compatible with this format.
+</p>
+
+<h2>Image</h2>
+
+<p>
+    To use images in Arduboy (such as sprites), they must be converted into code or FX data. This
+    utility lets you convert images to C++ code, either directly or saved as a <b>.h</b> file. It also
+    lets you generate a .bin file for use in fx data, though you must merge it with other FX data 
+    on your own.
+</p>
+
+<p>
+    The arduboy library doesn't distinguish between images and tilesheets; they are both stored in a contiguous
+    array with the width + height stored as the first 2 elements. However, the data is rearranged for tilesheets
+    so each tile is stored one after the other, while images are stored fully continuously (it ends up as the 
+    same amount of data, just different orders).
+</p>
+
+<p>
+    You can enable tiling of the image using the controls on the right of the pane. The image displayed on the 
+    left is a preview to help you see where the tiles line up. Spacing, if used, is removed from the data.
+</p>
+
+<p>
+    Mask generation is controlled manually rather than automatically, so you can always know if mask data
+    is being generated. Mask data increases the size of the data, and you must indicate to the Arduboy library
+    that you are utilizing masks. The transparency data in the image is used to generate the mask (if selected),
+    even if no transparency exists.
+</p>
+
+<h3>Image Caveats</h3>
+
+<ul>
+    <li>If no tiling is set, the entire image will be used</li>
+    <li>Stored width/height is based on individual tilesize (which is entire image size if no tiling set)</li>
+    <li>Tile sizes must be 1 byte each (up to 255x255) if generating code, but can be 2 bytes each (up to 65535x65535) if exporting to FX data</li>
+    <li>When mask is used, it defaults to "interleaving" the mask with the image data, which is usable with the Arduboy call "drawPlusMask"</li>
+    <li>"Separate mask" is <b>only</b> for code generation. You'll get a warning if it's set for FX data generation, as FX images only support "No mask" or "PlusMask"</li>
+    <li>Currently, the threshold for "black" is &lt; 64 in the green channel. The same threshold is used for transparency (if generating mask), transparent is alpha &lt; 64</li>
+</ul>
+
+<h3>Alternate image converters</h3>
+
+<p>This tool is meant as a simple image converter with some oft-used features. There are more robust tools.</p>
+
+<p>
+    <a href="https://github.com/Pharap/ABSpriteEditor">ABSpriteEditor</a> by Pharap is a robust sprite editor 
+    all-in-one that can also convert to code. If you're looking to make sprites for Arduboy, I recommend this one.
+</p>
+
+<p>
+    <a href="http://www.bloggingadeadhorse.com/TeamARGImgConverter/">TeamARGImgConverter</a> by the defunct 
+    TeamARG is a basic image converter with similar features to the ones in this toolset. It is hosted by 
+    Filmote, as TeamARG no longer exists. You may find examples on the forums for using this image converter;
+    if they're still using the old dead links, know that it is hosted at the link above now.
+</p>

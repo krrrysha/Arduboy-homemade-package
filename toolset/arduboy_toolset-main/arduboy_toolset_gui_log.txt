@@ -1,0 +1,1455 @@
+2026-07-20 14:26:43,725 - ERROR - Could not load emoji font, falling back to system default! Error: Failed adding font to database: NotoEmoji-Medium.ttf
+2026-07-20 14:26:43,788 - INFO - ACTION: Opened cart editor
+2026-07-20 14:28:02,332 - INFO - ACTION: Opened cart editor
+2026-07-20 14:28:18,441 - ERROR - No selected slot!
+NoneType: None
+2026-07-20 14:28:28,663 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 14:28:28,677 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 14:28:28,678 - INFO - Fully parsed 6 program sections
+2026-07-20 14:28:29,021 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 14:29:20,360 - DEBUG - Starting new HTTP connection (1): www.bloggingadeadhorse.com:80
+2026-07-20 14:29:22,770 - DEBUG - http://www.bloggingadeadhorse.com:80 "GET /cart/Cart_GetBINs.php?device=ArduboyFX%7CArduboyMini HTTP/1.1" 200 None
+2026-07-20 14:29:37,564 - INFO - ACTION: Retrieved update master list from http://www.bloggingadeadhorse.com/cart/Cart_GetBINs.php
+2026-07-20 14:29:38,306 - ERROR - 'NoneType' object is not iterable
+NoneType: None
+2026-07-20 14:30:09,239 - ERROR - [Errno 2] No such file or directory: 'D:\\home\\arduino\\08072026\\exampl\\image\\main_cart\\appresource\\about.html'
+NoneType: None
+2026-07-20 14:31:10,498 - ERROR - name 'unicode' is not defined
+NoneType: None
+2026-07-20 14:31:21,003 - ERROR - Can't write arduboy files for categories!
+NoneType: None
+2026-07-20 14:31:26,083 - ERROR - name 'unicode' is not defined
+NoneType: None
+2026-07-20 14:31:28,119 - ERROR - name 'unicode' is not defined
+NoneType: None
+2026-07-20 14:31:31,628 - ERROR - name 'unicode' is not defined
+NoneType: None
+2026-07-20 14:31:49,679 - ERROR - name 'unicode' is not defined
+NoneType: None
+2026-07-20 14:35:46,580 - INFO - ACTION: Opened cart editor
+2026-07-20 14:35:52,471 - ERROR - No selected slot!
+NoneType: None
+2026-07-20 14:35:59,989 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 14:36:00,007 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 14:36:00,008 - INFO - Fully parsed 6 program sections
+2026-07-20 14:36:00,313 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 14:36:07,435 - ERROR - name 'unicode' is not defined
+NoneType: None
+2026-07-20 14:36:11,259 - ERROR - name 'unicode' is not defined
+NoneType: None
+2026-07-20 14:39:22,854 - ERROR - name 'unicode' is not defined
+NoneType: None
+2026-07-20 14:43:04,007 - ERROR - Can't write arduboy files for categories!
+NoneType: None
+2026-07-20 14:48:35,909 - ERROR - name 'unicode' is not defined
+NoneType: None
+2026-07-20 14:48:44,018 - INFO - ACTION: Opened cart editor
+2026-07-20 14:49:09,209 - INFO - ACTION: Opened cart editor
+2026-07-20 14:50:43,746 - INFO - ACTION: Opened cart editor
+2026-07-20 14:51:19,032 - INFO - ACTION: Opened cart editor
+2026-07-20 14:52:01,759 - ERROR - 
+NoneType: None
+2026-07-20 14:52:20,836 - INFO - ACTION: Opened cart editor
+2026-07-20 14:52:24,117 - ERROR - No selected slot!
+NoneType: None
+2026-07-20 14:52:43,752 - INFO - ACTION: Opened cart editor
+2026-07-20 14:52:51,601 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 14:52:51,621 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 14:52:51,621 - INFO - Fully parsed 6 program sections
+2026-07-20 14:52:51,873 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 14:53:49,999 - DEBUG - Creating title image for Bootloader
+2026-07-20 14:54:55,916 - ERROR - cannot open resource
+NoneType: None
+2026-07-20 14:55:22,027 - DEBUG - Creating title image for Bootloader
+2026-07-20 14:55:22,040 - DEBUG - Importing PngImagePlugin
+2026-07-20 14:55:22,048 - INFO - ACTION: Generated single debug image for: Bootloader
+2026-07-20 14:56:58,618 - DEBUG - Creating title image for Bootloader
+2026-07-20 14:56:58,620 - INFO - ACTION: Generated single debug image for: Bootloader
+2026-07-20 14:58:30,715 - DEBUG - Creating title image for WOLF
+2026-07-20 14:58:30,717 - INFO - ACTION: Generated single debug image for: WOLF
+2026-07-20 15:47:45,167 - INFO - ACTION: Opened cart editor
+2026-07-20 15:48:21,565 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 15:48:21,579 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 15:48:21,579 - INFO - Fully parsed 6 program sections
+2026-07-20 15:48:21,905 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 15:50:45,907 - INFO - ACTION: Deleted category Game And Watch
+2026-07-20 15:51:01,597 - DEBUG - Compiling flashcart with 1 slots
+2026-07-20 15:51:03,830 - ERROR - Not enough items in the cart! Must have at least two categories (bootloader requirement)
+NoneType: None
+2026-07-20 15:51:38,597 - DEBUG - Compiling flashcart with 1 slots
+2026-07-20 15:51:44,209 - ERROR - Not enough items in the cart! Must have at least two categories (bootloader requirement)
+NoneType: None
+2026-07-20 15:51:48,847 - INFO - ACTION: Added new category to cart editor
+2026-07-20 15:51:55,686 - DEBUG - Creating title image for New Category
+2026-07-20 15:51:55,690 - DEBUG - Compiling flashcart with 2 slots
+2026-07-20 15:51:55,690 - INFO - Compiled fx flashcart, 2816 bytes, 0 games, 2 categories
+2026-07-20 15:51:55,708 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/08072026/exampl/image/newcart.bin
+2026-07-20 16:11:24,319 - INFO - ACTION: Opened cart editor
+2026-07-20 16:11:30,050 - DEBUG - Compiling flashcart with 0 slots
+2026-07-20 16:11:32,742 - ERROR - Not enough items in the cart! Must have at least two categories (bootloader requirement)
+NoneType: None
+2026-07-20 16:11:40,313 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 16:11:40,328 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 16:11:40,329 - INFO - Fully parsed 6 program sections
+2026-07-20 16:11:40,559 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 16:11:45,622 - DEBUG - Compiling flashcart with 6 slots
+2026-07-20 16:11:45,623 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 16:11:45,623 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:11:45,624 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 16:11:45,624 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:11:45,625 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 16:11:45,625 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:11:45,625 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 16:11:45,625 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:11:45,625 - INFO - Compiled fx flashcart, 1092864 bytes, 4 games, 2 categories
+2026-07-20 16:11:48,426 - ERROR - No Arduboys found!
+NoneType: None
+2026-07-20 16:11:48,433 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-07-20 16:22:42,334 - INFO - ACTION: Opened cart editor
+2026-07-20 16:22:57,915 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 16:22:57,930 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 16:22:57,930 - INFO - Fully parsed 6 program sections
+2026-07-20 16:22:58,192 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 16:23:02,777 - DEBUG - Compiling flashcart with 6 slots
+2026-07-20 16:23:02,777 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 16:23:02,778 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:23:02,778 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 16:23:02,779 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:23:02,779 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 16:23:02,779 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:23:02,779 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 16:23:02,780 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:23:02,780 - INFO - Compiled fx flashcart, 1092864 bytes, 4 games, 2 categories
+2026-07-20 16:23:06,689 - ERROR - No Arduboys found!
+NoneType: None
+2026-07-20 16:23:06,695 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-07-20 16:23:53,731 - DEBUG - Compiling flashcart with 6 slots
+2026-07-20 16:23:53,732 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 16:23:53,732 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:23:53,733 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 16:23:53,733 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:23:53,733 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 16:23:53,734 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:23:53,734 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 16:23:53,734 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:23:53,735 - INFO - Compiled fx flashcart, 1092864 bytes, 4 games, 2 categories
+2026-07-20 16:23:55,193 - ERROR - No Arduboys found!
+NoneType: None
+2026-07-20 16:23:55,202 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-07-20 16:28:06,667 - DEBUG - Compiling flashcart with 6 slots
+2026-07-20 16:28:06,668 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 16:28:06,668 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:28:06,669 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 16:28:06,669 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:28:06,670 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 16:28:06,670 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:28:06,670 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 16:28:06,670 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:28:06,670 - INFO - Compiled fx flashcart, 1092864 bytes, 4 games, 2 categories
+2026-07-20 16:28:08,020 - ERROR - No Arduboys found!
+NoneType: None
+2026-07-20 16:28:08,025 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-07-20 16:28:14,575 - INFO - ACTION: Opened cart editor
+2026-07-20 16:28:25,560 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 16:28:25,575 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 16:28:25,575 - INFO - Fully parsed 6 program sections
+2026-07-20 16:28:25,893 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 16:28:29,488 - DEBUG - Compiling flashcart with 6 slots
+2026-07-20 16:28:29,489 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 16:28:29,489 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:28:29,490 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 16:28:29,490 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:28:29,491 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 16:28:29,491 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:28:29,491 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 16:28:29,492 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:28:29,492 - INFO - Compiled fx flashcart, 1092864 bytes, 4 games, 2 categories
+2026-07-20 16:28:29,529 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-20 16:28:39,892 - ERROR - could not open port 'COM10': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-07-20 16:28:39,908 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-07-20 16:28:46,783 - DEBUG - Compiling flashcart with 6 slots
+2026-07-20 16:28:46,784 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 16:28:46,784 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:28:46,785 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 16:28:46,785 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:28:46,786 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 16:28:46,786 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:28:46,786 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 16:28:46,786 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:28:46,787 - INFO - Compiled fx flashcart, 1092864 bytes, 4 games, 2 categories
+2026-07-20 16:28:46,821 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-20 16:28:46,933 - INFO - Flashing 1092864 bytes to RISC-V device
+2026-07-20 16:28:46,934 - INFO - Start address: 0x80020000
+2026-07-20 16:28:47,259 - INFO - Parsed 68322 HEX records
+2026-07-20 16:28:47,260 - INFO - Checking device connection...
+2026-07-20 16:28:57,141 - ERROR - Device not responding
+NoneType: None
+2026-07-20 16:28:57,181 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-07-20 16:29:05,095 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 16:29:05,108 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 16:29:05,108 - INFO - Fully parsed 6 program sections
+2026-07-20 16:29:05,149 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 16:29:09,706 - DEBUG - Compiling flashcart with 6 slots
+2026-07-20 16:29:09,707 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 16:29:09,707 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:29:09,708 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 16:29:09,708 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:29:09,709 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 16:29:09,709 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:29:09,710 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 16:29:09,710 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:29:09,710 - INFO - Compiled fx flashcart, 1092864 bytes, 4 games, 2 categories
+2026-07-20 16:29:09,745 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-20 16:29:09,856 - INFO - Flashing 1092864 bytes to RISC-V device
+2026-07-20 16:29:09,856 - INFO - Start address: 0x80020000
+2026-07-20 16:29:10,182 - INFO - Parsed 68322 HEX records
+2026-07-20 16:29:10,182 - INFO - Checking device connection...
+2026-07-20 16:29:17,259 - ERROR - Device not responding
+NoneType: None
+2026-07-20 16:29:17,300 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-07-20 16:37:46,865 - INFO - ACTION: Opened cart editor
+2026-07-20 16:37:55,235 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 16:37:55,250 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 16:37:55,251 - INFO - Fully parsed 6 program sections
+2026-07-20 16:37:55,575 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 16:38:01,317 - DEBUG - Compiling flashcart with 6 slots
+2026-07-20 16:38:01,318 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 16:38:01,318 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:38:01,319 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 16:38:01,319 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:38:01,320 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 16:38:01,320 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:38:01,320 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 16:38:01,320 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 16:38:01,321 - INFO - Compiled fx flashcart, 1092864 bytes, 4 games, 2 categories
+2026-07-20 16:38:01,355 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-20 16:38:01,465 - INFO - Flashing 1092864 bytes to RISC-V device
+2026-07-20 16:38:01,466 - INFO - Waiting for device to reset into bootloader...
+2026-07-20 16:38:03,469 - WARNING - Attempt 1/5 failed: Device not responding
+2026-07-20 16:38:05,140 - WARNING - Attempt 2/5 failed: Device not responding
+2026-07-20 17:44:50,813 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-20 17:44:57,738 - INFO - ACTION: Opened cart editor
+2026-07-20 17:45:05,784 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 17:45:05,800 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 17:45:05,800 - INFO - Fully parsed 6 program sections
+2026-07-20 17:45:06,035 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 17:45:10,301 - DEBUG - Compiling flashcart with 6 slots
+2026-07-20 17:45:10,302 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 17:45:10,302 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 17:45:10,303 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 17:45:10,303 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 17:45:10,304 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 17:45:10,304 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 17:45:10,304 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 17:45:10,304 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 17:45:10,305 - INFO - Compiled fx flashcart, 1092864 bytes, 4 games, 2 categories
+2026-07-20 17:45:10,344 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-20 17:45:10,459 - INFO - Flashing 1092864 bytes to RISC-V device
+2026-07-20 17:45:10,699 - INFO - Device connected
+2026-07-20 17:45:10,700 - INFO - Start address: 0x80020000
+2026-07-20 17:45:11,018 - INFO - Parsed 68322 HEX records
+2026-07-20 17:45:11,018 - INFO - Checking device connection...
+2026-07-20 17:45:11,019 - INFO - Erasing flash memory...
+2026-07-20 17:45:26,430 - INFO - Flash erased
+2026-07-20 17:47:53,558 - INFO - Flashed 68322 records in 147.13 seconds
+2026-07-20 17:50:58,755 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-20 17:51:18,429 - INFO - ACTION: Added new category to cart editor
+2026-07-20 17:51:27,206 - INFO - ACTION: Moved category down: New Category
+2026-07-20 17:51:38,052 - DEBUG - Importing PngImagePlugin
+2026-07-20 17:51:38,058 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-20 17:51:38,058 - DEBUG - STREAM b'IDAT' 41 68
+2026-07-20 17:51:38,059 - INFO - ACTION: Edited tile image for: New Category
+2026-07-20 17:51:47,223 - DEBUG - Compiling flashcart with 7 slots
+2026-07-20 17:51:47,224 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 17:51:47,224 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 17:51:47,225 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 17:51:47,226 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 17:51:47,226 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 17:51:47,226 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 17:51:47,226 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 17:51:47,226 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 17:51:47,227 - INFO - Compiled fx flashcart, 1094144 bytes, 4 games, 3 categories
+2026-07-20 17:51:47,262 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-20 17:51:47,374 - INFO - Flashing 1094144 bytes to RISC-V device
+2026-07-20 17:51:47,619 - INFO - Device connected
+2026-07-20 17:51:47,619 - INFO - Start address: 0x80020000
+2026-07-20 17:51:47,941 - INFO - Parsed 68402 HEX records
+2026-07-20 17:51:47,941 - INFO - Checking device connection...
+2026-07-20 17:51:47,942 - INFO - Erasing flash memory...
+2026-07-20 17:52:03,186 - INFO - Flash erased
+2026-07-20 17:54:29,799 - INFO - Flashed 68402 records in 146.61 seconds
+2026-07-20 17:55:25,965 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-20 18:01:51,052 - ERROR - 
+NoneType: None
+2026-07-20 18:01:52,945 - INFO - ACTION: Opened cart editor
+2026-07-20 18:01:59,017 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 18:01:59,034 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 18:01:59,034 - INFO - Fully parsed 6 program sections
+2026-07-20 18:01:59,353 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 18:02:07,024 - INFO - ACTION: Added new category to cart editor
+2026-07-20 18:02:16,007 - INFO - ACTION: Moved slot by 1: New Category
+2026-07-20 18:02:26,171 - INFO - ACTION: Moved category down: Bootloader
+2026-07-20 18:02:35,208 - INFO - ACTION: Discarded current cart in editor
+2026-07-20 18:02:36,688 - INFO - ACTION: Opened cart editor
+2026-07-20 18:02:41,646 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 18:02:41,662 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 18:02:41,662 - INFO - Fully parsed 6 program sections
+2026-07-20 18:02:41,986 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 18:02:49,070 - INFO - ACTION: Added new category to cart editor
+2026-07-20 18:02:52,347 - DEBUG - Importing PngImagePlugin
+2026-07-20 18:02:52,353 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-20 18:02:52,353 - DEBUG - STREAM b'IDAT' 41 113
+2026-07-20 18:02:52,354 - INFO - ACTION: Edited tile image for: New Category
+2026-07-20 18:02:56,398 - DEBUG - Compiling flashcart with 7 slots
+2026-07-20 18:02:56,399 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 18:02:56,399 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:02:56,400 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 18:02:56,400 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:02:56,401 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 18:02:56,401 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:02:56,401 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 18:02:56,401 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:02:56,402 - INFO - Compiled fx flashcart, 1094144 bytes, 4 games, 3 categories
+2026-07-20 18:02:56,442 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-20 18:02:56,554 - INFO - Flashing 1094144 bytes to RISC-V device
+2026-07-20 18:02:56,793 - INFO - Device connected
+2026-07-20 18:02:56,793 - INFO - Start address: 0x80020000
+2026-07-20 18:02:57,111 - INFO - Parsed 68402 HEX records
+2026-07-20 18:02:57,111 - INFO - Checking device connection...
+2026-07-20 18:02:57,112 - INFO - Erasing flash memory...
+2026-07-20 18:03:11,946 - INFO - Flash erased
+2026-07-20 18:05:41,826 - INFO - Flashed 68402 records in 149.88 seconds
+2026-07-20 18:07:12,677 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-20 18:07:54,249 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-20 18:07:54,249 - DEBUG - STREAM b'IDAT' 41 68
+2026-07-20 18:07:54,250 - INFO - ACTION: Edited tile image for: New Category
+2026-07-20 18:07:58,291 - DEBUG - Compiling flashcart with 7 slots
+2026-07-20 18:07:58,292 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 18:07:58,292 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:07:58,294 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 18:07:58,294 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:07:58,295 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 18:07:58,295 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:07:58,295 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 18:07:58,295 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:07:58,296 - INFO - Compiled fx flashcart, 1094144 bytes, 4 games, 3 categories
+2026-07-20 18:07:58,335 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-20 18:07:58,446 - INFO - Flashing 1094144 bytes to RISC-V device
+2026-07-20 18:07:58,688 - INFO - Device connected
+2026-07-20 18:07:58,688 - INFO - Start address: 0x80020000
+2026-07-20 18:07:59,006 - INFO - Parsed 68402 HEX records
+2026-07-20 18:07:59,006 - INFO - Checking device connection...
+2026-07-20 18:07:59,007 - INFO - Erasing flash memory...
+2026-07-20 18:08:13,706 - INFO - Flash erased
+2026-07-20 18:10:42,874 - INFO - Flashed 68402 records in 149.17 seconds
+2026-07-20 18:11:30,314 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-20 18:11:34,224 - INFO - ACTION: Discarded current cart in editor
+2026-07-20 18:12:17,281 - INFO - ACTION: Opened cart editor
+2026-07-20 18:12:25,514 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-20 18:12:25,532 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-20 18:12:25,532 - INFO - Fully parsed 6 program sections
+2026-07-20 18:12:25,792 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-20 18:12:34,001 - INFO - ACTION: Added new category to cart editor
+2026-07-20 18:12:37,806 - DEBUG - Importing PngImagePlugin
+2026-07-20 18:12:37,812 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-20 18:12:37,812 - DEBUG - STREAM b'IDAT' 41 68
+2026-07-20 18:12:37,813 - INFO - ACTION: Edited tile image for: New Category
+2026-07-20 18:12:41,410 - DEBUG - Compiling flashcart with 7 slots
+2026-07-20 18:12:41,411 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 18:12:41,411 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:12:41,413 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 18:12:41,413 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:12:41,413 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 18:12:41,414 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:12:41,414 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 18:12:41,414 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:12:41,414 - INFO - Compiled fx flashcart, 1094144 bytes, 4 games, 3 categories
+2026-07-20 18:12:41,453 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-20 18:12:41,565 - INFO - Flashing 1094144 bytes to RISC-V device
+2026-07-20 18:12:41,804 - INFO - Device connected
+2026-07-20 18:12:41,805 - INFO - Start address: 0x80020000
+2026-07-20 18:12:42,123 - INFO - Parsed 68402 HEX records
+2026-07-20 18:13:24,202 - ERROR - GetOverlappedResult failed (PermissionError(13, 'Отказано в доступе.', None, 5))
+NoneType: None
+2026-07-20 18:13:24,221 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-07-20 18:13:57,593 - INFO - ACTION: Removed 1 slots from cart: 'New Category'
+2026-07-20 18:14:03,127 - DEBUG - Compiling flashcart with 6 slots
+2026-07-20 18:14:03,128 - DEBUG - Found FX signature at 0x7818 for WOLF
+2026-07-20 18:14:03,128 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:14:03,129 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-20 18:14:03,129 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:14:03,130 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-20 18:14:03,130 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:14:03,130 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-20 18:14:03,130 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-20 18:14:03,131 - INFO - Compiled fx flashcart, 1092864 bytes, 4 games, 2 categories
+2026-07-20 18:14:03,167 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-20 18:14:03,279 - INFO - Flashing 1092864 bytes to RISC-V device
+2026-07-20 18:14:03,523 - INFO - Device connected
+2026-07-20 18:14:03,523 - INFO - Start address: 0x80020000
+2026-07-20 18:14:03,843 - INFO - Parsed 68322 HEX records
+2026-07-20 18:16:30,960 - INFO - Flashed 68322 records in 147.12 seconds
+2026-07-20 18:16:37,734 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-20 20:57:45,192 - INFO - ACTION: Discarded current cart in editor
+2026-07-21 07:51:49,137 - INFO - ACTION: Opened cart editor
+2026-07-21 07:51:59,272 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-21 07:51:59,300 - DEBUG - Full parsing FX cart (1092864 bytes)
+2026-07-21 07:51:59,301 - INFO - Fully parsed 6 program sections
+2026-07-21 07:51:59,983 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-21 07:52:19,947 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/wolf/Wolf.ino.hex
+2026-07-21 07:52:19,957 - INFO - ACTION: Edited program for: WOLF
+2026-07-21 07:52:26,888 - DEBUG - Compiling flashcart with 6 slots
+2026-07-21 07:52:26,915 - DEBUG - Found FX signature at 0x736C for WOLF
+2026-07-21 07:52:26,915 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:52:26,916 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-21 07:52:26,916 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:52:26,917 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-21 07:52:26,918 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:52:26,918 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-21 07:52:26,918 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:52:26,919 - INFO - Compiled fx flashcart, 1088768 bytes, 4 games, 2 categories
+2026-07-21 07:52:26,941 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin
+2026-07-21 07:52:32,538 - DEBUG - Compiling flashcart with 6 slots
+2026-07-21 07:52:32,539 - DEBUG - Found FX signature at 0x736C for WOLF
+2026-07-21 07:52:32,539 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:52:32,540 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-21 07:52:32,540 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:52:32,541 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-21 07:52:32,541 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:52:32,542 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-21 07:52:32,542 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:52:32,542 - INFO - Compiled fx flashcart, 1088768 bytes, 4 games, 2 categories
+2026-07-21 07:52:32,637 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-21 07:52:32,773 - INFO - Flashing 1088768 bytes to RISC-V device
+2026-07-21 07:52:33,011 - INFO - Device connected
+2026-07-21 07:52:33,012 - INFO - Start address: 0x80020000
+2026-07-21 07:52:33,349 - INFO - Parsed 68066 HEX records
+2026-07-21 07:55:05,892 - INFO - Flashed 68066 records in 152.52 seconds
+2026-07-21 07:57:20,360 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-21 07:57:28,325 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/wolf/Wolf.ino.hex
+2026-07-21 07:57:28,334 - INFO - ACTION: Edited program for: WOLF
+2026-07-21 07:57:31,574 - DEBUG - Compiling flashcart with 6 slots
+2026-07-21 07:57:31,575 - DEBUG - Found FX signature at 0x736C for WOLF
+2026-07-21 07:57:31,575 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:57:31,577 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-21 07:57:31,577 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:57:31,578 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-21 07:57:31,578 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:57:31,578 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-21 07:57:31,579 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:57:31,579 - INFO - Compiled fx flashcart, 1088768 bytes, 4 games, 2 categories
+2026-07-21 07:57:31,620 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin
+2026-07-21 07:57:45,163 - DEBUG - Compiling flashcart with 6 slots
+2026-07-21 07:57:45,164 - DEBUG - Found FX signature at 0x736C for WOLF
+2026-07-21 07:57:45,164 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:57:45,166 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-21 07:57:45,166 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:57:45,167 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-21 07:57:45,167 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:57:45,167 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-21 07:57:45,167 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-21 07:57:45,168 - INFO - Compiled fx flashcart, 1088768 bytes, 4 games, 2 categories
+2026-07-21 07:57:45,205 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-21 07:57:45,317 - INFO - Flashing 1088768 bytes to RISC-V device
+2026-07-21 07:57:45,560 - INFO - Device connected
+2026-07-21 07:57:45,561 - INFO - Start address: 0x80020000
+2026-07-21 07:57:45,910 - INFO - Parsed 68066 HEX records
+2026-07-21 11:09:12,646 - ERROR - GetOverlappedResult failed (PermissionError(13, 'Отказано в доступе.', None, 5))
+NoneType: None
+2026-07-21 11:09:12,694 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-07-21 15:13:26,680 - INFO - ACTION: Opened cart editor
+2026-07-21 15:15:28,351 - INFO - ACTION: Opened cart editor
+2026-07-21 15:15:34,028 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-21 15:15:39,028 - ERROR - name 'serial' is not defined
+NoneType: None
+2026-07-22 06:38:28,981 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-22 06:38:29,023 - DEBUG - Full parsing FX cart (1088768 bytes)
+2026-07-22 06:38:29,025 - INFO - Fully parsed 6 program sections
+2026-07-22 06:38:29,894 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-22 06:38:38,534 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 06:38:43,282 - ERROR - name 'serial' is not defined
+NoneType: None
+2026-07-22 06:39:49,436 - ERROR - 
+NoneType: None
+2026-07-22 06:39:51,361 - INFO - ACTION: Opened cart editor
+2026-07-22 06:39:56,129 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 06:41:14,842 - ERROR - invalid literal for int() with base 10: b''
+NoneType: None
+2026-07-22 06:43:10,382 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 06:43:18,906 - ERROR - invalid literal for int() with base 10: b''
+NoneType: None
+2026-07-22 06:49:35,255 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 06:49:39,262 - ERROR - invalid literal for int() with base 10: b''
+NoneType: None
+2026-07-22 06:54:05,554 - INFO - ACTION: Opened cart editor
+2026-07-22 06:54:09,176 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 06:54:12,489 - ERROR - invalid literal for int() with base 10: b'Im'
+NoneType: None
+2026-07-22 06:54:27,465 - INFO - ACTION: Opened cart editor
+2026-07-22 06:54:32,168 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 06:54:40,371 - ERROR - invalid literal for int() with base 10: b'Im'
+NoneType: None
+2026-07-22 06:55:51,885 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 06:55:57,646 - ERROR - invalid literal for int() with base 10: b'Me'
+NoneType: None
+2026-07-22 06:56:21,692 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 06:56:30,024 - ERROR - invalid literal for int() with base 10: b''
+NoneType: None
+2026-07-22 06:58:29,734 - INFO - ACTION: Opened cart editor
+2026-07-22 06:58:33,557 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 06:58:40,228 - ERROR - invalid literal for int() with base 10: b''
+NoneType: None
+2026-07-22 10:45:23,250 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 10:45:28,757 - ERROR - could not open port 'COM10': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-07-22 10:45:33,895 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 10:45:40,023 - INFO - JDEC info: 0x050000 - custom-riscv (320 KiB)
+2026-07-22 10:45:40,023 - INFO - Reading entire FX in port COM10
+2026-07-22 10:45:56,389 - INFO - Read 5 blocks in 16.37 seconds
+2026-07-22 10:45:56,420 - DEBUG - Trim fx cart from 5 -> 0 bytes
+2026-07-22 10:46:03,099 - DEBUG - Full parsing FX cart (0 bytes)
+2026-07-22 10:46:03,099 - INFO - Fully parsed 0 program sections
+2026-07-22 10:46:03,112 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-22 11:03:58,449 - INFO - ACTION: Opened cart editor
+2026-07-22 11:04:01,998 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 11:04:07,439 - ERROR - could not open port 'COM10': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-07-22 11:04:11,161 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 11:04:17,138 - INFO - JDEC info: 0x050000 - custom-riscv (320 KiB)
+2026-07-22 11:04:17,139 - INFO - Reading entire FX in port COM10
+2026-07-22 11:04:24,038 - INFO - Read 5 blocks in 6.9 seconds
+2026-07-22 11:04:24,059 - DEBUG - Trim fx cart from 5 -> 0 bytes
+2026-07-22 11:04:35,099 - DEBUG - Full parsing FX cart (0 bytes)
+2026-07-22 11:04:35,099 - INFO - Fully parsed 0 program sections
+2026-07-22 11:04:35,121 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-22 11:10:44,068 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 11:10:50,046 - INFO - JDEC info: 0x050000 - custom-riscv (320 KiB)
+2026-07-22 11:10:50,047 - INFO - Reading entire FX in port COM10
+2026-07-22 11:10:56,946 - INFO - Read 5 blocks in 6.9 seconds
+2026-07-22 11:10:56,968 - DEBUG - Trim fx cart from 5 -> 0 bytes
+2026-07-22 11:11:05,452 - DEBUG - Full parsing FX cart (0 bytes)
+2026-07-22 11:11:05,453 - INFO - Fully parsed 0 program sections
+2026-07-22 11:11:05,477 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-22 11:16:20,987 - INFO - ACTION: Opened cart editor
+2026-07-22 11:16:24,452 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 11:16:28,613 - ERROR - Backup failed: Serial read error: requested 2 bytes, got 0 bytes (read call #1). Port: COM10, timeout: 3s. Data received: b''
+2026-07-22 11:16:38,519 - ERROR - Serial read error: requested 2 bytes, got 0 bytes (read call #1). Port: COM10, timeout: 3s. Data received: b''
+NoneType: None
+2026-07-22 11:20:30,555 - INFO - ACTION: Opened cart editor
+2026-07-22 11:20:34,766 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 11:20:39,691 - INFO - JDEC info: 0x050000 - custom-riscv (320 KiB)
+2026-07-22 11:20:39,692 - INFO - Reading entire FX in port COM10
+2026-07-22 11:20:43,156 - ERROR - Backup failed: Serial read error: requested 65536 bytes, got 1 bytes (read call #6). Port: COM10, timeout: 3s. Data received: b'\r'
+2026-07-22 11:21:03,937 - ERROR - Serial read error: requested 65536 bytes, got 1 bytes (read call #6). Port: COM10, timeout: 3s. Data received: b'\r'
+NoneType: None
+2026-07-22 11:33:32,660 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 11:33:37,574 - INFO - JDEC info: 0x050000 - custom-riscv (320 KiB)
+2026-07-22 11:33:37,574 - INFO - Reading entire FX in port COM10
+2026-07-22 11:33:41,036 - ERROR - Backup failed: Serial read error: requested 65536 bytes, got 1 bytes (read call #6). Port: COM10, timeout: 3s. Data received: b'\r'
+2026-07-22 11:33:48,475 - ERROR - Serial read error: requested 65536 bytes, got 1 bytes (read call #6). Port: COM10, timeout: 3s. Data received: b'\r'
+NoneType: None
+2026-07-22 11:40:34,208 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 11:40:39,133 - INFO - JDEC info: 0x050000 - custom-riscv (320 KiB)
+2026-07-22 11:40:39,134 - INFO - Reading entire FX in port COM10
+2026-07-22 11:40:42,584 - ERROR - Backup failed: Serial read error: requested 65536 bytes, got 1 bytes (read call #6). Port: COM10, timeout: 3s. Data received: b'\r'
+2026-07-22 11:41:10,043 - ERROR - Serial read error: requested 65536 bytes, got 1 bytes (read call #6). Port: COM10, timeout: 3s. Data received: b'\r'
+NoneType: None
+2026-07-22 11:46:54,573 - INFO - ACTION: Opened cart editor
+2026-07-22 11:46:57,809 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 11:47:02,736 - INFO - JDEC info: 0x050000 - custom-riscv (320 KiB)
+2026-07-22 11:47:02,736 - INFO - Reading entire FX in port COM10
+2026-07-22 11:47:06,197 - ERROR - Backup failed: Serial read error: requested 65536 bytes, got 1 bytes (read call #6). Port: COM10, timeout: 3s. Data received: b'\r'
+2026-07-22 11:47:14,243 - ERROR - Serial read error: requested 65536 bytes, got 1 bytes (read call #6). Port: COM10, timeout: 3s. Data received: b'\r'
+NoneType: None
+2026-07-22 11:55:52,118 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 11:55:53,926 - ERROR - could not open port 'COM10': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-07-22 11:56:07,518 - INFO - ACTION: Opened cart editor
+2026-07-22 11:56:11,278 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 11:56:15,508 - ERROR - could not open port 'COM10': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-07-22 11:56:28,018 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 11:56:32,934 - INFO - JDEC info: 0x050000 - custom-riscv (320 KiB)
+2026-07-22 11:56:32,934 - INFO - Reading entire FX in port COM10
+2026-07-22 11:56:36,390 - ERROR - Backup failed: Serial read error: requested 65536 bytes, got 1 bytes (read call #6). Port: COM10, timeout: 3s. Data received: b'\r'
+2026-07-22 11:56:53,086 - ERROR - Serial read error: requested 65536 bytes, got 1 bytes (read call #6). Port: COM10, timeout: 3s. Data received: b'\r'
+NoneType: None
+2026-07-22 11:58:36,046 - INFO - ACTION: Opened cart editor
+2026-07-22 11:58:39,121 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 11:58:39,232 - INFO - Using RISC-V compatible backup_fx
+2026-07-22 11:59:48,325 - DEBUG - Full parsing FX cart (0 bytes)
+2026-07-22 11:59:48,325 - INFO - Fully parsed 0 program sections
+2026-07-22 11:59:48,337 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-22 12:02:24,634 - INFO - ACTION: Opened cart editor
+2026-07-22 12:02:27,727 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 12:02:27,839 - INFO - Using RISC-V compatible backup_fx
+2026-07-22 12:03:29,220 - ERROR - Backup failed: GetOverlappedResult failed (PermissionError(13, 'Отказано в доступе.', None, 5))
+2026-07-22 12:03:40,298 - ERROR - GetOverlappedResult failed (PermissionError(13, 'Отказано в доступе.', None, 5))
+NoneType: None
+2026-07-22 12:39:27,281 - INFO - ACTION: Opened cart editor
+2026-07-22 12:39:30,512 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 12:39:35,438 - INFO - JDEC info: 0x050000 - custom-riscv (320 KiB)
+2026-07-22 12:39:35,438 - INFO - Reading entire FX in port COM10
+2026-07-22 12:39:38,896 - ERROR - Backup failed: Serial read error: requested 65536 bytes, got 1 bytes (read call #6). Port: COM10, timeout: 3s. Data received: b'\r'
+2026-07-22 12:39:46,446 - ERROR - Serial read error: requested 65536 bytes, got 1 bytes (read call #6). Port: COM10, timeout: 3s. Data received: b'\r'
+NoneType: None
+2026-07-22 13:14:32,090 - INFO - ACTION: Opened cart editor
+2026-07-22 13:14:35,822 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 13:14:44,806 - ERROR - could not open port 'COM10': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-07-22 13:14:48,452 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 13:14:53,269 - ERROR - Backup failed: No flash cart detected on port COM10
+2026-07-22 13:14:58,954 - ERROR - No flash cart detected on port COM10
+NoneType: None
+2026-07-22 13:15:50,318 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 13:15:55,139 - ERROR - Backup failed: No flash cart detected on port COM10
+2026-07-22 13:15:56,803 - ERROR - No flash cart detected on port COM10
+NoneType: None
+2026-07-22 13:26:15,906 - INFO - ACTION: Opened cart editor
+2026-07-22 13:26:22,596 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 13:26:27,425 - ERROR - Backup failed: No flash cart detected on port COM10
+2026-07-22 13:26:29,294 - ERROR - No flash cart detected on port COM10
+NoneType: None
+2026-07-22 13:39:45,377 - INFO - ACTION: Opened cart editor
+2026-07-22 13:39:49,094 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 13:39:53,917 - ERROR - Backup failed: No flash cart detected on port COM10
+2026-07-22 13:39:58,028 - ERROR - No flash cart detected on port COM10
+NoneType: None
+2026-07-22 13:41:37,136 - INFO - ACTION: Opened cart editor
+2026-07-22 13:41:40,276 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 13:44:22,445 - DEBUG - Full parsing FX cart (0 bytes)
+2026-07-22 13:44:22,446 - INFO - Fully parsed 0 program sections
+2026-07-22 13:44:22,471 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-22 13:45:36,039 - INFO - ACTION: Opened cart editor
+2026-07-22 13:45:39,423 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 13:45:55,657 - ERROR - No flash cart detected on port COM10
+NoneType: None
+2026-07-22 13:46:05,508 - INFO - ACTION: Opened cart editor
+2026-07-22 13:46:09,157 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 13:46:17,328 - ERROR - No flash cart detected on port COM10
+NoneType: None
+2026-07-22 13:49:06,181 - INFO - ACTION: Opened cart editor
+2026-07-22 13:49:09,307 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 13:49:12,288 - INFO - JDEC info: 0x050000 - custom-riscv (320 KiB)
+2026-07-22 13:49:12,289 - INFO - Reading entire FX in port COM10
+2026-07-22 13:49:27,622 - INFO - Read 5 blocks in 15.33 seconds
+2026-07-22 13:49:27,653 - DEBUG - Trim fx cart from 327680 -> 303104 bytes
+2026-07-22 13:49:35,038 - DEBUG - Full parsing FX cart (303104 bytes)
+2026-07-22 13:49:35,039 - INFO - Fully parsed 3 program sections
+2026-07-22 13:49:35,415 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-22 15:34:22,545 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 15:34:24,941 - ERROR - could not open port 'COM10': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-07-22 15:34:29,224 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 15:34:32,193 - INFO - JDEC info: 0x9C0F00 - custom-riscv (9987 KiB)
+2026-07-22 15:34:32,193 - INFO - Reading entire FX in port COM10
+2026-07-22 15:42:03,405 - INFO - Read 156 blocks in 451.21 seconds
+2026-07-22 15:42:03,434 - DEBUG - Trim fx cart from 10223616 -> 303104 bytes
+2026-07-22 17:31:27,116 - DEBUG - Full parsing FX cart (303104 bytes)
+2026-07-22 17:31:27,117 - INFO - Fully parsed 3 program sections
+2026-07-22 17:31:27,162 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-22 20:05:21,324 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 20:05:27,631 - ERROR - could not open port 'COM10': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-07-22 20:05:39,181 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 20:05:42,156 - INFO - JDEC info: 0x109C00 - custom-riscv (1063 KiB)
+2026-07-22 20:05:42,156 - INFO - Reading entire FX in port COM10
+2026-07-22 20:06:30,238 - INFO - Read 16 blocks in 48.08 seconds
+2026-07-22 20:06:30,269 - DEBUG - Trim fx cart from 1048576 -> 303104 bytes
+2026-07-22 20:07:10,943 - DEBUG - Full parsing FX cart (303104 bytes)
+2026-07-22 20:07:10,943 - INFO - Fully parsed 3 program sections
+2026-07-22 20:07:10,978 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-22 20:07:16,029 - INFO - ACTION: Created new cart in editor
+2026-07-22 20:07:18,715 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 20:07:21,690 - INFO - JDEC info: 0x109C00 - custom-riscv (1063 KiB)
+2026-07-22 20:07:21,691 - INFO - Reading entire FX in port COM10
+2026-07-22 20:08:09,772 - INFO - Read 16 blocks in 48.08 seconds
+2026-07-22 20:08:09,799 - DEBUG - Trim fx cart from 1048576 -> 303104 bytes
+2026-07-22 20:08:18,356 - DEBUG - Full parsing FX cart (303104 bytes)
+2026-07-22 20:08:18,356 - INFO - Fully parsed 3 program sections
+2026-07-22 20:08:18,397 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-22 20:38:40,124 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 20:38:45,781 - ERROR - could not open port 'COM10': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-07-22 20:38:53,701 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-22 20:38:56,677 - INFO - JDEC info: 0x110000 - custom-riscv (1088 KiB)
+2026-07-22 20:38:56,677 - INFO - Reading entire FX in port COM10
+2026-07-22 20:39:47,736 - INFO - Read 17 blocks in 51.06 seconds
+2026-07-22 20:39:47,763 - DEBUG - Trim fx cart from 1114112 -> 303104 bytes
+2026-07-22 20:44:17,385 - DEBUG - Full parsing FX cart (303104 bytes)
+2026-07-22 20:44:17,386 - INFO - Fully parsed 3 program sections
+2026-07-22 20:44:17,419 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-25 18:57:20,322 - INFO - ACTION: Opened cart editor
+2026-07-25 18:57:29,720 - ERROR - No Arduboys found!
+NoneType: None
+2026-07-25 18:58:06,395 - INFO - ACTION: Opened cart editor
+2026-07-25 18:58:08,280 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-25 18:58:11,260 - INFO - JDEC info: 0x110000 - custom-riscv (1088 KiB)
+2026-07-25 18:58:11,261 - INFO - Reading entire FX in port COM10
+2026-07-25 18:59:02,384 - INFO - DEBUG: raw dump saved to fx_raw_dump.bin (1114112 bytes)
+2026-07-25 18:59:02,386 - INFO - Read 17 blocks in 51.12 seconds
+2026-07-25 18:59:02,413 - DEBUG - Trim fx cart from 1114112 -> 303104 bytes
+2026-07-25 18:59:29,591 - DEBUG - Full parsing FX cart (303104 bytes)
+2026-07-25 18:59:29,592 - INFO - Fully parsed 3 program sections
+2026-07-25 18:59:30,993 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-25 21:15:00,894 - INFO - ACTION: Opened cart editor
+2026-07-25 21:15:05,797 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-25 21:15:07,291 - ERROR - could not open port 'COM10': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-07-25 21:15:16,322 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-25 21:15:22,568 - ERROR - Attempting to use a port that is not open
+NoneType: None
+2026-07-25 21:15:44,668 - INFO - ACTION: Opened cart editor
+2026-07-25 21:15:47,305 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-25 21:15:50,270 - INFO - JDEC info: 0x110000 - custom-riscv (1088 KiB)
+2026-07-25 21:15:50,270 - INFO - Reading entire FX in port COM10
+2026-07-25 21:17:29,732 - INFO - DEBUG: raw dump saved to fx_raw_dump.bin (1114112 bytes)
+2026-07-25 21:17:29,732 - INFO - Read 17 blocks in 99.46 seconds
+2026-07-25 21:17:29,759 - DEBUG - Trim fx cart from 1114112 -> 303104 bytes
+2026-07-25 21:17:55,061 - DEBUG - Full parsing FX cart (303104 bytes)
+2026-07-25 21:17:55,062 - INFO - Fully parsed 3 program sections
+2026-07-25 21:17:55,299 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-25 21:40:59,883 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-25 21:40:59,902 - DEBUG - Full parsing FX cart (1088768 bytes)
+2026-07-25 21:40:59,902 - INFO - Fully parsed 6 program sections
+2026-07-25 21:40:59,951 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-25 21:58:07,568 - DEBUG - Compiling flashcart with 6 slots
+2026-07-25 21:58:07,573 - DEBUG - Found FX signature at 0x736C for WOLF
+2026-07-25 21:58:07,574 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-25 21:58:07,574 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-25 21:58:07,575 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-25 21:58:07,575 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-25 21:58:07,576 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-25 21:58:07,576 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-25 21:58:07,576 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-25 21:58:07,576 - INFO - Compiled fx flashcart, 1088768 bytes, 4 games, 2 categories
+2026-07-25 21:58:07,619 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-25 21:58:07,731 - INFO - Flashing 1088768 bytes to RISC-V device
+2026-07-25 21:58:07,967 - INFO - Device connected
+2026-07-25 21:58:07,967 - INFO - Start address: 0x80020000
+2026-07-25 21:58:08,284 - INFO - Parsed 68066 HEX records
+2026-07-25 22:00:39,543 - INFO - Flashed 68066 records in 151.26 seconds
+2026-07-25 22:01:07,664 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-25 22:01:24,507 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-25 22:01:27,484 - INFO - JDEC info: 0x110000 - custom-riscv (1088 KiB)
+2026-07-25 22:01:27,485 - INFO - Reading entire FX in port COM10
+2026-07-25 22:03:06,947 - INFO - DEBUG: raw dump saved to fx_raw_dump.bin (1114112 bytes)
+2026-07-25 22:03:06,948 - INFO - Read 17 blocks in 99.46 seconds
+2026-07-25 22:03:06,982 - DEBUG - Trim fx cart from 1114112 -> 303104 bytes
+2026-07-25 22:08:52,352 - DEBUG - Full parsing FX cart (303104 bytes)
+2026-07-25 22:08:52,353 - INFO - Fully parsed 3 program sections
+2026-07-25 22:08:52,396 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-25 22:27:43,186 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-25 22:27:46,166 - INFO - JDEC info: 0x110000 - custom-riscv (1088 KiB)
+2026-07-25 22:27:46,166 - INFO - Reading entire FX in port COM10
+2026-07-25 22:29:25,396 - INFO - DEBUG: raw dump saved to fx_raw_dump.bin (1114112 bytes)
+2026-07-25 22:29:25,396 - INFO - Read 17 blocks in 99.23 seconds
+2026-07-25 22:29:25,429 - DEBUG - Trim fx cart from 1114112 -> 303104 bytes
+2026-07-25 22:29:50,847 - DEBUG - Full parsing FX cart (303104 bytes)
+2026-07-25 22:29:50,847 - INFO - Fully parsed 3 program sections
+2026-07-25 22:29:50,889 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-25 22:30:02,541 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-25 22:30:05,505 - INFO - JDEC info: 0x110000 - custom-riscv (1088 KiB)
+2026-07-25 22:30:05,505 - INFO - Reading entire FX in port COM10
+2026-07-25 22:31:44,938 - INFO - DEBUG: raw dump saved to fx_raw_dump.bin (1114112 bytes)
+2026-07-25 22:31:44,939 - INFO - Read 17 blocks in 99.43 seconds
+2026-07-25 22:31:44,976 - DEBUG - Trim fx cart from 1114112 -> 303104 bytes
+2026-07-25 22:40:05,764 - DEBUG - Full parsing FX cart (303104 bytes)
+2026-07-25 22:40:05,764 - INFO - Fully parsed 3 program sections
+2026-07-25 22:40:05,802 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-25 22:40:10,341 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-25 22:40:13,309 - INFO - JDEC info: 0x110000 - custom-riscv (1088 KiB)
+2026-07-25 22:40:13,310 - INFO - Reading entire FX in port COM10
+2026-07-25 22:41:53,094 - INFO - DEBUG: raw dump saved to fx_raw_dump.bin (1114112 bytes)
+2026-07-25 22:41:53,095 - INFO - Read 17 blocks in 99.78 seconds
+2026-07-25 22:41:53,118 - DEBUG - Trim fx cart from 1114112 -> 303104 bytes
+2026-07-25 22:42:05,437 - DEBUG - Full parsing FX cart (303104 bytes)
+2026-07-25 22:42:05,438 - INFO - Fully parsed 3 program sections
+2026-07-25 22:42:05,481 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-25 23:46:26,677 - INFO - ACTION: Opened cart editor
+2026-07-25 23:46:30,117 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-25 23:46:33,095 - INFO - JDEC info: 0x110000 - custom-riscv (1088 KiB)
+2026-07-25 23:46:33,095 - INFO - Reading entire FX in port COM10
+2026-07-25 23:48:17,530 - INFO - DEBUG: raw dump saved to fx_raw_dump.bin (1114112 bytes)
+2026-07-25 23:48:17,660 - INFO - Read 17 blocks in 104.56 seconds
+2026-07-25 23:48:17,693 - DEBUG - Trim fx cart from 1114112 -> 1088512 bytes
+2026-07-25 23:49:18,300 - DEBUG - Full parsing FX cart (1088512 bytes)
+2026-07-25 23:49:18,301 - INFO - Fully parsed 6 program sections
+2026-07-25 23:49:18,648 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-26 00:03:41,598 - INFO - ACTION: Opened cart editor
+2026-07-26 00:03:46,487 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-26 00:05:45,844 - ERROR - invalid literal for int() with base 10: b''
+NoneType: None
+2026-07-26 00:07:01,681 - INFO - ACTION: Opened cart editor
+2026-07-26 00:07:07,220 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-26 00:07:10,189 - INFO - JDEC info: 0x110000 - custom-riscv (1088 KiB)
+2026-07-26 00:07:10,190 - INFO - Reading entire FX in port COM10
+2026-07-26 00:08:00,086 - INFO - Read 17 blocks in 49.9 seconds
+2026-07-26 00:08:00,116 - DEBUG - Trim fx cart from 1114112 -> 303104 bytes
+2026-07-26 00:11:25,951 - DEBUG - Full parsing FX cart (303104 bytes)
+2026-07-26 00:11:25,952 - INFO - Fully parsed 3 program sections
+2026-07-26 00:11:26,170 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-26 00:20:36,598 - INFO - ACTION: Opened cart editor
+2026-07-26 00:20:42,295 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-26 00:20:45,268 - INFO - JDEC info: 0x110000 - custom-riscv (1088 KiB)
+2026-07-26 00:20:45,268 - INFO - Reading entire FX in port COM10
+2026-07-26 00:21:41,111 - INFO - Read 17 blocks in 55.84 seconds
+2026-07-26 00:21:41,136 - DEBUG - Trim fx cart from 1114112 -> 1088512 bytes
+2026-07-26 00:22:39,843 - DEBUG - Full parsing FX cart (1088512 bytes)
+2026-07-26 00:22:39,844 - INFO - Fully parsed 6 program sections
+2026-07-26 00:22:40,147 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-26 00:22:58,926 - DEBUG - Compiling flashcart with 6 slots
+2026-07-26 00:22:58,927 - DEBUG - Found FX signature at 0x736C for WOLF
+2026-07-26 00:22:58,927 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 00:22:58,928 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-26 00:22:58,928 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 00:22:58,929 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-26 00:22:58,929 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 00:22:58,929 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-26 00:22:58,929 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 00:22:58,930 - INFO - Compiled fx flashcart, 1088768 bytes, 4 games, 2 categories
+2026-07-26 00:22:58,952 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/08072026/exampl/image/main_cart/fx_raw_dump2.bin
+2026-07-26 00:28:30,077 - INFO - ACTION: Opened cart editor
+2026-07-26 00:28:40,108 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-26 00:28:43,078 - INFO - JDEC info: 0x110000 - custom-riscv (1088 KiB)
+2026-07-26 00:28:43,078 - INFO - Reading entire FX in port COM10
+2026-07-26 00:29:38,920 - INFO - Read 17 blocks in 55.84 seconds
+2026-07-26 00:29:38,943 - DEBUG - Trim fx cart from 1114112 -> 1088512 bytes
+2026-07-26 00:30:19,440 - DEBUG - Full parsing FX cart (1088512 bytes)
+2026-07-26 00:30:19,441 - INFO - Fully parsed 6 program sections
+2026-07-26 00:30:19,614 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-26 00:30:37,744 - INFO - ACTION: Moved slot by -1: Bomberman
+2026-07-26 00:30:40,654 - INFO - ACTION: Moved slot by -1: Bomberman
+2026-07-26 00:30:44,283 - INFO - ACTION: Moved slot by -1: Bomberman
+2026-07-26 00:31:05,008 - DEBUG - Compiling flashcart with 6 slots
+2026-07-26 00:31:05,008 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-26 00:31:05,009 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 00:31:05,009 - DEBUG - Found FX signature at 0x736C for WOLF
+2026-07-26 00:31:05,009 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 00:31:05,011 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-26 00:31:05,011 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 00:31:05,011 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-26 00:31:05,011 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 00:31:05,011 - INFO - Compiled fx flashcart, 1090816 bytes, 4 games, 2 categories
+2026-07-26 00:31:05,052 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-26 00:31:05,163 - INFO - Flashing 1090816 bytes to RISC-V device
+2026-07-26 00:31:05,401 - INFO - Device connected
+2026-07-26 00:31:05,401 - INFO - Start address: 0x80020000
+2026-07-26 00:31:05,722 - INFO - Parsed 68194 HEX records
+2026-07-26 00:33:34,004 - INFO - Flashed 68194 records in 148.28 seconds
+2026-07-26 00:34:09,662 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-26 00:45:04,866 - DEBUG - Importing PngImagePlugin
+2026-07-26 00:45:04,886 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 00:45:04,887 - DEBUG - STREAM b'IDAT' 41 8192
+2026-07-26 00:45:04,900 - INFO - ACTION: Edited tile image for: Bootloader
+2026-07-26 09:46:18,117 - INFO - ACTION: Discarded current cart in editor
+2026-07-26 16:29:01,445 - INFO - ACTION: Opened cart editor
+2026-07-26 16:29:43,061 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin"
+2026-07-26 16:29:43,079 - DEBUG - Full parsing FX cart (1088768 bytes)
+2026-07-26 16:29:43,080 - INFO - Fully parsed 6 program sections
+2026-07-26 16:29:43,411 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small8.bin into editor
+2026-07-26 16:30:05,989 - INFO - ACTION: Edited FX save for: WOLF
+2026-07-26 16:33:02,077 - INFO - ACTION: Edited FX save for: WOLF
+2026-07-26 16:33:17,426 - DEBUG - Importing PngImagePlugin
+2026-07-26 16:33:17,436 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 16:33:17,437 - DEBUG - STREAM b'sRGB' 41 1
+2026-07-26 16:33:17,437 - DEBUG - STREAM b'gAMA' 54 4
+2026-07-26 16:33:17,437 - DEBUG - STREAM b'cHRM' 70 32
+2026-07-26 16:33:17,437 - DEBUG - STREAM b'PLTE' 114 6
+2026-07-26 16:33:17,437 - DEBUG - STREAM b'pHYs' 132 9
+2026-07-26 16:33:17,437 - DEBUG - STREAM b'tIME' 153 7
+2026-07-26 16:33:17,437 - DEBUG - b'tIME' 153 7 (unknown)
+2026-07-26 16:33:17,437 - DEBUG - STREAM b'IDAT' 172 1606
+2026-07-26 16:33:17,438 - INFO - ACTION: Edited tile image for: WOLF
+2026-07-26 16:49:01,586 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 16:49:01,586 - DEBUG - STREAM b'IDAT' 41 8192
+2026-07-26 16:49:01,593 - INFO - ACTION: Edited tile image for: Game And Watch
+2026-07-26 16:54:55,281 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 16:54:55,282 - DEBUG - STREAM b'sRGB' 41 1
+2026-07-26 16:54:55,282 - DEBUG - STREAM b'gAMA' 54 4
+2026-07-26 16:54:55,282 - DEBUG - STREAM b'cHRM' 70 32
+2026-07-26 16:54:55,282 - DEBUG - STREAM b'PLTE' 114 6
+2026-07-26 16:54:55,282 - DEBUG - STREAM b'pHYs' 132 9
+2026-07-26 16:54:55,282 - DEBUG - STREAM b'tIME' 153 7
+2026-07-26 16:54:55,282 - DEBUG - b'tIME' 153 7 (unknown)
+2026-07-26 16:54:55,282 - DEBUG - STREAM b'IDAT' 172 367
+2026-07-26 16:54:55,284 - INFO - ACTION: Edited tile image for: Game And Watch
+2026-07-26 16:55:57,689 - INFO - ACTION: Moved slot by 1: PrinceOfArabia.ino
+2026-07-26 16:55:57,715 - INFO - ACTION: Moved slot by -1: PrinceOfArabia.ino
+2026-07-26 16:55:58,461 - INFO - ACTION: Moved slot by 1: PrinceOfArabia.ino
+2026-07-26 16:55:59,171 - INFO - ACTION: Moved slot by 1: PrinceOfArabia.ino
+2026-07-26 16:56:07,863 - INFO - ACTION: Added new category to cart editor
+2026-07-26 16:56:13,443 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 16:56:13,443 - DEBUG - STREAM b'IDAT' 41 8192
+2026-07-26 16:56:13,450 - INFO - ACTION: Edited tile image for: New Category
+2026-07-26 16:57:19,551 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 16:57:19,551 - DEBUG - STREAM b'sRGB' 41 1
+2026-07-26 16:57:19,551 - DEBUG - STREAM b'gAMA' 54 4
+2026-07-26 16:57:19,551 - DEBUG - STREAM b'cHRM' 70 32
+2026-07-26 16:57:19,552 - DEBUG - STREAM b'PLTE' 114 6
+2026-07-26 16:57:19,552 - DEBUG - STREAM b'pHYs' 132 9
+2026-07-26 16:57:19,552 - DEBUG - STREAM b'tIME' 153 7
+2026-07-26 16:57:19,552 - DEBUG - b'tIME' 153 7 (unknown)
+2026-07-26 16:57:19,552 - DEBUG - STREAM b'IDAT' 172 322
+2026-07-26 16:57:19,553 - INFO - ACTION: Edited tile image for: New Category
+2026-07-26 16:57:35,670 - DEBUG - Compiling flashcart with 7 slots
+2026-07-26 16:57:35,671 - DEBUG - Found FX signature at 0x736C for WOLF
+2026-07-26 16:57:35,671 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 16:57:35,672 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-26 16:57:35,672 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 16:57:35,673 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-26 16:57:35,673 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 16:57:35,674 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-26 16:57:35,674 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 16:57:35,675 - INFO - Compiled fx flashcart, 1089792 bytes, 4 games, 3 categories
+2026-07-26 16:57:35,701 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/08072026/exampl/image/flashcart-image_small9.bin
+2026-07-26 16:57:41,116 - DEBUG - Compiling flashcart with 7 slots
+2026-07-26 16:57:41,117 - DEBUG - Found FX signature at 0x736C for WOLF
+2026-07-26 16:57:41,117 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 16:57:41,118 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-26 16:57:41,118 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 16:57:41,118 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-26 16:57:41,118 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 16:57:41,119 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-26 16:57:41,120 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 16:57:41,120 - INFO - Compiled fx flashcart, 1089792 bytes, 4 games, 3 categories
+2026-07-26 16:57:41,169 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-26 16:57:41,281 - INFO - Flashing 1089792 bytes to RISC-V device
+2026-07-26 16:57:41,515 - INFO - Device connected
+2026-07-26 16:57:41,515 - INFO - Start address: 0x80020000
+2026-07-26 16:57:41,831 - INFO - Parsed 68130 HEX records
+2026-07-26 17:00:14,068 - INFO - Flashed 68130 records in 152.24 seconds
+2026-07-26 17:00:16,734 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-26 17:01:44,312 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 17:01:44,312 - DEBUG - STREAM b'sRGB' 41 1
+2026-07-26 17:01:44,312 - DEBUG - STREAM b'gAMA' 54 4
+2026-07-26 17:01:44,312 - DEBUG - STREAM b'cHRM' 70 32
+2026-07-26 17:01:44,312 - DEBUG - STREAM b'PLTE' 114 6
+2026-07-26 17:01:44,313 - DEBUG - STREAM b'pHYs' 132 9
+2026-07-26 17:01:44,313 - DEBUG - STREAM b'tIME' 153 7
+2026-07-26 17:01:44,313 - DEBUG - b'tIME' 153 7 (unknown)
+2026-07-26 17:01:44,313 - DEBUG - STREAM b'IDAT' 172 523
+2026-07-26 17:01:44,315 - INFO - ACTION: Edited tile image for: Bootloader
+2026-07-26 17:01:52,435 - DEBUG - Compiling flashcart with 7 slots
+2026-07-26 17:01:52,435 - DEBUG - Found FX signature at 0x736C for WOLF
+2026-07-26 17:01:52,436 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 17:01:52,436 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-26 17:01:52,436 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 17:01:52,436 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-26 17:01:52,437 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 17:01:52,438 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-26 17:01:52,438 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 17:01:52,438 - INFO - Compiled fx flashcart, 1089792 bytes, 4 games, 3 categories
+2026-07-26 17:01:52,483 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-26 17:01:52,594 - INFO - Flashing 1089792 bytes to RISC-V device
+2026-07-26 17:01:52,836 - INFO - Device connected
+2026-07-26 17:01:52,836 - INFO - Start address: 0x80020000
+2026-07-26 17:01:53,161 - INFO - Parsed 68130 HEX records
+2026-07-26 17:04:23,545 - INFO - Flashed 68130 records in 150.38 seconds
+2026-07-26 17:19:33,403 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-26 17:19:38,167 - INFO - ACTION: Discarded current cart in editor
+2026-07-26 17:19:38,168 - INFO - ACTION: Created new cart in editor
+2026-07-26 17:21:07,414 - INFO - ACTION: Opened cart editor
+2026-07-26 17:21:17,069 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-26 17:21:20,044 - INFO - JDEC info: 0x110000 - custom-riscv (1088 KiB)
+2026-07-26 17:21:20,045 - INFO - Reading entire FX in port COM10
+2026-07-26 17:22:15,887 - INFO - Read 17 blocks in 55.84 seconds
+2026-07-26 17:22:15,911 - DEBUG - Trim fx cart from 1114112 -> 1089536 bytes
+2026-07-26 17:22:16,901 - DEBUG - Full parsing FX cart (1089536 bytes)
+2026-07-26 17:22:16,902 - INFO - Fully parsed 7 program sections
+2026-07-26 17:22:17,224 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-26 17:22:20,516 - INFO - ACTION: Created new cart in editor
+2026-07-26 17:22:31,653 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small.bin"
+2026-07-26 17:22:31,673 - DEBUG - Full parsing FX cart (797952 bytes)
+2026-07-26 17:22:31,675 - INFO - Fully parsed 36 program sections
+2026-07-26 17:22:31,821 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small.bin into editor
+2026-07-26 17:22:37,670 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small7.bin"
+2026-07-26 17:22:37,687 - DEBUG - Full parsing FX cart (371968 bytes)
+2026-07-26 17:22:37,687 - INFO - Fully parsed 5 program sections
+2026-07-26 17:22:37,738 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small7.bin into editor
+2026-07-26 17:22:51,044 - INFO - ACTION: Removed 1 slots from cart: 'WOLF'
+2026-07-26 17:22:55,433 - DEBUG - Compiling flashcart with 4 slots
+2026-07-26 17:22:55,433 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-26 17:22:55,434 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 17:22:55,434 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-26 17:22:55,434 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 17:22:55,434 - INFO - Compiled fx flashcart, 67328 bytes, 2 games, 2 categories
+2026-07-26 17:22:55,474 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-26 17:22:55,589 - INFO - Flashing 67328 bytes to RISC-V device
+2026-07-26 17:22:55,825 - INFO - Device connected
+2026-07-26 17:22:55,825 - INFO - Start address: 0x80020000
+2026-07-26 17:22:55,846 - INFO - Parsed 4211 HEX records
+2026-07-26 17:23:04,866 - INFO - Flashed 4211 records in 9.02 seconds
+2026-07-26 17:23:06,275 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-26 17:24:49,411 - INFO - ACTION: Discarded current cart in editor
+2026-07-26 17:24:49,411 - INFO - ACTION: Created new cart in editor
+2026-07-26 17:24:58,020 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-26 17:25:00,983 - INFO - JDEC info: 0x020000 - custom-riscv (128 KiB)
+2026-07-26 17:25:00,983 - INFO - Reading entire FX in port COM10
+2026-07-26 17:25:07,685 - INFO - Read 2 blocks in 6.7 seconds
+2026-07-26 17:25:07,714 - DEBUG - Trim fx cart from 131072 -> 67072 bytes
+2026-07-26 17:25:09,011 - DEBUG - Full parsing FX cart (67072 bytes)
+2026-07-26 17:25:09,011 - INFO - Fully parsed 4 program sections
+2026-07-26 17:25:09,046 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-26 17:25:21,588 - DEBUG - Importing PngImagePlugin
+2026-07-26 17:25:21,594 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 17:25:21,594 - DEBUG - STREAM b'sRGB' 41 1
+2026-07-26 17:25:21,594 - DEBUG - STREAM b'gAMA' 54 4
+2026-07-26 17:25:21,594 - DEBUG - STREAM b'cHRM' 70 32
+2026-07-26 17:25:21,595 - DEBUG - STREAM b'PLTE' 114 6
+2026-07-26 17:25:21,595 - DEBUG - STREAM b'pHYs' 132 9
+2026-07-26 17:25:21,595 - DEBUG - STREAM b'tIME' 153 7
+2026-07-26 17:25:21,595 - DEBUG - b'tIME' 153 7 (unknown)
+2026-07-26 17:25:21,595 - DEBUG - STREAM b'IDAT' 172 523
+2026-07-26 17:25:21,596 - INFO - ACTION: Edited tile image for: Bootloader
+2026-07-26 17:25:38,067 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 17:25:38,067 - DEBUG - STREAM b'sRGB' 41 1
+2026-07-26 17:25:38,067 - DEBUG - STREAM b'gAMA' 54 4
+2026-07-26 17:25:38,067 - DEBUG - STREAM b'cHRM' 70 32
+2026-07-26 17:25:38,068 - DEBUG - STREAM b'PLTE' 114 6
+2026-07-26 17:25:38,068 - DEBUG - STREAM b'pHYs' 132 9
+2026-07-26 17:25:38,068 - DEBUG - STREAM b'tIME' 153 7
+2026-07-26 17:25:38,068 - DEBUG - b'tIME' 153 7 (unknown)
+2026-07-26 17:25:38,068 - DEBUG - STREAM b'IDAT' 172 367
+2026-07-26 17:25:38,069 - INFO - ACTION: Edited tile image for: Game And Watch
+2026-07-26 17:26:02,383 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/wolf/Wolf.ino.hex
+2026-07-26 17:26:03,935 - ERROR - 'CartWindow' object has no attribute 'device_select'
+NoneType: None
+2026-07-26 17:26:20,045 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/wolf/Wolf.ino.hex
+2026-07-26 17:26:25,686 - ERROR - 'CartWindow' object has no attribute 'device_select'
+NoneType: None
+2026-07-26 17:26:31,915 - INFO - ACTION: Added new category to cart editor
+2026-07-26 17:26:35,339 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/wolf/fxdata_save_071125.hex
+2026-07-26 17:26:36,310 - ERROR - 'CartWindow' object has no attribute 'device_select'
+NoneType: None
+2026-07-26 17:26:53,659 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/wolf/Wolf.ino.hex
+2026-07-26 17:27:01,439 - ERROR - 'CartWindow' object has no attribute 'device_select'
+NoneType: None
+2026-07-26 17:27:11,850 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/pops/PrinceOfArabia.ino.hex
+2026-07-26 17:27:27,209 - ERROR - 'CartWindow' object has no attribute 'device_select'
+NoneType: None
+2026-07-26 17:27:43,717 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/pops/PrinceOfArabia.ino.hex
+2026-07-26 17:27:55,048 - ERROR - 'CartWindow' object has no attribute 'device_select'
+NoneType: None
+2026-07-26 17:28:01,974 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/pops/PrinceOfArabia.ino.hex
+2026-07-26 17:28:03,025 - ERROR - 'CartWindow' object has no attribute 'device_select'
+NoneType: None
+2026-07-26 17:28:06,609 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/pops/PrinceOfArabia.ino.hex
+2026-07-26 17:28:07,587 - ERROR - 'CartWindow' object has no attribute 'device_select'
+NoneType: None
+2026-07-26 17:28:27,232 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/pops/PrinceOfArabia.ino.hex
+2026-07-26 17:33:09,161 - ERROR - 'CartWindow' object has no attribute 'device_select'
+NoneType: None
+2026-07-26 17:37:00,515 - INFO - ACTION: Discarded current cart in editor
+2026-07-26 17:37:05,688 - INFO - ACTION: Opened cart editor
+2026-07-26 17:37:13,355 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small7.bin"
+2026-07-26 17:37:13,373 - DEBUG - Full parsing FX cart (371968 bytes)
+2026-07-26 17:37:13,373 - INFO - Fully parsed 5 program sections
+2026-07-26 17:37:13,625 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small7.bin into editor
+2026-07-26 17:37:24,631 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/wolf/Wolf.ino.hex
+2026-07-26 17:37:24,643 - INFO - ACTION: Added 'Arduboy' game to cart: 
+2026-07-26 17:37:36,531 - INFO - ACTION: Discarded current cart in editor
+2026-07-26 17:37:43,685 - INFO - ACTION: Opened cart editor
+2026-07-26 17:37:50,657 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-26 17:37:53,630 - INFO - JDEC info: 0x020000 - custom-riscv (128 KiB)
+2026-07-26 17:37:53,630 - INFO - Reading entire FX in port COM10
+2026-07-26 17:38:00,332 - INFO - Read 2 blocks in 6.7 seconds
+2026-07-26 17:38:00,356 - DEBUG - Trim fx cart from 131072 -> 67072 bytes
+2026-07-26 17:38:01,534 - DEBUG - Full parsing FX cart (67072 bytes)
+2026-07-26 17:38:01,535 - INFO - Fully parsed 4 program sections
+2026-07-26 17:38:01,813 - INFO - ACTION: Loaded cart from Arduboy into editor
+2026-07-26 17:38:16,473 - DEBUG - Importing PngImagePlugin
+2026-07-26 17:38:16,480 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 17:38:16,480 - DEBUG - STREAM b'sRGB' 41 1
+2026-07-26 17:38:16,480 - DEBUG - STREAM b'gAMA' 54 4
+2026-07-26 17:38:16,480 - DEBUG - STREAM b'cHRM' 70 32
+2026-07-26 17:38:16,480 - DEBUG - STREAM b'PLTE' 114 6
+2026-07-26 17:38:16,480 - DEBUG - STREAM b'pHYs' 132 9
+2026-07-26 17:38:16,480 - DEBUG - STREAM b'tIME' 153 7
+2026-07-26 17:38:16,481 - DEBUG - b'tIME' 153 7 (unknown)
+2026-07-26 17:38:16,481 - DEBUG - STREAM b'IDAT' 172 523
+2026-07-26 17:38:16,482 - INFO - ACTION: Edited tile image for: Bootloader
+2026-07-26 17:38:25,281 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 17:38:25,281 - DEBUG - STREAM b'sRGB' 41 1
+2026-07-26 17:38:25,281 - DEBUG - STREAM b'gAMA' 54 4
+2026-07-26 17:38:25,281 - DEBUG - STREAM b'cHRM' 70 32
+2026-07-26 17:38:25,281 - DEBUG - STREAM b'PLTE' 114 6
+2026-07-26 17:38:25,281 - DEBUG - STREAM b'pHYs' 132 9
+2026-07-26 17:38:25,281 - DEBUG - STREAM b'tIME' 153 7
+2026-07-26 17:38:25,282 - DEBUG - b'tIME' 153 7 (unknown)
+2026-07-26 17:38:25,282 - DEBUG - STREAM b'IDAT' 172 367
+2026-07-26 17:38:25,283 - INFO - ACTION: Edited tile image for: Game And Watch
+2026-07-26 17:38:37,644 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/wolf/Wolf.ino.hex
+2026-07-26 17:38:37,655 - INFO - ACTION: Added 'Arduboy' game to cart: 
+2026-07-26 17:38:52,346 - INFO - ACTION: Moved slot by 1: Wolf3d
+2026-07-26 17:38:54,030 - INFO - ACTION: Moved slot by 1: Wolf3d
+2026-07-26 17:38:54,927 - INFO - ACTION: Moved slot by 1: Wolf3d
+2026-07-26 17:39:01,069 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 17:39:01,070 - DEBUG - STREAM b'sRGB' 41 1
+2026-07-26 17:39:01,070 - DEBUG - STREAM b'gAMA' 54 4
+2026-07-26 17:39:01,070 - DEBUG - STREAM b'cHRM' 70 32
+2026-07-26 17:39:01,070 - DEBUG - STREAM b'PLTE' 114 6
+2026-07-26 17:39:01,070 - DEBUG - STREAM b'pHYs' 132 9
+2026-07-26 17:39:01,070 - DEBUG - STREAM b'tIME' 153 7
+2026-07-26 17:39:01,070 - DEBUG - b'tIME' 153 7 (unknown)
+2026-07-26 17:39:01,070 - DEBUG - STREAM b'IDAT' 172 1606
+2026-07-26 17:39:01,071 - INFO - ACTION: Edited tile image for: Wolf3d
+2026-07-26 17:39:07,973 - INFO - ACTION: Edited FX data for: Wolf3d
+2026-07-26 17:39:11,216 - INFO - ACTION: Edited FX save for: Wolf3d
+2026-07-26 17:39:20,819 - INFO - ACTION: Added new category to cart editor
+2026-07-26 17:39:28,431 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 17:39:28,431 - DEBUG - STREAM b'sRGB' 41 1
+2026-07-26 17:39:28,431 - DEBUG - STREAM b'gAMA' 54 4
+2026-07-26 17:39:28,431 - DEBUG - STREAM b'cHRM' 70 32
+2026-07-26 17:39:28,431 - DEBUG - STREAM b'PLTE' 114 6
+2026-07-26 17:39:28,431 - DEBUG - STREAM b'pHYs' 132 9
+2026-07-26 17:39:28,431 - DEBUG - STREAM b'tIME' 153 7
+2026-07-26 17:39:28,431 - DEBUG - b'tIME' 153 7 (unknown)
+2026-07-26 17:39:28,432 - DEBUG - STREAM b'IDAT' 172 322
+2026-07-26 17:39:28,433 - INFO - ACTION: Edited tile image for: New Category
+2026-07-26 17:39:43,017 - DEBUG - Reading data from hex file: D:/home/arduino/08072026/exampl/pops/PrinceOfArabia.ino.hex
+2026-07-26 17:39:43,030 - INFO - ACTION: Added 'Arduboy' game to cart: 
+2026-07-26 17:39:56,469 - INFO - ACTION: Edited FX data for: PrinceOfArabia.ino
+2026-07-26 17:40:14,122 - INFO - ACTION: Added more save for: PrinceOfArabia.ino
+2026-07-26 17:40:53,865 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-26 17:40:53,866 - DEBUG - STREAM b'IDAT' 41 782
+2026-07-26 17:40:53,867 - INFO - ACTION: Edited tile image for: PrinceOfArabia.ino
+2026-07-26 17:41:01,619 - DEBUG - Compiling flashcart with 7 slots
+2026-07-26 17:41:01,620 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-07-26 17:41:01,620 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 17:41:01,620 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for Bomberman! FX data will not be patched.
+2026-07-26 17:41:01,621 - WARNING - Couldn't patch menu to return to bootloader for Bomberman: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 17:41:01,621 - DEBUG - Found FX signature at 0x736C for Wolf3d
+2026-07-26 17:41:01,621 - WARNING - Couldn't patch menu to return to bootloader for Wolf3d: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 17:41:01,622 - DEBUG - Found FX signature at 0x958C for PrinceOfArabia.ino
+2026-07-26 17:41:01,623 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-07-26 17:41:01,623 - INFO - Compiled fx flashcart, 1089792 bytes, 4 games, 3 categories
+2026-07-26 17:41:01,662 - DEBUG - Found VID:PID=1A86:55D3(COM10)[bootld]
+2026-07-26 17:41:01,774 - INFO - Flashing 1089792 bytes to RISC-V device
+2026-07-26 17:41:02,014 - INFO - Device connected
+2026-07-26 17:41:02,014 - INFO - Start address: 0x80020000
+2026-07-26 17:41:02,336 - INFO - Parsed 68130 HEX records
+2026-07-26 17:43:27,339 - INFO - Flashed 68130 records in 145.00 seconds
+2026-07-26 17:43:34,613 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-07-31 18:02:30,585 - INFO - ACTION: Opened cart editor
+2026-07-31 18:02:52,072 - DEBUG - Reading flash image from file "D:/home/arduino/08072026/exampl/image/flashcart-image_small9.bin"
+2026-07-31 18:02:52,099 - DEBUG - Full parsing FX cart (1089792 bytes)
+2026-07-31 18:02:52,101 - INFO - Fully parsed 7 program sections
+2026-07-31 18:02:52,516 - INFO - ACTION: Loaded cart from D:/home/arduino/08072026/exampl/image/flashcart-image_small9.bin into editor
+2026-07-31 18:03:00,918 - DEBUG - Importing PngImagePlugin
+2026-07-31 18:03:00,967 - DEBUG - STREAM b'IHDR' 16 13
+2026-07-31 18:03:00,967 - DEBUG - STREAM b'IDAT' 41 113
+2026-07-31 18:03:00,970 - INFO - ACTION: Edited tile image for: Game And Watch
+2026-07-31 18:03:49,811 - INFO - ACTION: Discarded current cart in editor
+2026-07-31 18:03:56,240 - INFO - ACTION: Opened cart editor
+2026-08-07 08:51:32,595 - INFO - ACTION: Opened cart editor
+2026-08-07 09:00:22,628 - DEBUG - Reading flash image from file "D:/home/arduino/26072026/game_spibear/img/flashcart-image_small9.bin"
+2026-08-07 09:00:22,668 - DEBUG - Full parsing FX cart (1089792 bytes)
+2026-08-07 09:00:22,669 - INFO - Fully parsed 7 program sections
+2026-08-07 09:00:23,061 - INFO - ACTION: Loaded cart from D:/home/arduino/26072026/game_spibear/img/flashcart-image_small9.bin into editor
+2026-08-07 09:00:44,844 - INFO - ACTION: Removed 1 slots from cart: 'Bomberman'
+2026-08-07 09:01:06,358 - DEBUG - Reading data from hex file: D:/home/arduino/26072026/game_spibear/unicorn_dash/unicorn_dash.ino.hex
+2026-08-07 09:01:06,367 - INFO - ACTION: Edited program for: UniCorn
+2026-08-07 09:03:50,986 - DEBUG - Reading data from hex file: D:/home/arduino/26072026/game_spibear/wolf3d/Wolf.ino.hex
+2026-08-07 09:03:50,997 - INFO - ACTION: Edited program for: WOLF
+2026-08-07 09:03:57,552 - DEBUG - Reading data from hex file: D:/home/arduino/26072026/game_spibear/pops/PrinceOfArabia_mik32/PrinceOfArabia.ino.hex
+2026-08-07 09:03:57,564 - INFO - ACTION: Edited program for: PrinceOfArabia.ino
+2026-08-07 09:04:03,724 - DEBUG - Compiling flashcart with 6 slots
+2026-08-07 09:04:03,725 - DEBUG - Found FX signature at 0x73E0 for WOLF
+2026-08-07 09:04:03,725 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-07 09:04:03,726 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-07 09:04:03,726 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-07 09:04:03,726 - DEBUG - Found FX signature at 0x941C for PrinceOfArabia.ino
+2026-08-07 09:04:03,727 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-08-07 09:04:03,727 - INFO - Compiled fx flashcart, 1044736 bytes, 3 games, 3 categories
+2026-08-07 09:04:03,802 - DEBUG - Found VID:PID=1A86:55D3(COM9)[bootld]
+2026-08-07 09:04:16,128 - ERROR - could not open port 'COM9': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-08-07 09:04:16,152 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-08-07 09:04:35,268 - DEBUG - Compiling flashcart with 6 slots
+2026-08-07 09:04:35,269 - DEBUG - Found FX signature at 0x73E0 for WOLF
+2026-08-07 09:04:35,269 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-07 09:04:35,270 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-07 09:04:35,270 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-07 09:04:35,271 - DEBUG - Found FX signature at 0x941C for PrinceOfArabia.ino
+2026-08-07 09:04:35,271 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-08-07 09:04:35,272 - INFO - Compiled fx flashcart, 1044736 bytes, 3 games, 3 categories
+2026-08-07 09:04:35,317 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/26072026/game_spibear/img/flashcart-image_small_spi.bin
+2026-08-07 09:04:40,780 - DEBUG - Compiling flashcart with 6 slots
+2026-08-07 09:04:40,781 - DEBUG - Found FX signature at 0x73E0 for WOLF
+2026-08-07 09:04:40,781 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-07 09:04:40,782 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-07 09:04:40,782 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-07 09:04:40,783 - DEBUG - Found FX signature at 0x941C for PrinceOfArabia.ino
+2026-08-07 09:04:40,783 - WARNING - Couldn't patch menu to return to bootloader for PrinceOfArabia.ino: No menu patch applied. ISR size too small (0 bytes)
+2026-08-07 09:04:40,784 - INFO - Compiled fx flashcart, 1044736 bytes, 3 games, 3 categories
+2026-08-07 09:04:40,847 - DEBUG - Found VID:PID=1A86:55D3(COM9)[bootld]
+2026-08-07 09:04:40,959 - INFO - Flashing 1044736 bytes to RISC-V device
+2026-08-07 09:04:41,198 - INFO - Device connected
+2026-08-07 09:04:41,198 - INFO - Start address: 0x80020000
+2026-08-07 09:04:41,507 - INFO - Parsed 65313 HEX records
+2026-08-07 09:07:04,731 - INFO - Flashed 65313 records in 143.22 seconds
+2026-08-07 09:09:07,612 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-08-07 09:12:02,863 - INFO - ACTION: Opened cart editor
+2026-08-07 09:12:19,975 - DEBUG - Reading flash image from file "D:/home/arduino/26072026/game_spibear/img/flashcart-image_small_spi.bin"
+2026-08-07 09:12:20,013 - DEBUG - Full parsing FX cart (1044736 bytes)
+2026-08-07 09:12:20,014 - INFO - Fully parsed 6 program sections
+2026-08-07 09:12:20,282 - INFO - ACTION: Loaded cart from D:/home/arduino/26072026/game_spibear/img/flashcart-image_small_spi.bin into editor
+2026-08-07 09:12:29,454 - INFO - ACTION: Removed 1 slots from cart: 'WOLF'
+2026-08-07 09:12:35,884 - INFO - ACTION: Removed 1 slots from cart: 'PrinceOfArabia.ino'
+2026-08-07 09:13:03,020 - DEBUG - Reading data from hex file: D:/home/arduino/26072026/game_spibear/unicorn_dash/unicorn_dash.ino.hex
+2026-08-07 09:13:03,026 - INFO - ACTION: Edited program for: UniCorn
+2026-08-07 09:13:09,146 - DEBUG - Compiling flashcart with 4 slots
+2026-08-07 09:13:09,147 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-07 09:13:09,147 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-07 09:13:09,147 - INFO - Compiled fx flashcart, 26368 bytes, 1 games, 3 categories
+2026-08-07 09:13:09,199 - DEBUG - Found VID:PID=1A86:55D3(COM9)[bootld]
+2026-08-07 09:13:09,311 - INFO - Flashing 26368 bytes to RISC-V device
+2026-08-07 09:13:09,550 - INFO - Device connected
+2026-08-07 09:13:09,551 - INFO - Start address: 0x80020000
+2026-08-07 09:13:09,559 - INFO - Parsed 1650 HEX records
+2026-08-07 09:13:13,130 - INFO - Flashed 1650 records in 3.57 seconds
+2026-08-07 09:13:14,764 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-08-07 09:13:33,560 - DEBUG - Compiling flashcart with 4 slots
+2026-08-07 09:13:33,561 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-07 09:13:33,561 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-07 09:13:33,561 - INFO - Compiled fx flashcart, 26368 bytes, 1 games, 3 categories
+2026-08-07 09:13:33,588 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/26072026/game_spibear/img/flashcart-image_small_spi.bin
+2026-08-12 10:46:40,167 - INFO - ACTION: Opened cart editor
+2026-08-12 10:46:55,257 - DEBUG - Reading flash image from file "D:/home/arduino/26072026/game_spibear/img/flashcart-image_small9.bin"
+2026-08-12 10:46:55,291 - DEBUG - Full parsing FX cart (1089792 bytes)
+2026-08-12 10:46:55,292 - INFO - Fully parsed 7 program sections
+2026-08-12 10:46:55,875 - INFO - ACTION: Loaded cart from D:/home/arduino/26072026/game_spibear/img/flashcart-image_small9.bin into editor
+2026-08-12 10:47:12,751 - INFO - ACTION: Removed 1 slots from cart: 'PrinceOfArabia.ino'
+2026-08-12 10:47:21,751 - INFO - ACTION: Discarded current cart in editor
+2026-08-12 10:47:24,148 - DEBUG - Reading flash image from file "D:/home/arduino/26072026/game_spibear/img/flashcart-image_small_spi.bin"
+2026-08-12 10:47:24,172 - DEBUG - Full parsing FX cart (26368 bytes)
+2026-08-12 10:47:24,172 - INFO - Fully parsed 4 program sections
+2026-08-12 10:47:24,213 - INFO - ACTION: Loaded cart from D:/home/arduino/26072026/game_spibear/img/flashcart-image_small_spi.bin into editor
+2026-08-12 10:47:32,154 - DEBUG - Reading flash image from file "D:/home/arduino/26072026/game_spibear/img/flashcart-image_small9.bin"
+2026-08-12 10:47:32,179 - DEBUG - Full parsing FX cart (1089792 bytes)
+2026-08-12 10:47:32,180 - INFO - Fully parsed 7 program sections
+2026-08-12 10:47:32,229 - INFO - ACTION: Loaded cart from D:/home/arduino/26072026/game_spibear/img/flashcart-image_small9.bin into editor
+2026-08-12 10:47:37,115 - INFO - ACTION: Removed 1 slots from cart: 'PrinceOfArabia.ino'
+2026-08-12 10:47:42,281 - INFO - ACTION: Removed 1 slots from cart: 'Bomberman'
+2026-08-12 10:48:00,649 - DEBUG - Reading data from hex file: D:/home/arduino/26072026/game_spibear/wolf3d/Wolf.ino.hex
+2026-08-12 10:48:00,662 - INFO - ACTION: Edited program for: WOLF
+2026-08-12 10:48:06,017 - DEBUG - Reading data from hex file: D:/home/arduino/26072026/game_spibear/unicorn_dash/unicorn_dash.ino.hex
+2026-08-12 10:48:06,023 - INFO - ACTION: Edited program for: UniCorn
+2026-08-12 10:48:09,484 - DEBUG - Compiling flashcart with 5 slots
+2026-08-12 10:48:09,489 - DEBUG - Found FX signature at 0x73EC for WOLF
+2026-08-12 10:48:09,489 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-12 10:48:09,489 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-12 10:48:09,489 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-12 10:48:09,490 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-12 10:48:09,512 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/26072026/game_spibear/img/flashcart-image_small9.bin
+2026-08-12 10:48:24,170 - DEBUG - Compiling flashcart with 5 slots
+2026-08-12 10:48:24,171 - DEBUG - Found FX signature at 0x73EC for WOLF
+2026-08-12 10:48:24,171 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-12 10:48:24,171 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-12 10:48:24,172 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-12 10:48:24,172 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-12 10:48:24,198 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin
+2026-08-12 10:48:27,847 - DEBUG - Compiling flashcart with 5 slots
+2026-08-12 10:48:27,847 - DEBUG - Found FX signature at 0x73EC for WOLF
+2026-08-12 10:48:27,848 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-12 10:48:27,848 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-12 10:48:27,848 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-12 10:48:27,848 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-12 10:48:27,895 - DEBUG - Found VID:PID=1A86:55D3(COM9)[bootld]
+2026-08-12 10:48:29,456 - ERROR - could not open port 'COM9': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-08-12 10:48:29,465 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-08-12 10:48:39,031 - DEBUG - Compiling flashcart with 5 slots
+2026-08-12 10:48:39,032 - DEBUG - Found FX signature at 0x73EC for WOLF
+2026-08-12 10:48:39,032 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-12 10:48:39,032 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-12 10:48:39,033 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-12 10:48:39,033 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-12 10:48:39,079 - DEBUG - Found VID:PID=1A86:55D3(COM9)[bootld]
+2026-08-12 10:48:39,190 - INFO - Flashing 326656 bytes to RISC-V device
+2026-08-12 10:48:39,431 - INFO - Device connected
+2026-08-12 10:48:39,432 - INFO - Start address: 0x80020000
+2026-08-12 10:48:39,535 - INFO - Parsed 20422 HEX records
+2026-08-12 10:49:22,061 - INFO - Flashed 20422 records in 42.53 seconds
+2026-08-12 10:49:48,707 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-08-13 09:16:36,702 - INFO - ACTION: Opened cart editor
+2026-08-13 09:16:54,577 - DEBUG - Reading flash image from file "D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin"
+2026-08-13 09:16:54,610 - DEBUG - Full parsing FX cart (326656 bytes)
+2026-08-13 09:16:54,610 - INFO - Fully parsed 5 program sections
+2026-08-13 09:16:54,947 - INFO - ACTION: Loaded cart from D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin into editor
+2026-08-13 09:17:06,912 - DEBUG - Reading data from hex file: D:/home/arduino/26072026/game_spibear/wolf3d/Wolf.ino.hex
+2026-08-13 09:17:06,921 - INFO - ACTION: Edited program for: WOLF
+2026-08-13 09:18:45,181 - INFO - ACTION: Discarded current cart in editor
+2026-08-17 18:38:50,956 - INFO - ACTION: Opened cart editor
+2026-08-17 18:39:03,262 - DEBUG - Reading flash image from file "D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin"
+2026-08-17 18:39:03,281 - DEBUG - Full parsing FX cart (326656 bytes)
+2026-08-17 18:39:03,282 - INFO - Fully parsed 5 program sections
+2026-08-17 18:39:03,718 - INFO - ACTION: Loaded cart from D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin into editor
+2026-08-17 18:39:10,293 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 18:39:10,295 - DEBUG - Found FX signature at 0x73EC for WOLF
+2026-08-17 18:39:10,295 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:39:10,296 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 18:39:10,296 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:39:10,296 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-17 18:39:12,070 - ERROR - No Arduboys found!
+NoneType: None
+2026-08-17 18:39:12,080 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-08-17 18:39:20,892 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 18:39:20,892 - DEBUG - Found FX signature at 0x73EC for WOLF
+2026-08-17 18:39:20,893 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:39:20,893 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 18:39:20,893 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:39:20,893 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-17 18:39:20,942 - DEBUG - Found VID:PID=1A86:55D3(COM9)[bootld]
+2026-08-17 18:39:21,054 - INFO - Flashing 326656 bytes to RISC-V device
+2026-08-17 18:39:21,291 - INFO - Device connected
+2026-08-17 18:39:21,292 - INFO - Start address: 0x80020000
+2026-08-17 18:39:21,394 - INFO - Parsed 20422 HEX records
+2026-08-17 18:40:05,665 - INFO - Flashed 20422 records in 44.27 seconds
+2026-08-17 18:41:57,551 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-08-17 18:42:04,094 - DEBUG - Reading data from hex file: D:/home/arduino/26072026/game_spibear/wolf3d/Wolf.ino.hex
+2026-08-17 18:42:04,107 - INFO - ACTION: Edited program for: WOLF
+2026-08-17 18:42:16,384 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 18:42:16,384 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-17 18:42:16,385 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:42:16,385 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 18:42:16,385 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:42:16,386 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-17 18:42:16,407 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin
+2026-08-17 18:42:22,233 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 18:42:22,234 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-17 18:42:22,234 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:42:22,234 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 18:42:22,234 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:42:22,234 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-17 18:42:22,272 - DEBUG - Found VID:PID=1A86:55D3(COM9)[bootld]
+2026-08-17 18:42:31,403 - ERROR - could not open port 'COM9': PermissionError(13, 'Отказано в доступе.', None, 5)
+NoneType: None
+2026-08-17 18:42:31,422 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-08-17 18:42:36,482 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 18:42:36,483 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-17 18:42:36,483 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:42:36,484 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 18:42:36,484 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:42:36,484 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-17 18:42:36,524 - DEBUG - Found VID:PID=1A86:55D3(COM9)[bootld]
+2026-08-17 18:42:36,636 - INFO - Flashing 326656 bytes to RISC-V device
+2026-08-17 18:42:42,010 - WARNING - Attempt 1/5 failed: Device not responding
+2026-08-17 18:42:47,427 - WARNING - Attempt 2/5 failed: Device not responding
+2026-08-17 18:42:52,816 - WARNING - Attempt 3/5 failed: Device not responding
+2026-08-17 18:42:58,234 - WARNING - Attempt 4/5 failed: Device not responding
+2026-08-17 18:43:03,611 - WARNING - Attempt 5/5 failed: Device not responding
+2026-08-17 18:43:05,564 - ERROR - Device not responding after 5 attempts.
+NoneType: None
+2026-08-17 18:43:05,574 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-08-17 18:43:09,521 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 18:43:09,521 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-17 18:43:09,521 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:43:09,522 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 18:43:09,522 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:43:09,522 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-17 18:43:09,547 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin
+2026-08-17 18:43:29,829 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 18:43:29,830 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-17 18:43:29,830 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:43:29,830 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 18:43:29,831 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 18:43:29,831 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-17 18:43:29,870 - DEBUG - Found VID:PID=1A86:55D3(COM9)[bootld]
+2026-08-17 18:43:29,982 - INFO - Flashing 326656 bytes to RISC-V device
+2026-08-17 18:43:30,229 - INFO - Device connected
+2026-08-17 18:43:30,229 - INFO - Start address: 0x80020000
+2026-08-17 18:43:30,330 - INFO - Parsed 20422 HEX records
+2026-08-17 18:44:14,712 - INFO - Flashed 20422 records in 44.38 seconds
+2026-08-17 22:55:05,866 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-08-17 22:55:54,735 - DEBUG - Reading data from hex file: D:/home/arduino/26072026/game_spibear/wolf3d/Wolf.ino.hex
+2026-08-17 22:55:54,745 - INFO - ACTION: Edited program for: WOLF
+2026-08-17 22:55:58,305 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 22:55:58,306 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-17 22:55:58,306 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 22:55:58,307 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 22:55:58,307 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 22:55:58,307 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-17 22:55:58,332 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin
+2026-08-17 22:56:02,110 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 22:56:02,111 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-17 22:56:02,111 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 22:56:02,111 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 22:56:02,111 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 22:56:02,111 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-17 22:56:03,160 - ERROR - No Arduboys found!
+NoneType: None
+2026-08-17 22:56:03,167 - INFO - ACTION: Failed flashing cart in editor to Arduboy
+2026-08-17 22:56:13,040 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 22:56:13,041 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-17 22:56:13,041 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 22:56:13,041 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 22:56:13,042 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 22:56:13,042 - INFO - Compiled fx flashcart, 326656 bytes, 2 games, 3 categories
+2026-08-17 22:56:13,083 - DEBUG - Found VID:PID=1A86:55D3(COM9)[bootld]
+2026-08-17 22:56:13,194 - INFO - Flashing 326656 bytes to RISC-V device
+2026-08-17 22:56:13,439 - INFO - Device connected
+2026-08-17 22:56:13,440 - INFO - Start address: 0x80020000
+2026-08-17 22:56:13,541 - INFO - Parsed 20422 HEX records
+2026-08-17 22:56:57,785 - INFO - Flashed 20422 records in 44.24 seconds
+2026-08-17 22:57:36,273 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-08-17 22:59:10,838 - DEBUG - Reading data from hex file: D:/home/arduino/26072026/game_spibear/unicorn_dash/unicorn_dash.ino.hex
+2026-08-17 22:59:10,845 - INFO - ACTION: Edited program for: UniCorn
+2026-08-17 22:59:14,907 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 22:59:14,908 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-17 22:59:14,908 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 22:59:14,908 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 22:59:14,908 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 22:59:14,908 - INFO - Compiled fx flashcart, 326144 bytes, 2 games, 3 categories
+2026-08-17 22:59:14,932 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin
+2026-08-17 23:54:54,768 - DEBUG - Reading data from hex file: D:/home/arduino/26072026/game_spibear/wolf3d/Wolf.ino.hex
+2026-08-17 23:54:54,778 - INFO - ACTION: Edited program for: WOLF
+2026-08-17 23:55:01,310 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 23:55:01,311 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-17 23:55:01,311 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 23:55:01,312 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 23:55:01,312 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 23:55:01,312 - INFO - Compiled fx flashcart, 326144 bytes, 2 games, 3 categories
+2026-08-17 23:55:01,333 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin
+2026-08-17 23:55:06,599 - DEBUG - Compiling flashcart with 5 slots
+2026-08-17 23:55:06,599 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-17 23:55:06,600 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 23:55:06,600 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-17 23:55:06,600 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-17 23:55:06,600 - INFO - Compiled fx flashcart, 326144 bytes, 2 games, 3 categories
+2026-08-17 23:55:06,638 - DEBUG - Found VID:PID=1A86:55D3(COM9)[bootld]
+2026-08-17 23:55:06,749 - INFO - Flashing 326144 bytes to RISC-V device
+2026-08-17 23:55:06,992 - INFO - Device connected
+2026-08-17 23:55:06,993 - INFO - Start address: 0x80020000
+2026-08-17 23:55:07,094 - INFO - Parsed 20390 HEX records
+2026-08-17 23:55:50,786 - INFO - Flashed 20390 records in 43.69 seconds
+2026-08-18 08:22:31,932 - INFO - ACTION: Flashed cart in editor to Arduboy
+2026-08-19 09:23:25,021 - INFO - ACTION: Opened cart editor
+2026-08-19 09:23:46,274 - DEBUG - Reading flash image from file "D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin"
+2026-08-19 09:23:46,297 - DEBUG - Full parsing FX cart (326144 bytes)
+2026-08-19 09:23:46,298 - INFO - Fully parsed 5 program sections
+2026-08-19 09:23:46,669 - INFO - ACTION: Loaded cart from D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin into editor
+2026-08-19 09:23:52,796 - DEBUG - Reading data from hex file: D:/home/arduino/26072026/game_spibear/wolf3d/Wolf.ino.hex
+2026-08-19 09:23:52,807 - INFO - ACTION: Edited program for: WOLF
+2026-08-19 09:23:55,737 - DEBUG - Compiling flashcart with 5 slots
+2026-08-19 09:23:55,739 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-19 09:23:55,739 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-19 09:23:55,740 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-19 09:23:55,740 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-19 09:23:55,740 - INFO - Compiled fx flashcart, 326144 bytes, 2 games, 3 categories
+2026-08-19 09:23:55,765 - INFO - ACTION: Saved cart in editor to file D:/home/arduino/26072026/game_spibear/img/flashcart-image_small10.bin
+2026-08-19 09:23:59,753 - DEBUG - Compiling flashcart with 5 slots
+2026-08-19 09:23:59,754 - DEBUG - Found FX signature at 0x73F0 for WOLF
+2026-08-19 09:23:59,754 - WARNING - Couldn't patch menu to return to bootloader for WOLF: No menu patch applied. ISR size too small (0 bytes)
+2026-08-19 09:23:59,755 - WARNING - FX signature 'FXBOYDAT' NOT FOUND in binary for UniCorn! FX data will not be patched.
+2026-08-19 09:23:59,755 - WARNING - Couldn't patch menu to return to bootloader for UniCorn: No menu patch applied. ISR size too small (0 bytes)
+2026-08-19 09:23:59,755 - INFO - Compiled fx flashcart, 326144 bytes, 2 games, 3 categories
+2026-08-19 09:23:59,802 - DEBUG - Found VID:PID=1A86:55D3(COM9)[bootld]
+2026-08-19 09:23:59,914 - INFO - Flashing 326144 bytes to RISC-V device
+2026-08-19 09:24:00,145 - INFO - Device connected
+2026-08-19 09:24:00,146 - INFO - Start address: 0x80020000
+2026-08-19 09:24:00,250 - INFO - Parsed 20390 HEX records
+2026-08-19 09:24:45,799 - INFO - Flashed 20390 records in 45.55 seconds
+2026-08-19 09:57:16,768 - INFO - ACTION: Flashed cart in editor to Arduboy
