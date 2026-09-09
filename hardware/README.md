@@ -5,9 +5,9 @@
 [kit](./kit/)
 ![Принципиальная схема](./kit/v03b.png)
 
-![Корпус (STL)] (./kit/kit_v01_vaza.stl)
+![Корпус (STL)](./kit/kit_v01_vaza.stl)
 
-![Ручка джойстика (STL)] (./kit/Direct.stl)
+![Ручка джойстика (STL)](./kit/Direct.stl)
 
 В папке имеется схема версии v0.3b и STL-файл корпуса платы v0.1
 
