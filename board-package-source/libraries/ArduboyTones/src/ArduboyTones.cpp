@@ -380,16 +380,20 @@ void ArduboyTones::nextTone()
 	#endif
 #else // ELBEARBOY
 	if (freq == 0) { // if tone is silent
+	#ifndef SPIBEAR_TM16
       ocrValue = F_CPU / SILENT_FREQ / 2 - 1; // dummy tone for silence
+	#else
+		ocrValue = F_CPU / 32 /SILENT_FREQ / 2 - 1;
+	#endif
       freq = SILENT_FREQ;
       toneSilent = true;
       GPIO_0->CLEAR = 1 << TONE_PIN; // set the pin low
     }
     else {
 	  #ifndef SPIBEAR_TM16
-	  ocrValue = F_CPU / freq / 2 - 1; // счет без делителя
+		ocrValue = F_CPU / freq / 2 - 1; // счет без делителя
 	  #else
-	  ocrValue = F_CPU / 32 /freq / 2 - 1; // счет без делителя
+		ocrValue = F_CPU / 32 /freq / 2 - 1; 
 	  #endif
       toneSilent = false;
     }

@@ -135,10 +135,15 @@ void loop()
 	//PAD_CONFIG->PORT_1_CFG &= ~(0b11 << (2 * SPEAKER_2_BIT)); // Нужно проверять, что там на порту!!!. установка вывода 1 порта 1 (в режим 0xb00).  Timer Disconnect!
 
         GPIO_0->DIRECTION_OUT = (1 << SPEAKER_1_BIT);
-        GPIO_1->DIRECTION_OUT = (1 << SPEAKER_2_BIT);
         GPIO_0->CLEAR = (1 << SPEAKER_1_BIT) ;
+		#ifndef SPIBEAR
+		GPIO_1->DIRECTION_OUT = (1 << SPEAKER_2_BIT);
         GPIO_1->SET =   (1 << SPEAKER_2_BIT);
-
+		#else
+		GPIO_0->DIRECTION_OUT = (1 << SPEAKER_2_BIT);
+        GPIO_0->SET =   (1 << SPEAKER_2_BIT);
+		#endif
+		
         //GPIO_1->DIRECTION_IN =  (1 << SPEAKER_2_BIT)
 
         for (int i = 0; i < 50; i++) 
@@ -159,13 +164,25 @@ void loop()
                 if (speaker2_on) 
                 {
                 //if ((i % 2) == 0) GPIO_1->CLEAR = (1 << SPEAKER_2_BIT); else GPIO_1->SET = (1 << SPEAKER_2_BIT);
-                if ((GPIO_1->STATE & (1 << SPEAKER_2_BIT))) {GPIO_1->CLEAR = 1 << SPEAKER_2_BIT;} else {GPIO_1->SET = 1 << SPEAKER_2_BIT;}
-                }
-                else GPIO_1->SET =   (1 << SPEAKER_2_BIT);
-                delayMicroseconds(300);
-        }
+
+
+				#ifndef SPIBEAR
+								if ((GPIO_1->STATE & (1 << SPEAKER_2_BIT))) {GPIO_1->CLEAR = 1 << SPEAKER_2_BIT;} else {GPIO_1->SET = 1 << SPEAKER_2_BIT;}
+								}
+								else GPIO_1->SET =   (1 << SPEAKER_2_BIT);
+								delayMicroseconds(300);
+						}
+						GPIO_1->CLEAR = (1 << SPEAKER_2_BIT) ;
+				#else
+								if ((GPIO_0->STATE & (1 << SPEAKER_2_BIT))) {GPIO_0->CLEAR = 1 << SPEAKER_2_BIT;} else {GPIO_0->SET = 1 << SPEAKER_2_BIT;}
+								}
+								else GPIO_0->SET =   (1 << SPEAKER_2_BIT);
+								delayMicroseconds(300);
+						}
+						GPIO_0->CLEAR = (1 << SPEAKER_2_BIT) ;
+				#endif	
+
         GPIO_0->CLEAR = (1 << SPEAKER_1_BIT) ;
-        GPIO_1->CLEAR = (1 << SPEAKER_2_BIT) ;
         hardwareChange = false;
 #endif
   }
