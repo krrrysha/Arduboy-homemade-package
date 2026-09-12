@@ -48,8 +48,8 @@ THE SOFTWARE.
 #endif
 
 #ifdef MCU_MIK32_Amur
-  #define ELBEARBOY
-  #warning ELBEARBOY!
+  #define BEARBOARD
+  #warning BEARBOARD!
   #include <mik32_hal_irq.h>
   	#include "Arduboy2.h" // в оригинальной библиотеке нет связи с Arduboy2. видимо может использоваться отдельно. Но у нас надо загрузить конкретные варианты пинов для разных схем....
   typedef uint32_t uint24_t;
@@ -153,7 +153,7 @@ THE SOFTWARE.
 	#define TONE_PIN2_DDR DDRB
 	#define TONE_PIN2 PORTB3
 	#define TONE_PIN2_MASK _BV(TONE_PIN2)
-#elif defined (ELBEARBOY)
+#elif defined (BEARBOARD)
 	#ifndef SPIBEAR				
 	#define TONE_PIN 3  // D9/3 port_0_3
 	#define TONE_PIN_PORT GPIO_0->STATE

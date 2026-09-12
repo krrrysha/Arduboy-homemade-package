@@ -12,7 +12,7 @@
 #include <Arduboy2.h>
 #include <ArduboyTones.h>
 
-#if !defined(ELBEARBOY)
+#if !defined(BEARBOARD)
 	#include <avr/pgmspace.h>
 #endif
 

@@ -12,12 +12,12 @@ uint8_t Arduboy2Core::ADCJoystickState = 0;
 unsigned int Arduboy2Core::JoystickXZero = 5000; // first run indicator. number greater than 2^10 (greater than 2^12 for mik32)
 unsigned int Arduboy2Core::JoystickYZero = 5000; // first run indicator. number greater than 2^10 (greater than 2^12 for mik32)
 #endif
-#ifdef ELBEARBOY
+#ifdef BEARBOARD
 	uint8_t Arduboy2Core::chan_converted = 0;
 	uint8_t Arduboy2Core::chan_selected = 0; 
 #endif
 
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 	#include <avr/wdt.h>
 #else	
 	#include <wdt.h>
@@ -321,7 +321,7 @@ void Arduboy2Core::boot()
   #endif
 
   // Select the ADC input here so a delay isn't required in generateRandomSeed()
-  #ifndef ELBEARBOY
+  #ifndef BEARBOARD
 
 
 
@@ -407,7 +407,7 @@ void Arduboy2Core::bootPins()
   #endif
   // switch off LEDs by default
   PORTC &= ~(_BV(GREEN_LED_BIT)   | _BV(BLUE_LED_BIT) | _BV(RED_LED_BIT)); // если бы светодиоды там были, их надо было бы выключить....
-#elif defined (ELBEARBOY)
+#elif defined (BEARBOARD)
 	
 	//включаем тактирование GPIO_0, GPIO_1, ADC
 	PM->CLK_APB_P_SET |=  PM_CLOCK_APB_P_GPIO_0_M | PM_CLOCK_APB_P_GPIO_1_M | PM_CLOCK_APB_P_ANALOG_REGS_M; 
@@ -867,7 +867,7 @@ void Arduboy2Core::bootOLED()
 // Initialize the SPI interface for the display
 void Arduboy2Core::bootSPI()
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 // master, mode 0, MSB first, CPU clock / 2 (8MHz)
   SPCR = _BV(SPE) | _BV(MSTR);
   SPSR = _BV(SPI2X);
@@ -915,7 +915,7 @@ void Arduboy2Core::bootSPI()
 void Arduboy2Core::SPItransfer(uint8_t data)	
 
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
   SPDR = data;
   /*
    * The following NOP introduces a small delay that can prevent the wait
@@ -947,7 +947,7 @@ void Arduboy2Core::SPItransfer(uint8_t data)
 #if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
 void Arduboy2Core::i2c_start(uint8_t mode)
 {
-  #if defined(ELBEARBOY)
+  #if defined(BEARBOARD)
   I2C_SDA_LOW();       // disable posible internal pullup, ensure SDA low on enabling output
   I2C_SDA_AS_OUTPUT(); // SDA low before SCL for start condition
   I2C_SCL_LOW();
@@ -965,7 +965,7 @@ void Arduboy2Core::i2c_start(uint8_t mode)
 
 void Arduboy2Core::i2c_sendByte(uint8_t byte)
 {
-  #ifndef ELBEARBOY
+  #ifndef BEARBOARD
   uint8_t sda_clr = I2C_PORT & ~((1 << I2C_SDA) | (1 << I2C_SCL));
   uint8_t scl = 1 << I2C_SCL;
   uint8_t sda = 1 << I2C_SDA;
@@ -1040,7 +1040,7 @@ void Arduboy2Core::safeMode()
   if (buttonsState() == UP_BUTTON)
   {
     setRGBledRedOn();
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 #ifndef ARDUBOY_CORE // for Arduboy core timer 0 should remain enabled
     // prevent the bootloader magic number from being overwritten by timer 0
     // when a timer variable overlaps the magic number location
@@ -1057,7 +1057,7 @@ void Arduboy2Core::safeMode()
 
 void Arduboy2Core::idle()
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
   SMCR = _BV(SE); // select idle mode and enable sleeping
   sleep_cpu();
   SMCR = 0; // disable sleeping
@@ -1066,7 +1066,7 @@ void Arduboy2Core::idle()
 
 void Arduboy2Core::bootPowerSaving()
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
   #if defined(PRR) && !defined(PRR0)
 	#if defined (JOYSTICKANALOG)  // disable power saving for ADC
 	PRR = _BV(PRTWI);
@@ -1405,7 +1405,7 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
     }
   }
   displayDisable();
-#elif (defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX)) && !defined(ELBEARBOY)
+#elif (defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX)) && !defined(BEARBOARD)
   uint16_t length = WIDTH * HEIGHT / 8;
   uint8_t sda_clr = I2C_PORT & ~((1 << I2C_SDA) | (1 << I2C_SCL));
   uint8_t scl = 1 << I2C_SCL;
@@ -1527,7 +1527,7 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
   );
  #endif
   i2c_stop();
-#elif defined(ELBEARBOY) 
+#elif defined(BEARBOARD) 
 	 #if  ( defined(OLED_SSD1306_I2C) && defined(OLED_SSD1306_SPI))
 	  i2c_start(SSD1306_I2C_DATA);
 	  if (clear)
@@ -1735,7 +1735,7 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
   }
 
   
-#elif (defined(OLED_SH1106) || defined(LCD_ST7565)) && !defined(ELBEARBOY)
+#elif (defined(OLED_SH1106) || defined(LCD_ST7565)) && !defined(BEARBOARD)
   //Assembly optimized page mode display code with clear support.
   //Each byte transfer takes 18 cycles
   asm volatile (
@@ -2188,7 +2188,7 @@ void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
 #endif
 
 
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 	#if defined(ECONSOLE) 
   // only blue on DevKit, which is not PWM capable
   (void)red;    // parameter unused
@@ -2268,7 +2268,7 @@ void Arduboy2Core::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
 
 void Arduboy2Core::setRGBled(uint8_t color, uint8_t val)
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 	#if defined(ECONSOLE) 
 	   //(void)blue;  // parameter unused
 	#elif defined (ARDUBOY_10)
@@ -2325,7 +2325,7 @@ void Arduboy2Core::setRGBled(uint8_t color, uint8_t val)
 
 void Arduboy2Core::freeRGBled()
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 	#ifdef ARDUBOY_10
 		  // clear the COM bits to return the pins to normal I/O mode
 		  TCCR0A = _BV(WGM01) | _BV(WGM00);
@@ -2340,7 +2340,7 @@ void Arduboy2Core::freeRGBled()
 
 void Arduboy2Core::digitalWriteRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 	#if defined (LCD_ST7565) || (MICROCADE)
 	  if ((red & green & blue) == RGB_OFF) //prevent backlight off 
 	  {
@@ -2377,7 +2377,7 @@ void Arduboy2Core::digitalWriteRGB(uint8_t red, uint8_t green, uint8_t blue)
 
 void Arduboy2Core::digitalWriteRGB(uint8_t color, uint8_t val)
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 	#ifdef ARDUBOY_10
 	  if (color == RED_LED)
 	  {
@@ -2464,7 +2464,7 @@ uint8_t Arduboy2Core::buttonsState()
 	if (bitRead(B_BUTTON_PORTIN, B_BUTTON_BIT) == 0) { buttons |= B_BUTTON; }
 
 
-  #elif defined(ELBEARBOY)
+  #elif defined(BEARBOARD)
 	buttons = 0;
 	#ifndef JOYSTICKANALOG
 		#ifndef SPIBEAR
@@ -2560,7 +2560,7 @@ unsigned long Arduboy2Core::generateRandomSeed()
 {
   unsigned long seed;
 
-#ifndef ELBEARBOY // classic or ECONSOLE
+#ifndef BEARBOARD // classic or ECONSOLE
   
 	#ifdef JOYSTICKANALOG
 
@@ -2627,7 +2627,7 @@ void Arduboy2Core::delayByte(uint8_t ms)
   delayShort(ms);
 }
 
-#ifdef ELBEARBOY
+#ifdef BEARBOARD
 
 /*
 void inline Arduboy2Core::Delay_us (uint32_t us) //Функция задержки в микросекундах us
@@ -2895,7 +2895,7 @@ void eeprom_update_byte(void *__dst, uint8_t val){
 
 void Arduboy2Core::exitToBootloader()
 {
-#if !defined  (ELBEARBOY) 
+#if !defined  (BEARBOARD) 
   cli();
  #ifdef ARDUBOY_CORE
   asm volatile 
@@ -2938,7 +2938,7 @@ void Arduboy2Core::exitToBootloader()
 
 void Arduboy2NoUSB::mainNoUSB()
 {
-#if !defined  (ECONSOLE) && !defined  (ELBEARBOY)
+#if !defined  (ECONSOLE) && !defined  (BEARBOARD)
   // disable USB
   UDCON = _BV(DETACH);
   UDIEN = 0;

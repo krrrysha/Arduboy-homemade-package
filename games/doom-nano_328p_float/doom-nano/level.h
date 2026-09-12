@@ -1,7 +1,7 @@
 #ifndef _level_h
 #define _level_h
 
-#if !defined(ELBEARBOY)
+#if !defined(BEARBOARD)
 #include <avr/pgmspace.h>
 #endif
 

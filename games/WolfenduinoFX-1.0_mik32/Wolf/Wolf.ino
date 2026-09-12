@@ -11,7 +11,7 @@
 
 Arduboy2Base arduboy;
 
-#ifdef ELBEARBOY
+#ifdef BEARBOARD
 #undef pgm_read_ptr(addr)
 int y_lut[64] = {
     0,   0,   0,   0,   0,   0,   0,   0,

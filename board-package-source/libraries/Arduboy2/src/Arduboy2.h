@@ -9,12 +9,12 @@
 
 
 #ifdef MCU_MIK32_Amur
-	#define ELBEARBOY
-	#warning ELBEARBOY!
+	#define BEARBOARD
+	#warning BEARBOARD!
 #endif
 
 #include <Arduino.h>
-#if !defined(ELBEARBOY)
+#if !defined(BEARBOARD)
 	#include <avr/eeprom.h>
 #else	
 	#include <wiring_time.h>
@@ -2239,7 +2239,7 @@ class Arduboy2 : public Print, public Arduboy2Base
   static constexpr uint8_t fullCharacterHeight = characterHeight + lineSpacing;
 };
 
-	#ifndef ELBEARBOY
+	#ifndef BEARBOARD
 	extern volatile unsigned long timer0_millis;
 	#else
 		#include "mik32_hal_scr1_timer.h"

@@ -169,8 +169,8 @@ void setup()
   
 
   arduboyUnitName.bootLogoText();
-  //char myunit1[] {'E', 'L', 'B', 'E', 'A', 'R', 'B', 'O', 'Y'};
-  //char myunit1[] = {"ELBEAR"};
+  //char myunit1[] {'M', 'U', 'R', 'B', 'O', 'Y'};
+  //char myunit1[] = {"MURBOY"};
   //arduboy.writeUnitName(myunit1);
   //arduboy.writeShowBootLogoFlag(true);
   //arduboy.writeShowUnitNameFlag(true);

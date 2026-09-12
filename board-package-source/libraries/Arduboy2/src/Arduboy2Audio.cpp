@@ -11,7 +11,7 @@ bool Arduboy2Audio::audio_enabled = false;
 void Arduboy2Audio::on()
 {
   // fire up audio pins by seting them as outputs
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 	#ifdef ARDUBOY_10
 	  bitSet(SPEAKER_1_DDR, SPEAKER_1_BIT);
 	  bitSet(SPEAKER_2_DDR, SPEAKER_2_BIT);
@@ -36,7 +36,7 @@ void Arduboy2Audio::off()
 {
   audio_enabled = false;
   // shut off audio pins by setting them as inputs
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 #ifdef ARDUBOY_10
   bitClear(SPEAKER_1_DDR, SPEAKER_1_BIT);
   bitClear(SPEAKER_2_DDR, SPEAKER_2_BIT);
@@ -65,7 +65,7 @@ void Arduboy2Audio::toggle()
 
 void Arduboy2Audio::saveOnOff()
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
   EEPROM.update(Arduboy2Base::eepromAudioOnOff, audio_enabled);
 #else
 	Arduboy2Core::update_eeprom_byte(Arduboy2Base::eepromAudioOnOff, audio_enabled);
@@ -74,7 +74,7 @@ void Arduboy2Audio::saveOnOff()
 
 void Arduboy2Audio::begin()
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
   if (EEPROM.read(Arduboy2Base::eepromAudioOnOff))
 #else
 	if (Arduboy2Core::read_eeprom_byte(Arduboy2Base::eepromAudioOnOff))

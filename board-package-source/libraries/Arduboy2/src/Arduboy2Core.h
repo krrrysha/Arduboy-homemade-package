@@ -63,8 +63,8 @@
 	//#define JOYSTICKANALOG // undef or JOYSTICKANALOG or JOYSTICKDISCRETE.  JOYSTICKANALOG - when using the Joystick Shield analog stick; 
 	//#define JOYSTICKDISCRETE
 	#define SPIBEAR
-	#define ELBEARBOY
-	//#warning ELBEARBOY!
+	#define BEARBOARD
+	//#warning BEARBOARD!
 	
 	#ifdef SPIBEAR
 		#include <spi_.h>
@@ -86,7 +86,7 @@
 
 
 #include <Arduino.h>
-#if !defined(ELBEARBOY)
+#if !defined(BEARBOARD)
 	#include <avr/power.h>
 	#include <avr/sleep.h>
 #else
@@ -96,10 +96,10 @@
 #endif
 
 #ifdef JOYSTICKANALOG
-	#if !defined(ELBEARBOY) // ECONSOLE:
+	#if !defined(BEARBOARD) // ECONSOLE:
 		#define JOYSENSX 200 //Joystick sensitivity. X axis
 		#define JOYSENSY 200 //Joystick sensitivity. Y axis
-	#else // ELBEARBOY:
+	#else // BEARBOARD:
 		#define JOYSENSX 1000 //Joystick sensitivity. X axis
 		#define JOYSENSY 1000 //Joystick sensitivity. Y axis
 	#endif
@@ -131,7 +131,7 @@
 #ifdef ARDUBOY_10
 
 //spi
-#if !defined (ELBEARBOY) && !defined(ECONSOLE)
+#if !defined (BEARBOARD) && !defined(ECONSOLE)
 	#if defined (AB_ALTERNATE_WIRING)
 		  #define PIN_CS 1        // Pro Micro alternative display CS pin (pin 12 not not available)
 		  #define CS_PORT PORTD
@@ -178,7 +178,7 @@
 	#define SPI_MISO_PORT PORTB
 	#define SPI_MISO_BIT PORTB3
 
-#elif defined (ELBEARBOY) && defined (SPIBEAR)
+#elif defined (BEARBOARD) && defined (SPIBEAR)
 
 	#define SELSPI_BIT 10 // отключает nss IN, включает nss out к D9 PORT 0.10
 
@@ -226,7 +226,7 @@
 		#define SSD1306_I2C_ADDR 0x3c //0x3c:default, 0x3d: alternative)
 		#define SSD1306_I2C_CMD  0x00
 		#define SSD1306_I2C_DATA 0x40
-	#elif defined (ELBEARBOY)
+	#elif defined (BEARBOARD)
 			#define SELA_A_PIN 15 //  PORT 1.15 UNO, NANO select Analog/i2c
 			#define SELA_B_PIN 11 //  PORT 1.11 NANO select Analog/i2c
 			
@@ -286,7 +286,7 @@
 #endif
 
 //начало настройки RGB
-#ifndef ELBEARBOY 
+#ifndef BEARBOARD 
 	#if defined (ECONSOLE)
 		#define RED_LED 13   /**< The pin number for the red color in the RGB LED. */
 		#define GREEN_LED 17 /**< The pin number for the greem color in the RGB LED. */
@@ -335,7 +335,7 @@
 	  #define POWER_LED_PORT PORTD
 	  #define POWER_LED_BIT PORTD0
 	#endif
-#else // ELBEARBOY
+#else // BEARBOARD
 
 	#if defined (JOYSTICKDISCRETE) || defined (JOYSTICKANALOG) || defined (SPIBEAR)
 		#define RED_LED 2  // D13 port 1.2
@@ -494,7 +494,7 @@
 		#define B_BUTTON_DDR DDRD
 		#define B_BUTTON_BIT PORTD7
 	#endif // END KEYS
-#elif defined (ELBEARBOY)
+#elif defined (BEARBOARD)
 
 	//define ADC_CONFIG_SAH_TIME_MY          (0x3F << ADC_CONFIG_SAH_TIME_S) //Время выборки очередного отсчета в тактах АЦП - используем значение по-умолчанию
 	// нумерация каналов ADC - сквозная 0,1,2:
@@ -581,7 +581,7 @@
 		#define DOWN_BUTTON_PORTIN GPIO_0->STATE
 	
 	#endif 
-	// конец настройки кнопок для ELBEARBOY-платформа
+	// конец настройки кнопок для BEARBOARD-платформа
 #else // настройки кнопок для классических ARDUBOY-платформ
 	#if defined (MICROCADE)
 		#define PIN_LEFT_BUTTON A1
@@ -683,7 +683,7 @@
 		#define SPEAKER_2_PORT PORTB
 		#define SPEAKER_2_DDR DDRB
 		#define SPEAKER_2_BIT PORTB3
-	#elif defined (ELBEARBOY)
+	#elif defined (BEARBOARD)
 		#ifdef SPIBEAR
 			#define PIN_SPEAKER_1 10  // D2 port_0_10 Timer16_1_out
 			#define SPEAKER_1_PORT GPIO_0->STATE
@@ -838,12 +838,12 @@
 		#define YAXIS_IN_ADMUX (_BV(REFS0) | _BV(MUX0) ) // ADC:b_0001=AC1; "0100 0001"; REF: 0100-> Vcc with external capacitor at AREF pin; REFS1=0, REFS0=1, ADLAR=0, MUX4=0, MUX3=0, MUX2=0, MUX1=0, MUX0=1;
 		 
 /*
-	#elif defined (ELBEARBOY) // MIK32: A2=ADC3=port_0_4
+	#elif defined (BEARBOARD) // MIK32: A2=ADC3=port_0_4
 		#define PIN_RANDOM 4 // ADC3 port_0_4
 		#define CHAN_RANDOM 3 // ADC3 port_0_4
 		//define CNAN_ADCINIT_NANO 3 // канал инициализации ACE-NANO?
 */
-	#elif defined (ELBEARBOY) // MIK32: ADC6=port_0_11
+	#elif defined (BEARBOARD) // MIK32: ADC6=port_0_11
 		#define PIN_RANDOM 11 // ADC6 port_0_11
 		#define CHAN_RANDOM 6// ADC6 port_0_11
 	#else // ATmega32U4: A4=ADC1=PORTF1
@@ -1156,7 +1156,7 @@ class Arduboy2Core : public Arduboy2NoUSB
     
 	static void inline LCDDataMode() __attribute__((always_inline))
     {
-     #ifndef ELBEARBOY
+     #ifndef BEARBOARD
 		 #if defined(GU12864_800B)
 		  bitClear(DC_PORT, DC_BIT);
 		 #else
@@ -1193,7 +1193,7 @@ class Arduboy2Core : public Arduboy2NoUSB
      */
     static void inline LCDCommandMode() __attribute__((always_inline))
     {
-     #ifndef ELBEARBOY
+     #ifndef BEARBOARD
 		 #ifdef GU12864_800B
 		  bitSet(DC_PORT, DC_BIT);
 		 #else
@@ -1249,7 +1249,7 @@ class Arduboy2Core : public Arduboy2NoUSB
 
 #if defined(OLED_SSD1306_I2C) || defined(OLED_SSD1306_I2CX) || defined(OLED_SH1106_I2C)
     static void i2c_start(uint8_t mode);
-	#if defined(ELBEARBOY)
+	#if defined(BEARBOARD)
 		/* small delay for i2c
 	*/
 		#define __NOP() __asm volatile ("ADDI x0, x0, 0")
@@ -1517,7 +1517,7 @@ class Arduboy2Core : public Arduboy2NoUSB
 
     static void inline setRGBledRedOn()__attribute__((always_inline))
     {
-     #ifndef ELBEARBOY
+     #ifndef BEARBOARD
 		 #ifndef LCD_ST7565
 		  bitClear(RED_LED_PORT, RED_LED_BIT); // Red on
 		 #else
@@ -1530,7 +1530,7 @@ class Arduboy2Core : public Arduboy2NoUSB
 
     static void inline setRGBledRedOff()__attribute__((always_inline))
     {
-     #ifndef ELBEARBOY
+     #ifndef BEARBOARD
 		 #ifndef LCD_ST7565
 		  bitSet(RED_LED_PORT, RED_LED_BIT); // Red off
 		 #else
@@ -1543,7 +1543,7 @@ class Arduboy2Core : public Arduboy2NoUSB
 
     static void inline setRGBledGreenOn()__attribute__((always_inline))
     {
-    #ifndef ELBEARBOY
+    #ifndef BEARBOARD
 		 #ifndef LCD_ST7565
 		  bitClear(GREEN_LED_PORT, GREEN_LED_BIT); // Green on
 		 #else
@@ -1556,7 +1556,7 @@ class Arduboy2Core : public Arduboy2NoUSB
 
     static void inline setRGBledGreenOff()__attribute__((always_inline))
     {
-    #ifndef ELBEARBOY
+    #ifndef BEARBOARD
 		 #ifndef LCD_ST7565
 		  bitSet(GREEN_LED_PORT, GREEN_LED_BIT); // Green off
 		 #else
@@ -1569,7 +1569,7 @@ class Arduboy2Core : public Arduboy2NoUSB
 
     static void inline setRGBledBlueOn()__attribute__((always_inline))
     {
-    #ifndef ELBEARBOY
+    #ifndef BEARBOARD
 		 #ifndef LCD_ST7565
 		  bitClear(BLUE_LED_PORT, BLUE_LED_BIT); // Blue on
 		 #else
@@ -1582,7 +1582,7 @@ class Arduboy2Core : public Arduboy2NoUSB
 
     static void inline setRGBledBlueOff()__attribute__((always_inline))
     {
-	#ifndef ELBEARBOY	 
+	#ifndef BEARBOARD	 
 		 #ifndef LCD_ST7565
 		  bitSet(BLUE_LED_PORT, BLUE_LED_BIT); // Blue off
 		 #else
@@ -1824,7 +1824,7 @@ class Arduboy2Core : public Arduboy2NoUSB
      * \see ARDUBOY_NO_USB
      */
     static void exitToBootloader();
-	#if defined (ELBEARBOY)
+	#if defined (BEARBOARD)
 	static	uint8_t chan_converted;
 	static	uint8_t chan_selected;
 	

@@ -3,7 +3,7 @@
 #include "types.h"
 #include "constants.h"
 
-#if !defined(ELBEARBOY)
+#if !defined(BEARBOARD)
   #include <stdlib.h>
 #endif
 

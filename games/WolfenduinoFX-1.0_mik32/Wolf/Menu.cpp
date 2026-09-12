@@ -5,7 +5,7 @@
 #include "Save.h"
 #include "Generated/fxdata.h"
 
-#ifdef ELBEARBOY
+#ifdef BEARBOARD
 	#undef pgm_read_ptr(addr)
 	#define pgm_read_ptr(addr) (*(const void**)(addr))
 #endif

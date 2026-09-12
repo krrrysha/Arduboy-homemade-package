@@ -1,6 +1,6 @@
 #include "ArduboyFX.h"
 
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 	#include <wiring.c>А
 #else
 	//my_SPDR.INPUT=0;
@@ -34,7 +34,7 @@ FrameControl FX::frameControl;
 
 uint8_t FX::writeByte(uint8_t data)
 {
-#ifndef ELBEARBOY // нет смысла использовать напрямую для ELBEARBOY
+#ifndef BEARBOARD // нет смысла использовать напрямую для BEARBOARD
   SPDR = data;
   asm volatile("nop\n");
   uint8_t result;
@@ -50,7 +50,7 @@ uint8_t FX::writeByte(uint8_t data)
 }
 
 
-uint8_t FX::readByte() // нет смысла использовать напрямую для ELBEARBOY
+uint8_t FX::readByte() // нет смысла использовать напрямую для BEARBOARD
 {
   return writeByte(0);
 }
@@ -86,7 +86,7 @@ void FX::begin(uint16_t developmentDataPage) //
     : "r18", "r19", "r20", "r21"
    );
  #else
-	 #ifndef ELBEARBOY
+	 #ifndef BEARBOARD
 		  if (pgm_read_word(FX_DATA_VECTOR_KEY_POINTER) == FX_VECTOR_KEY_VALUE)
 		  {
 			programDataPage = (pgm_read_byte(FX_DATA_VECTOR_PAGE_POINTER) << 8) | pgm_read_byte(FX_DATA_VECTOR_PAGE_POINTER + 1);
@@ -143,7 +143,7 @@ void FX::begin(uint16_t developmentDataPage, uint16_t developmentSavePage) //
     : "r18", "r19", "r20", "r21"
    );
  #else
-	  #ifndef ELBEARBOY
+	  #ifndef BEARBOARD
 		  if (pgm_read_word(FX_DATA_VECTOR_KEY_POINTER) == FX_VECTOR_KEY_VALUE)
 		  {
 			programDataPage = (pgm_read_byte(FX_DATA_VECTOR_PAGE_POINTER) << 8) | pgm_read_byte(FX_DATA_VECTOR_PAGE_POINTER + 1);
@@ -183,7 +183,7 @@ void FX::begin(uint16_t developmentDataPage, uint16_t developmentSavePage) //
 // на будущую доработку? Потребует перехода в командный режим и чтения
 void FX::readJedecID(JedecID & id)
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
   enable();
   writeByte(SFC_JEDEC_ID);
   id.manufacturer = readByte();
@@ -196,7 +196,7 @@ void FX::readJedecID(JedecID & id)
 // на будущую доработку? Потребует перехода в командный режим и чтения
 void FX::readJedecID(JedecID* id)
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
   enable();
   writeByte(SFC_JEDEC_ID);
   id -> manufacturer = readByte();
@@ -209,11 +209,11 @@ void FX::readJedecID(JedecID* id)
 
 bool FX::detect()
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
   seekCommand(SFC_READ, 0);
   SPDR = 0;
 #else
-//  seekCommand(SFC_READ, 0); // исключаем команды чтения из вариантов обработки seekCommand (для ELBEARBOY, чтобы не переходить в перифейрийный режим, но для AVR это тоже эквивалент)
+//  seekCommand(SFC_READ, 0); // исключаем команды чтения из вариантов обработки seekCommand (для BEARBOARD, чтобы не переходить в перифейрийный режим, но для AVR это тоже эквивалент)
 //  SPDR = 0;
   seekData(0);
 #endif
@@ -223,7 +223,7 @@ bool FX::detect()
 // на будущую доработку? exitToBootloader пока не реализован в Arduboy2.
 void FX::noFXReboot()
   {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
     if (!detect())
     {
       do
@@ -241,7 +241,7 @@ void FX::noFXReboot()
 
 void FX::writeCommand(uint8_t command)
 {
-#ifndef ELBEARBOY // пока необходимости нет
+#ifndef BEARBOARD // пока необходимости нет
   enable();
   writeByte(command);
   disable();
@@ -251,7 +251,7 @@ void FX::writeCommand(uint8_t command)
 
 void FX::wakeUp()
 {
-#ifndef ELBEARBOY // нет смысла ничего включать/отключать. флеш на ace uno используется всегда. 
+#ifndef BEARBOARD // нет смысла ничего включать/отключать. флеш на ace uno используется всегда. 
   //writeCommand(SFC_POWERDOWN);
   writeCommand(SFC_RELEASE_POWERDOWN);
 #endif  
@@ -260,12 +260,12 @@ void FX::wakeUp()
 
 void FX::sleep()
 {
-#ifndef ELBEARBOY // нет смысла ничего включать/отключать. флеш на ace uno используется всегда. 	
+#ifndef BEARBOARD // нет смысла ничего включать/отключать. флеш на ace uno используется всегда. 	
   writeCommand(SFC_POWERDOWN);
 #endif
 }
 
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 void FX::writeEnable()
 {
   writeCommand(SFC_WRITE_ENABLE);
@@ -280,7 +280,7 @@ __attribute__((section(".ram_text")))void FX::writeEnable()
 
 void FX::seekCommand(uint8_t command, uint24_t address)
 {
-#ifndef ELBEARBOY // в первоначальном виде - не используется. Для записи блока сейва, блока страницы и очистки страницы будем использовать аналог?
+#ifndef BEARBOARD // в первоначальном виде - не используется. Для записи блока сейва, блока страницы и очистки страницы будем использовать аналог?
   enable();
  #ifdef ARDUINO_ARCH_AVR
   register uint8_t cmd asm("r24") = command; //assembly optimizer for AVR platform ~saves 12 bytes
@@ -312,7 +312,7 @@ void FX::seekCommand(uint8_t command, uint24_t address)
 void FX::seekData(uint24_t address)
 {
   uint24_t abs_address = address;
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
  #ifdef ARDUINO_ARCH_AVR
   asm volatile
   (
@@ -374,7 +374,7 @@ void FX::seekDataArray(uint24_t address, uint8_t index, uint8_t offset, uint8_t 
 
 void FX::seekSave(uint24_t address)
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
  #ifdef ARDUINO_ARCH_AVR
   uint24_t abs_address = address;
   asm volatile
@@ -407,7 +407,7 @@ void FX::seekSave(uint24_t address)
 uint8_t FX::readPendingUInt8()
 {
   wait();
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
   uint8_t result = SPDR;
   SPDR = 0;
   return result;
@@ -439,7 +439,7 @@ uint16_t FX::readPendingUInt16()
   );
   return result;
  #else //C++ implementation for non AVR platforms
-	#ifndef ELBEARBOY
+	#ifndef BEARBOARD
 		return ((uint16_t)readPendingUInt8() << 8) | (uint16_t)readPendingUInt8();
 	#else
 		return (((uint16_t)readPendingUInt8()) << 8) | (uint16_t)readPendingUInt8();
@@ -464,7 +464,7 @@ uint16_t FX::readPendingLastUInt16()
   );
   return result;
  #else //C++ implementation for non AVR platforms
-	#ifndef ELBEARBOY
+	#ifndef BEARBOARD
 		return ((uint16_t)readPendingUInt8() << 8) | (uint16_t)readEnd();
 	#else
 		return (((uint16_t)readPendingUInt8()) << 8) | (uint16_t)readEnd();
@@ -491,7 +491,7 @@ uint24_t FX::readPendingUInt24()
   );
   return result;
  #else //C++ implementation for non AVR platforms
-	#ifndef ELBEARBOY
+	#ifndef BEARBOARD
 		return ((uint24_t)readPendingUInt16() << 8) | readPendingUInt8();
 	#else
 		return (((uint24_t)readPendingUInt16()) << 8) | readPendingUInt8();
@@ -518,7 +518,7 @@ uint24_t FX::readPendingLastUInt24()
   );
   return result;
  #else //C++ implementation for non AVR platforms
-   #ifndef ELBEARBOY
+   #ifndef BEARBOARD
 	return ((uint24_t)readPendingUInt16() << 8) | readEnd();
    #else
     return (((uint24_t)readPendingUInt16()) << 8) | readEnd();
@@ -711,7 +711,7 @@ uint8_t FX::loadGameState(uint8_t* gameState, size_t size) // ~54 bytes
   return result;
 }
 
- #ifndef ELBEARBOY
+ #ifndef BEARBOARD
 void FX::saveGameState(const uint8_t* gameState, size_t size) // ~152 bytes locates free space in 4K save block and saves the GamesState.
 {                                                       //            if there is not enough free space, the block is erased prior to saving
 
@@ -905,7 +905,7 @@ void FX::saveGameState(const uint8_t* gameState, size_t size) // ~152 bytes loca
    }	
 #endif
 
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 void  FX::eraseSaveBlock(uint16_t page)
 {
   writeEnable();
@@ -938,7 +938,7 @@ __attribute__((section(".ram_text"))) void  FX::eraseSaveBlock(uint16_t page)
 }
 #endif
 
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 void FX::writeSavePage(uint16_t page, uint8_t* buffer)
 {
   writeEnable();
@@ -976,7 +976,7 @@ __attribute__((section(".ram_text"))) void FX::writeSavePage(uint16_t page, uint
 }
 #endif
 
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 void FX::waitWhileBusy()
 {
   enable();
@@ -1038,7 +1038,7 @@ void FX::drawBitmap(int16_t x, int16_t y, uint24_t address, uint8_t frame, uint8
     else renderheight = height;
   }
   
-  #ifndef ELBEARBOY
+  #ifndef BEARBOARD
 	  uint24_t offset = (uint24_t)(frame * (fastDiv8(height+(uint16_t)7)) + skiptop) * width + skipleft;
   #else
     uint24_t offset = (uint24_t)(frame * (fastDiv8((uint16_t)(height+(uint16_t)7))) + skiptop) * width + skipleft;
@@ -1424,7 +1424,7 @@ uint24_t FX::drawFrame(uint24_t address) //~94 bytes
   for(;;)
   {
 	seekData(address);
-	#ifndef ELBEARBOY // в AVR данная структура занимает 2+2+3+1+1=9 байт
+	#ifndef BEARBOARD // в AVR данная структура занимает 2+2+3+1+1=9 байт
 		address += sizeof(f);
 	#else // у нас структура занимает 2+2+"4"+1+1 +"2"= 12 байт. вычислять сдвиг таким образом больше нельзя
 		address += 9;
@@ -1464,7 +1464,7 @@ uint16_t FX::readIndexedUInt16(uint24_t address, uint8_t index)
 
 uint24_t FX::readIndexedUInt24(uint24_t address, uint8_t index)
 {
-  #ifndef ELBEARBOY
+  #ifndef BEARBOARD
 	seekDataArray(address, index, 0, sizeof(uint24_t)); // может быть несовместимо для uint24_t
   #else
     seekDataArray(address, index, 0, 3); 
@@ -1482,7 +1482,7 @@ uint32_t FX::readIndexedUInt32(uint24_t address, uint8_t index)
 void FX::displayPrefetch(uint24_t address, uint8_t* target, uint16_t len, bool clear)
 {
   seekData(address);
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
   asm volatile
   (
     "   ldi     r30, lo8(%[sbuf])               \n" // uint8_t* ptr = Arduboy2::sBuffer;
@@ -1565,7 +1565,7 @@ void FX::displayPrefetch(uint24_t address, uint8_t* target, uint16_t len, bool c
 
 void FX::display()
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
   enableOLED();
   Arduboy2Base::display();
   disableOLED();
@@ -1576,7 +1576,7 @@ void FX::display()
 
 void FX::display(bool clear)
 {
-#ifndef ELBEARBOY	
+#ifndef BEARBOARD	
   enableOLED();
   Arduboy2Base::display(clear);
   disableOLED();
@@ -1725,7 +1725,7 @@ void FX::drawNumber(uint32_t n, int8_t digits) //
   drawString(str);
 }
 
-#ifdef ELBEARBOY
+#ifdef BEARBOARD
 	// двунаправленная команда без полинга 
 	__attribute__((section(".ram_text"))) bool FX::my_SPIFI_SendCommand_LL(
 		uint32_t cmd,

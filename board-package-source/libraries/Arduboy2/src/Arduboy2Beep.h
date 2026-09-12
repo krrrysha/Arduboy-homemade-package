@@ -15,8 +15,8 @@
 #ifdef MCU_MIK32_Amur
 #include "mik32_hal_timer16.h"
 	#include "Arduboy2.h" // в оригинальной библиотеке нет связи с Arduboy2. видимо может использоваться отдельно. Но у нас надо загрузить конкретные варианты пинов для разных схем....
-	#define ELBEARBOY
-	#warning ELBEARBOY!
+	#define BEARBOARD
+	#warning BEARBOARD!
 	// Добавлены отдельне от SPEAKER_PIN, т.к. оригинальная библиотека не зависит от других
 	#ifndef SPIBEAR // это не работает без ссылки на Arduboy2
 		#define BEEPER_1_BIT 3 //D9
@@ -267,9 +267,9 @@ class BeepPin1
    */
   static constexpr uint16_t freq(const float hz)
   {
-#ifndef ELBEARBOY 
+#ifndef BEARBOARD 
     return (uint16_t) (((F_CPU / 8 / 2) + (hz / 2)) / hz) - 1;
-#else // ELBEARBOY
+#else // BEARBOARD
 	//return (uint16_t) ((F_CPU/32/hz)-(1/2)) ; 
 	return (uint16_t) (((F_CPU / 16 / 2) + (hz / 2)) / hz) - 1;
 #endif
@@ -377,9 +377,9 @@ class BeepPin2
    */
   static constexpr uint16_t freq(const float hz)
   {
-#ifndef ELBEARBOY 
+#ifndef BEARBOARD 
     return (uint16_t) (((F_CPU / 128 / 2) + (hz / 2)) / hz) - 1;
-#else // ELBEARBOY
+#else // BEARBOARD
 	//return (uint16_t) ((F_CPU/32/hz)-(1/2)) ; 
 	return (uint16_t) (((F_CPU / 16 / 2) + (hz / 2)) / hz) - 1;
 #endif

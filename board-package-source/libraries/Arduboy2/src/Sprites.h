@@ -5,8 +5,8 @@
  */
 
 #ifdef MCU_MIK32_Amur
-	#define ELBEARBOY
-	#warning ELBEARBOY!
+	#define BEARBOARD
+	#warning BEARBOARD!
 #endif
 
 

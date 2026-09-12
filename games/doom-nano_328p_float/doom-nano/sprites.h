@@ -1,7 +1,7 @@
 #ifndef _sprites_h
 #define _sprites_h
 
-#if !defined(ELBEARBOY)
+#if !defined(BEARBOARD)
   #include <avr/pgmspace.h>
 #endif
 #include <stdint.h>

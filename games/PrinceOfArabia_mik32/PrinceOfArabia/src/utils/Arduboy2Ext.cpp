@@ -69,7 +69,7 @@ uint16_t rnd = 0xACE1;
 
 uint8_t Arduboy2Ext::randomLFSR(uint8_t min, uint8_t max) {
   uint16_t r = rnd;
-  #ifndef ELBEARBOY
+  #ifndef BEARBOARD
   r ^= TCNT0; // add some extra timing randomness
   #else
 	r ^=(uint16_t)TIMER32_2->VALUE;

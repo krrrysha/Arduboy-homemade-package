@@ -113,7 +113,7 @@ void loop()
     arduboy.setRGBled(pgm_read_byte(rgbValues + rgbLed.red), pgm_read_byte(rgbValues + rgbLed.green), pgm_read_byte(rgbValues + rgbLed.blue));
     
 
-    #ifndef ELBEARBOY
+    #ifndef BEARBOARD
         rxled_on ? RXLED1 : RXLED0;
         txled_on ? TXLED1 : TXLED0;
         SPEAKER_1_PORT &= ~_BV(SPEAKER_1_BIT);    

@@ -43,8 +43,8 @@ THE SOFTWARE.
 #include <ArduboyFX.h>
 
 #ifdef MCU_MIK32_Amur
-  #define ELBEARBOY
-  #warning ELBEARBOY!
+  #define BEARBOARD
+  #warning BEARBOARD!
   #include <mik32_hal_irq.h>
   	#include "Arduboy2.h" // в оригинальной библиотеке нет связи с Arduboy2. видимо может использоваться отдельно. Но у нас надо загрузить конкретные варианты пинов для разных схем....
   typedef uint32_t uint24_t;
@@ -134,7 +134,7 @@ THE SOFTWARE.
 // the tone() function.
 #define MAX_TONES 3
 
-#if defined (ELBEARBOY)
+#if defined (BEARBOARD)
 	#ifndef SPIBEAR				
 	#define TONE_PIN 3  // D9/3 port_0_3
 	#define TONE_PIN_PORT GPIO_0->STATE

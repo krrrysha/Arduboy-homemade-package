@@ -2,8 +2,8 @@
 #define ARDUBOYFX_H
 
 #ifdef MCU_MIK32_Amur
-	#define ELBEARBOY
-	#warning ELBEARBOY!
+	#define BEARBOARD
+	#warning BEARBOARD!
 // режимы работы
 // 	чтение ответа ограниченной длины:
 // SFC_JEDEC_ID          = 0x9F; // только опкод | 3 байта ответа
@@ -47,7 +47,7 @@
 // For Arduboy2Base::sBuffer, WIDTH, HEIGHT, CS_PORT ...
 #include <Arduboy2.h>
 
-#ifndef ELBEARBOY // на ELBEARBOY используем SPIFI-flash
+#ifndef BEARBOARD // на BEARBOARD используем SPIFI-flash
 	#if defined (CART_CS_RX)
 	  #define FX_PORT PORTD
 	  #define FX_BIT PORTD2
@@ -67,7 +67,7 @@ constexpr uint16_t FX_DATA_VECTOR_PAGE_POINTER = 0x0016;
 constexpr uint16_t FX_SAVE_VECTOR_KEY_POINTER  = 0x0018; /* reserved interrupt vector 6  area */
 constexpr uint16_t FX_SAVE_VECTOR_PAGE_POINTER = 0x001A;
 
-#ifdef ELBEARBOY
+#ifdef BEARBOARD
 //constexpr uint32_t SampeDataKeyPointer[2]={0x4658424F, 0x59444154}; //FXBOYDAT  // когда адрес задан, содержит маскированный ключ: FXBOYDAT в обратном порядке
 
 typedef struct {
@@ -183,7 +183,7 @@ constexpr uint8_t dcmProportional = (1 << dcfProportional); // draw characters w
 // Note above modes may be combined like (dcmMasked | dcmProportional)
 
 
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 using uint24_t = __uint24; 
 #else
 	#include <stdint.h>
@@ -247,7 +247,7 @@ struct FrameData
 
 
 
-#ifdef ELBEARBOY
+#ifdef BEARBOARD
 		#define SPIFI_FIELDFORM_ALL_PARALLEL SPIFI_CONFIG_CMD_FIELDFORM_ALL_PARALLEL
 		#define SPIFI_FRAMEFORM_OPCODE SPIFI_CONFIG_CMD_FRAMEFORM_OPCODE_NOADDR
 		#define SPIFI_FRAMEFORM_3ADDR SPIFI_CONFIG_CMD_FRAMEFORM_NOOPCODE_3ADDR
@@ -312,7 +312,7 @@ class FX
     [[gnu::always_inline]]
     static inline void enableOLED() // selects OLED display.
     {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
       CS_PORT &= ~(1 << CS_BIT);
 #endif
     };
@@ -320,7 +320,7 @@ class FX
     [[gnu::always_inline]]
     static inline void disableOLED() // deselects OLED display.
     {
-#ifndef ELBEARBOY		
+#ifndef BEARBOARD		
       CS_PORT |=  (1 << CS_BIT);
 #endif
     };
@@ -328,7 +328,7 @@ class FX
     [[gnu::always_inline]]
     static inline void enable() // selects external flash memory and allows new commands
     {
-#ifndef ELBEARBOY      
+#ifndef BEARBOARD      
 	  FX_PORT  &= ~(1 << FX_BIT);
 #endif
     };
@@ -337,7 +337,7 @@ class FX
     [[gnu::always_inline]]
     static inline void disable() // deselects external flash memory and ends the last command
     {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
       FX_PORT  |=  (1 << FX_BIT);
 #endif	  
     };
@@ -346,7 +346,7 @@ class FX
     [[gnu::always_inline]]
     static inline void wait() // wait for a pending flash transfer to complete
     {
-#ifndef ELBEARBOY 
+#ifndef BEARBOARD 
       while ((SPSR & (1 << SPIF)) == 0);
 #else
 	// возможно здесь потребуется реализовать какое-то ожидание? 
@@ -361,7 +361,7 @@ class FX
     [[gnu::always_inline]]
     static inline void writeByteBeforeWait(uint8_t data)
     {
-#ifndef ELBEARBOY 
+#ifndef BEARBOARD 
       SPDR = data;
       asm volatile("nop\n");
       wait();
@@ -373,7 +373,7 @@ class FX
     [[gnu::always_inline]]
     static inline void writeByteAfterWait(uint8_t data)
     {
-#ifndef ELBEARBOY 
+#ifndef BEARBOARD 
       wait();
       SPDR = data;
 #else
@@ -410,13 +410,13 @@ class FX
     static void wakeUp(); // Wake up flash memory from power down mode
 
     static void sleep(); // Put flash memory in power down mode for low power
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
     static void writeEnable();// Puts flash memory in write mode, required prior to any write command
 #else
 	__attribute__((section(".ram_text"))) static void writeEnable();
 #endif
 
-    #ifndef ELBEARBOY
+    #ifndef BEARBOARD
 		[[gnu::noinline, gnu::naked]]
 	#else
 		[[gnu::noinline]]
@@ -462,7 +462,7 @@ class FX
       seekData(address + ((index * sizeof(Type)) + offset));
     }
 
-    #ifndef ELBEARBOY
+    #ifndef BEARBOARD
 		[[gnu::noinline, gnu::naked]]
 	#else
 		[[gnu::noinline]]
@@ -475,7 +475,7 @@ class FX
     [[gnu::always_inline]]
     static inline uint8_t readUnsafe() // read flash data without performing any checks and starts the next read.
 		{
-      #ifndef ELBEARBOY
+      #ifndef BEARBOARD
 		  uint8_t result = SPDR;
 		  SPDR = 0;
 		  return result;
@@ -489,7 +489,7 @@ class FX
     [[gnu::always_inline]]
     static inline uint8_t readUnsafeEnd()
     {
-      #ifndef ELBEARBOY
+      #ifndef BEARBOARD
 	  uint8_t result = SPDR;
 	  disable();
       return result;	  
@@ -509,14 +509,14 @@ class FX
     [[gnu::noinline]]
     static uint8_t readPendingLastUInt8();
 
-    #ifndef ELBEARBOY
+    #ifndef BEARBOARD
 		[[gnu::noinline, gnu::naked]]
 	#else
 		[[gnu::noinline]]
 	#endif
     static uint16_t readPendingUInt16(); //read a partly prefetched 16-bit word from the current flash location
 
-    #ifndef ELBEARBOY
+    #ifndef BEARBOARD
 		[[gnu::noinline, gnu::naked]]
 	#else
 		[[gnu::noinline]]
@@ -613,7 +613,7 @@ class FX
     /// * _[trivially copyable](https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable)_
     /// * a _[standard-layout](https://en.cppreference.com/w/cpp/language/data_members#Standard-layout)_ type
     /// Attempting to read an object that does not meet these restrictions will result in _undefined behaviour_.
-#ifndef ELBEARBOY 
+#ifndef BEARBOARD 
     template<typename Type>
     static void saveGameState(const Type & object)
     {
@@ -872,7 +872,7 @@ class FX
 
     static FrameControl frameControl;
 
-	#ifdef ELBEARBOY
+	#ifdef BEARBOARD
 
 
 	static uint32_t my_SPDR_ADDR;

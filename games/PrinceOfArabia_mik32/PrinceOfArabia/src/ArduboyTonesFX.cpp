@@ -55,7 +55,7 @@ struct TonesFX {
 #endif
 };
 
-#ifdef ELBEARBOY	
+#ifdef BEARBOARD	
 static volatile bool tonesPlaying = false;
 #endif
 
@@ -77,14 +77,14 @@ ArduboyTonesFX::ArduboyTonesFX(boolean (*outEn)(), uint16_t *tonesArray, uint8_t
   outputEnabled = outEn;
   tonesBufferFX.FX = tonesArray;
   tonesBufferFX.Len = tonesArrayLen;
-#ifndef ELBEARBOY				 
+#ifndef BEARBOARD				 
   bitClear(TONE_PIN_PORT, TONE_PIN); // set the pin low
   bitSet(TONE_PIN_DDR, TONE_PIN); // set the pin to output mode
 	#ifdef TONES_2_SPEAKER_PINS
 	  bitClear(TONE_PIN2_PORT, TONE_PIN2); // set pin 2 low
 	  bitSet(TONE_PIN2_DDR, TONE_PIN2); // set pin 2 to output mode
 	#endif
-#else	 // ELBEARBOY
+#else	 // BEARBOARD
 	#ifndef SPIBEAR_TM16					 
 	// Timer32_1_ch4, D9= PORT 0.3 
 	PM->CLK_APB_P_SET |= PM_CLOCK_APB_P_TIMER32_1_M | PM_CLOCK_APB_P_GPIO_0_M;
@@ -159,13 +159,13 @@ void ArduboyTonesFX::tonesFromFX(uint24_t tones)
   tonesBufferFX.Head = 0;
   tonesBufferFX.Tail = 255; // odd value to signal fill buffer
   fillBufferFromFX();
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 	#ifdef ECONSOLE
 	  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
 	#else
 	  bitWrite(TIMSK3, OCIE3A, 0); // disable the output compare match interrupt
 	#endif
-#else // ELBEARBOY
+#else // BEARBOARD
 	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
 	#ifndef SPIBEAR_TM16
 		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
@@ -278,7 +278,7 @@ void ArduboyTonesFX::fillBufferFromFX()
 
 void ArduboyTonesFX::noTone()
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 	#ifdef ECONSOLE
 	  bitWrite(TIMSK1, OCIE1A, 0); // disable the output compare match interrupt
 	  TCCR1B = 0; // stop the counter
@@ -290,7 +290,7 @@ void ArduboyTonesFX::noTone()
 	#ifdef TONES_VOLUME_CONTROL
 	  bitClear(TONE_PIN2_PORT, TONE_PIN2); // set pin 2 low
 	#endif
-#else // ELBEARBOY
+#else // BEARBOARD
 	// отключаем прерывания по сравнению. Возможно здесь потребуется перезапуск канала, либо достаточно обнулить OCR или остановить счёт?
 	#ifndef SPIBEAR_TM16
 		EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
@@ -324,7 +324,7 @@ void ArduboyTonesFX::volumeMode(uint8_t mode)
 
 bool ArduboyTonesFX::playing()
 {
-  #ifndef ELBEARBOY
+  #ifndef BEARBOARD
   return TCCR3B;
   #else
   return tonesPlaying;
@@ -358,7 +358,7 @@ void ArduboyTonesFX::nextTone()
 #endif
 
   freq &= ~TONE_HIGH_VOLUME; // strip volume indicator from frequency
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 #ifdef TONES_ADJUST_PRESCALER
   if (freq >= MIN_NO_PRESCALE_FREQ) {
     tccrxbValue = _BV(WGM32) | _BV(CS30); // CTC mode, no prescaling
@@ -381,7 +381,7 @@ void ArduboyTonesFX::nextTone()
 #ifdef TONES_ADJUST_PRESCALER
   }
 #endif
-#else // ELBEARBOY
+#else // BEARBOARD
 	if (freq == 0) { // if tone is silent
       #ifndef SPIBEAR_TM16
 	  ocrValue = F_CPU / SILENT_FREQ / 2 - 1; // dummy tone for silence
@@ -410,7 +410,7 @@ void ArduboyTonesFX::nextTone()
 #ifdef TONES_VOLUME_CONTROL
   if (tonesFX.toneHighVol && !tonesFX.toneSilent) {
     // set pin 2 to the compliment of pin 1
-	#ifndef ELBEARBOY	
+	#ifndef BEARBOARD	
 		if (bitRead(TONE_PIN_PORT, TONE_PIN)) {
 		  bitClear(TONE_PIN2_PORT, TONE_PIN2);
 		}
@@ -421,7 +421,7 @@ void ArduboyTonesFX::nextTone()
 	else {
 		bitClear(TONE_PIN2_PORT, TONE_PIN2); // set pin 2 low for normal volume
 	}
-   #else // ELBEARBOY
+   #else // BEARBOARD
 		if (GPIO_0->STATE & (1 << TONE_PIN)) {GPIO_0->CLEAR = 1 << TONE_PIN2;} // здесь производится инверсия PIN2 относительно PIN1
 		else {GPIO_0->SET = 1 << TONE_PIN2;}
 	}
@@ -438,7 +438,7 @@ void ArduboyTonesFX::nextTone()
   }
 
 
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 	#ifdef ECONSOLE
 	  TCCR1A = 0;
 		#ifdef TONES_ADJUST_PRESCALER
@@ -460,7 +460,7 @@ void ArduboyTonesFX::nextTone()
   tonesFX.durationToggleCount = toggleCount;
 	  bitWrite(TIMSK3, OCIE3A, 1); // enable the output compare match interrupt
 	#endif
-#else // ELBEARBOY
+#else // BEARBOARD
 	  tonesPlaying = true;
 	// Timer32_1_ch4, D9= PORT 0.3 
 	// выполняем на случай, если audio.on/off переключит в неправильный режим
@@ -545,13 +545,13 @@ uint16_t ArduboyTonesFX::getNext()
    #endif
 }
 
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
 	#ifdef ECONSOLE
 	ISR(TIMER1_COMPA_vect)
 	#else
 	ISR(TIMER3_COMPA_vect)
 	#endif
-#else // ELBEARBOY
+#else // BEARBOARD
 	extern "C" __attribute__((section(".ram_text"))) void ISR()
 #endif	
 {
@@ -601,7 +601,7 @@ uint16_t ArduboyTonesFX::getNext()
   );
  #else
 	 
-  #ifdef ELBEARBOY
+  #ifdef BEARBOARD
 	#ifndef SPIBEAR_TM16
 		TIMER32_1->INT_CLEAR =   0xFFFFFFFF;
 	#endif
@@ -613,14 +613,14 @@ uint16_t ArduboyTonesFX::getNext()
   long toggleCount = tonesFX.durationToggleCount;
   if (--toggleCount >= 0) {
     if (!tonesFX.toneSilent) {
-	#ifndef ELBEARBOY		
+	#ifndef BEARBOARD		
 			  bitSet(*(&TONE_PIN_PIN), TONE_PIN); // toggle the pin
 		#ifdef TONES_VOLUME_CONTROL
 			  if (tonesFX.toneHighVol) {
 				bitSet(*(&TONE_PIN2_PIN), TONE_PIN2); // toggle pin 2
 			  }
 		#endif
-	#else // ELBEARBOY
+	#else // BEARBOARD
 		if (GPIO_0->STATE & (1 << TONE_PIN)) {GPIO_0->CLEAR = 1 << TONE_PIN;}
 		else {GPIO_0->SET = 1 << TONE_PIN;}
 		#ifdef TONES_VOLUME_CONTROL
@@ -636,7 +636,7 @@ uint16_t ArduboyTonesFX::getNext()
     tonesFX.durationToggleCount = toggleCount;
   }
   else {
-  #ifdef ELBEARBOY
+  #ifdef BEARBOARD
 		#ifndef SPIBEAR_TM16
 			EPIC->MASK_LEVEL_CLEAR = HAL_EPIC_TIMER32_1_MASK;
 		#else

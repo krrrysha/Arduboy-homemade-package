@@ -14,7 +14,7 @@ inline uint8_t* GetScreenBuffer() { return arduboy.sBuffer; }
 [[gnu::always_inline]]
 inline void drawPixel(uint8_t x, uint8_t y, uint8_t color)
 {
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
   uint16_t row_offset;
   uint8_t bit;
 

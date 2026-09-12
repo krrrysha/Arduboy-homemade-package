@@ -301,7 +301,7 @@ void Sprites::drawBitmap(int16_t x, int16_t y,
       }
       break;
 
-#ifndef ELBEARBOY
+#ifndef BEARBOARD
     case SPRITE_PLUS_MASK:
       // *2 because we use double the bits (mask + bitmap)
       bofs = (uint8_t *)(bitmap + ((start_h * w) + xOffset) * 2);
